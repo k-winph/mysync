@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base app styling. Mobile-first, dark-mode aware via `.dark` on <html>. */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply dark:bg-slate-950 dark:text-slate-100;
+    /* Respect iOS safe areas when installed as PWA */
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  /* Remove number input spinners for a cleaner money field */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer components {
+  .input-base {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base
+      outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30
+      dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100;
+  }
+}

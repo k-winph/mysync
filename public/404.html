@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>MySync</title>
+    <!--
+      GitHub Pages SPA redirect (rafgraph/spa-github-pages technique).
+      GitHub Pages returns this 404.html for any unknown path. We encode the
+      requested path into a query string and bounce to the app's base URL, where
+      the snippet in index.html restores the real route. Keeps deep links working.
+      pathSegmentsToKeep = 1 because the app is served from /mysync/.
+    -->
+    <script>
+      var pathSegmentsToKeep = 1;
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>

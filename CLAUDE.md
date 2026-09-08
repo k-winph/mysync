@@ -381,3 +381,39 @@ finance-app/
 ---
 
 *จบเอกสาร — อัปเดตเอกสารนี้ทุกครั้งที่มีการตัดสินใจเชิงโครงสร้างใหม่*
+
+---
+
+## 12. บันทึกการพัฒนา (Build Log)
+
+### ชื่อแอพ: **MySync** (ล็อกแล้ว)
+
+### การตัดสินใจเชิงโครงสร้างเพิ่มเติม (เฟส 1)
+- **repo/base:** โปรเจกต์อยู่ใน `D:\7 MySync\mysync` โดยตรง → `base: '/mysync/'`
+  ใน vite.config.js และ `basename="/mysync/"` ใน main.jsx (deploy ที่ `.../mysync/`)
+- **React 18** (ไม่ใช่ 19) + **Vite 5** (ไม่ใช่ 8) — เลือกเวอร์ชันเสถียรที่ ecosystem
+  รอบข้าง (recharts, vite-plugin-pwa) เทสต์ครบ พังยากกว่า
+- **Tailwind v3** (config-based) ตามที่เจ้าของเลือก
+- **โครงสร้าง store:** ใช้ Zustand store เดียว (`src/store/useStore.js`) รวม
+  transactions + categories + settings — แอพเล็ก การอ่านข้าม slice ง่ายกว่า
+- **SPA routing บน GitHub Pages:** ใช้เทคนิค 404.html redirect (public/404.html
+  + snippet ใน index.html) เพื่อให้ deep link ไม่ 404
+- **ข้อจำกัด environment:** `npm install` ต้องรันบน Windows โดยตรง (D:\ เป็น NTFS)
+  ไม่รันผ่าน bridge เพราะเขียน node_modules ผ่าน mount ช้ามาก
+
+### สถานะ Checklist เฟส 1
+- [x] ตั้งโปรเจกต์ Vite + Tailwind + Zustand + router + dayjs + lucide
+- [x] ตั้ง base/basename = /mysync/
+- [x] วางโครงโฟลเดอร์ตามข้อ 8
+- [x] Zustand store (transactions + categories + settings) + persist
+- [x] seed หมวดหมู่ default (12 หมวด)
+- [x] utility: formatMoney/parseMoney, uuid, date helpers (day.js)
+- [x] หน้าบันทึกรายรับ-รายจ่าย (เพิ่ม/แก้/ลบ + หมวด + แท็ก + โน้ต)
+- [x] Dashboard สรุปเดือนนี้ (รับ/จ่าย/คงเหลือ + top spending)
+- [x] Dark mode toggle (เก็บใน Settings)
+- [x] Export/Import (Excel via SheetJS + CSV via PapaParse)
+- [x] PWA setup (manifest + service worker via vite-plugin-pwa + icons)
+- [ ] Deploy ขึ้น GitHub Pages (รอทำ)
+- [x] ทดสอบ build + runtime (headless) ผ่าน: คำนวณยอดถูก, dark mode ทำงาน, 0 error
+
+*เฟส 1 พร้อมใช้งาน — รอ `npm install` บนเครื่อง + ทดสอบบนมือถือ + deploy*
