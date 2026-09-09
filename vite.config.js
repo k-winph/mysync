@@ -27,6 +27,16 @@ export default defineConfig({
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
         ],
+        // Long-press the installed app icon to jump straight to adding a record.
+        shortcuts: [
+          {
+            name: 'Quick add',
+            short_name: 'Add',
+            description: 'Add a new transaction',
+            url: '/mysync/?quickadd=1',
+            icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png' }],
+          },
+        ],
       },
     }),
   ],

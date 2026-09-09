@@ -37,3 +37,22 @@ export function getMonthRange(iso) {
 export function isWithin(iso, start, end) {
   return iso >= start && iso <= end
 }
+
+/** Same as getMonthRange but for the month before the given date (default now). */
+export function getPrevMonthRange(iso) {
+  const d = (iso ? dayjs(iso) : dayjs()).subtract(1, 'month')
+  return {
+    start: d.startOf('month').format('YYYY-MM-DD'),
+    end: d.endOf('month').format('YYYY-MM-DD'),
+    label: d.format('MMMM YYYY'),
+  }
+}
+
+/**
+ * Percentage change from `prev` to `curr`. Returns null when there is no
+ * meaningful baseline (prev is 0), so the UI can show a dash instead of Infinity.
+ */
+export function percentChange(prev, curr) {
+  if (!prev) return curr ? null : 0
+  return Math.round(((curr - prev) / prev) * 100)
+}

@@ -31,6 +31,11 @@ export const strings = {
     recent: 'Recent transactions',
     empty: 'No transactions yet. Tap + to add your first one.',
     topCategories: 'Top spending',
+    spendingByCategory: 'Spending by category',
+    quickAdd: 'Quick add',
+    vsLastMonth: 'vs last month',
+    noChange: 'no change',
+    noExpenseData: 'No spending this month yet.',
   },
 
   tx: {
@@ -47,6 +52,30 @@ export const strings = {
     deleteConfirm: 'Delete this transaction?',
     empty: 'No transactions.',
     pickCategory: 'Select a category',
+    noResults: 'No transactions match your filters.',
+  },
+
+  filter: {
+    search: 'Search',
+    searchHint: 'Search note, tag or category',
+    type: 'Type',
+    allTypes: 'All',
+    category: 'Category',
+    allCategories: 'All categories',
+    from: 'From',
+    to: 'To',
+    clear: 'Clear filters',
+    filters: 'Filters',
+    tagSummary: 'Totals by tag',
+    resultCount: (n) => `${n} result${n === 1 ? '' : 's'}`,
+  },
+
+  tag: {
+    title: 'Totals by tag',
+    empty: 'No tags used yet. Add tags to transactions to see totals here.',
+    spent: 'Spent',
+    received: 'Received',
+    count: (n) => `${n} item${n === 1 ? '' : 's'}`,
   },
 
   category: {
