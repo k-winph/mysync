@@ -22,7 +22,9 @@ export default function App() {
   const syncTagsFromTransactions = useStore((s) => s.syncTagsFromTransactions)
 
   // Locked on every load when a PIN is set; unlock lasts for the session only.
-  const [unlocked, setUnlocked] = useState(false)
+  // Initialised from the PIN state at load, so enabling a PIN mid-session does
+  // NOT lock you out immediately — it takes effect on the next open/reload.
+  const [unlocked, setUnlocked] = useState(() => !useStore.getState().settings.pinEnabled)
 
   // Seed default categories on first launch (no-op if user already has some),
   // and make sure tags used by existing transactions are in the managed list.

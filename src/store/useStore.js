@@ -31,6 +31,8 @@ const DEFAULT_SETTINGS = {
   stockApiKey: '', // user's own free API key, stored on-device only
   debtNotify: false, // fire a local notification for due/overdue debts on app open
   lastDebtNotifyAt: null, // YYYY-MM-DD of the last debt notification (once per day)
+  biometricEnabled: false, // unlock with fingerprint/Face (WebAuthn), needs PIN as fallback
+  biometricCredId: null, // stored WebAuthn credential id (base64url)
 }
 
 export const useStore = create(

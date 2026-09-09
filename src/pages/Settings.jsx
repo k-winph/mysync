@@ -1,11 +1,12 @@
-import { useRef, useState } from 'react'
-import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell } from 'lucide-react'
+import { useRef, useState, useEffect } from 'react'
+import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate } from '../utils/date'
 import { exportExcel, exportCSV, importFile } from '../services/exportImport'
 import { PROVIDERS } from '../services/stockApi'
-import { requestNotificationPermission, notificationPermission } from '../utils/notify'
+import { requestNotificationPermission } from '../utils/notify'
+import { biometricAvailable, registerBiometric } from '../utils/webauthn'
 import Card from '../components/ui/Card'
 import CategoryManager from '../components/CategoryManager'
 import TagManager from '../components/TagManager'
@@ -68,6 +69,24 @@ export default function Settings() {
   const [importMsg, setImportMsg] = useState('')
   const [pinModal, setPinModal] = useState(null) // 'set' | 'disable' | null
   const [notifMsg, setNotifMsg] = useState('')
+  const [bioAvailable, setBioAvailable] = useState(false)
+  const [bioMsg, setBioMsg] = useState('')
+
+  useEffect(() => {
+    biometricAvailable().then(setBioAvailable)
+  }, [])
+
+  const onToggleBiometric = async (on) => {
+    setBioMsg('')
+    if (!on) return updateSettings({ biometricEnabled: false, biometricCredId: null })
+    if (!bioAvailable) return setBioMsg(strings.settings.biometricUnavailable)
+    try {
+      const credId = await registerBiometric()
+      updateSettings({ biometricEnabled: true, biometricCredId: credId })
+    } catch {
+      setBioMsg(strings.settings.biometricFailed)
+    }
+  }
 
   // Turning the PIN on/off both go through the PIN modal (set requires entering
   // it twice; turning off requires the current PIN).
@@ -148,6 +167,14 @@ export default function Settings() {
             checked={settings.pinEnabled}
             onChange={onToggleLock}
           />
+          {settings.pinEnabled && bioAvailable && (
+            <ToggleRow
+              icon={Fingerprint}
+              label={strings.settings.biometric}
+              checked={settings.biometricEnabled}
+              onChange={onToggleBiometric}
+            />
+          )}
           <ToggleRow
             icon={Bell}
             label={strings.settings.debtReminders}
@@ -155,6 +182,10 @@ export default function Settings() {
             onChange={onToggleDebtNotify}
           />
         </Card>
+        {settings.pinEnabled && bioAvailable && (
+          <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.biometricHint}</p>
+        )}
+        {bioMsg && <p className="mt-1 px-1 text-xs font-medium text-amber-600">{bioMsg}</p>}
         <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.debtRemindersHint}</p>
         {notifMsg && <p className="mt-1 px-1 text-xs font-medium text-amber-600">{notifMsg}</p>}
       </div>

@@ -478,3 +478,35 @@ finance-app/
 
 ### สรุปเฟส 2: กลุ่ม A + B + C เสร็จครบแล้ว 🎉
 เหลือเฟส 3 (แจ้งเตือน, PIN, หลายสกุลเงิน, i18n ไทย, เป้าหมายออม, auto-tax)
+
+---
+
+## 16. เฟส 3 — กลุ่มแจ้งเตือน & ความปลอดภัย (เสร็จแล้ว)
+
+**เตือน backup:** banner สีเหลืองบน Dashboard เมื่อมีข้อมูลและไม่ได้ backup เกิน 14 วัน
+(เช็กจาก `settings.lastBackupAt`) กดไปหน้า Settings หรือกากบาทปิดได้ (ปิดแบบ session)
+
+**ล็อกแอพด้วย PIN:**
+- `utils/pin.js`: hashPin (SHA-256 + prefix), verifyPin — ไม่เก็บ PIN ตรงๆ เก็บแค่ hash
+- `components/PinPad.jsx`: คีย์แพดตัวเลข (dots + 0-9 + ลบ + ยืนยัน) 4-6 หลัก
+- `components/LockScreen.jsx`: หน้าล็อกเต็มจอ ก่อนเข้าแอพ (ล็อกทุกครั้งที่ reload, ปลดล็อกแค่ session)
+- `components/PinSetupModal.jsx`: ตั้ง PIN (กรอก 2 ครั้ง) / ปิดล็อก (ยืนยัน PIN เดิม)
+- Settings > Security & alerts: toggle App lock
+- **หมายเหตุความปลอดภัย:** เป็น casual lock กันคนแอบดู ไม่ใช่ security จริง (ข้อมูลยังอยู่ localStorage)
+
+**แจ้งเตือนหนี้ใกล้ครบ:**
+- `utils/notify.js`: requestNotificationPermission, showNotification (ผ่าน SW registration ก่อน)
+- App mount: ถ้าเปิด `debtNotify` + permission granted → เตือนหนี้ที่ due ภายใน 3 วัน/เกินกำหนด
+  วันละครั้ง (`lastDebtNotifyAt`)
+- Settings > Security & alerts: toggle Debt due reminders (ขอ permission ตอนเปิด)
+- **ข้อจำกัดสถาปัตยกรรม:** ไม่มีหลังบ้าน → เตือนได้เฉพาะตอน "เปิดแอพ" (foreground)
+  push ตอนแอพปิดต้องมีเซิร์ฟเวอร์ push ซึ่งขัดกับหลัก privacy-first
+
+**ทดสอบ (headless):** PIN ตั้ง/ล็อกตอน reload/ใส่ผิดขึ้น error/ใส่ถูกปลดล็อก, banner backup โผล่
+เมื่อ stale, Security section + toggle ทำงาน, 0 console error
+
+### เหลือในเฟส 3
+- เป้าหมายการออม (Savings Goal)
+- สรุปยื่นภาษีอัตโนมัติ (ดึงรายได้ทั้งปี → Tax)
+- หลายสกุลเงิน
+- ภาษาไทย/อังกฤษ (i18next)

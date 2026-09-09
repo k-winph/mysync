@@ -29,7 +29,8 @@ export default function PinSetupModal({ open, mode, onClose }) {
   const submit = async () => {
     if (mode === 'disable') {
       if (await verifyPin(value, pinHash)) {
-        updateSettings({ pinEnabled: false, pinHash: null })
+        // Biometric requires a PIN fallback, so clear it when the lock is removed.
+        updateSettings({ pinEnabled: false, pinHash: null, biometricEnabled: false, biometricCredId: null })
         onClose()
       } else {
         setError(strings.lock.wrong)

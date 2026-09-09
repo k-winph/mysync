@@ -248,6 +248,10 @@ export const strings = {
     saved: 'Saved',
     security: 'Security & alerts',
     appLock: 'App lock (PIN)',
+    biometric: 'Unlock with biometrics',
+    biometricHint: 'Use your fingerprint or Face to unlock (falls back to PIN).',
+    biometricUnavailable: 'Biometrics are not available on this device/browser.',
+    biometricFailed: 'Could not set up biometrics. Try again.',
     debtReminders: 'Debt due reminders',
     debtRemindersHint:
       'Get a notification when a debt is overdue or due soon — checked when you open the app.',
@@ -263,6 +267,7 @@ export const strings = {
     wrong: 'Wrong PIN. Try again.',
     disableTitle: 'Enter PIN to turn off lock',
     lockedNote: 'MySync is locked',
+    useBiometric: 'Use biometrics',
   },
 
   reminder: {

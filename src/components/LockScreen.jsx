@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react'
-import { Lock } from 'lucide-react'
+import { Lock, Fingerprint } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { verifyPin } from '../utils/pin'
+import { verifyBiometric } from '../utils/webauthn'
 import PinPad from './PinPad'
 
 // Full-screen lock shown before the app when a PIN is enabled. Unlocks for the
-// current session only (re-locks on reload).
+// current session only (re-locks on reload). Offers biometric unlock when set up,
+// always with the PIN as fallback.
 export default function LockScreen({ onUnlock }) {
   const pinHash = useStore((s) => s.settings.pinHash)
+  const biometricEnabled = useStore((s) => s.settings.biometricEnabled)
+  const biometricCredId = useStore((s) => s.settings.biometricCredId)
   const [value, setValue] = useState('')
   const [error, setError] = useState('')
 
   const submit = async () => {
-    if (await verifyPin(value, pinHash)) {
-      onUnlock()
-    } else {
+    if (await verifyPin(value, pinHash)) onUnlock()
+    else {
       setError(strings.lock.wrong)
       setValue('')
     }
@@ -26,6 +29,20 @@ export default function LockScreen({ onUnlock }) {
     if (value.length === 6) submit()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
+
+  const tryBiometric = async () => {
+    try {
+      if (await verifyBiometric(biometricCredId)) onUnlock()
+    } catch {
+      /* cancelled or failed — user can use the PIN */
+    }
+  }
+
+  // Prompt biometrics automatically on open when set up.
+  useEffect(() => {
+    if (biometricEnabled && biometricCredId) tryBiometric()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 px-8 dark:bg-slate-950">
@@ -38,6 +55,14 @@ export default function LockScreen({ onUnlock }) {
       <div className="w-full max-w-xs">
         <PinPad value={value} onChange={(v) => { setValue(v); setError('') }} />
       </div>
+      {biometricEnabled && biometricCredId && (
+        <button
+          onClick={tryBiometric}
+          className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-brand-600"
+        >
+          <Fingerprint size={20} /> {strings.lock.useBiometric}
+        </button>
+      )}
     </div>
   )
 }
