@@ -294,49 +294,53 @@ function InvestmentsCard({ portfolios, holdings, onOpen }) {
   const segments = total > 0 ? shares.map((s) => ({ pct: (s.value / total) * 100, color: s.color })) : []
 
   return (
-    <button onClick={onOpen} className="block w-full space-y-2 text-left">
-      {/* Value + today's change hero */}
-      <Card className="bg-gradient-to-br from-brand-600 to-brand-700 text-white">
-        <div className="mb-1 flex items-center justify-between">
-          <span className="text-sm opacity-80">{strings.stock.title}</span>
-          <ChevronRight size={18} className="opacity-80" />
-        </div>
-        {grand.map((g) => {
-          const up = g.hasTodayChange ? g.todayChange >= 0 : g.gain >= 0
-          const cents = g.hasTodayChange ? g.todayChange : g.gain
-          const pct = g.hasTodayChange ? g.todayPct : g.gainPct
-          const label = g.hasTodayChange ? strings.stock.today : strings.stock.allGainLoss
-          return (
-            <div key={g.currency} className="mb-2 last:mb-0">
-              <MoneyText satang={g.value} currency={g.currency} className="text-3xl font-bold" />
-              {(g.hasTodayChange || g.priced > 0) && (
-                <div className={`mt-1 text-sm font-medium ${up ? 'text-emerald-300' : 'text-rose-300'}`}>
-                  {up ? '▲' : '▼'} <MoneyText satang={Math.abs(cents)} currency={g.currency} />{' '}
-                  ({up ? '+' : '-'}{Math.abs(pct).toFixed(2)}%) <span className="opacity-70">{label}</span>
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </Card>
-
-      {/* Portfolio proportions */}
-      {shares.length > 0 && (
-        <Card className="flex items-center gap-4">
-          <Ring segments={segments} />
-          <div className="min-w-0 flex-1 space-y-1.5">
-            {shares.map((s) => (
-              <div key={s.id} className="flex items-center gap-2 text-sm">
-                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
-                <span className="min-w-0 flex-1 truncate">{s.name}</span>
-                <span className="font-semibold">
-                  {total > 0 ? ((s.value / total) * 100).toFixed(1) : '0'}%
-                </span>
-              </div>
-            ))}
+    <button onClick={onOpen} className="block w-full text-left">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800">
+        {/* Top: value + today's change */}
+        <div className="bg-gradient-to-br from-brand-600 to-brand-700 p-4 text-white">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-sm opacity-80">{strings.stock.title}</span>
+            <ChevronRight size={18} className="opacity-80" />
           </div>
-        </Card>
-      )}
+          {grand.map((g) => {
+            const up = g.hasTodayChange ? g.todayChange >= 0 : g.gain >= 0
+            const cents = g.hasTodayChange ? g.todayChange : g.gain
+            const pct = g.hasTodayChange ? g.todayPct : g.gainPct
+            const label = g.hasTodayChange ? strings.stock.today : strings.stock.allGainLoss
+            return (
+              <div key={g.currency} className="mb-2 last:mb-0">
+                <MoneyText satang={g.value} currency={g.currency} className="text-3xl font-bold" />
+                {(g.hasTodayChange || g.priced > 0) && (
+                  <div className={`mt-1 text-sm font-medium ${up ? 'text-emerald-300' : 'text-rose-300'}`}>
+                    {up ? '▲' : '▼'} <MoneyText satang={Math.abs(cents)} currency={g.currency} />{' '}
+                    ({up ? '+' : '-'}{Math.abs(pct).toFixed(2)}%) <span className="opacity-70">{label}</span>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Bottom: donut on the far left, portfolio shares flowing right (scrolls) */}
+        {shares.length > 0 && (
+          <div className="flex items-center gap-4 bg-white p-4 dark:bg-slate-900">
+            <Ring segments={segments} size={64} />
+            <div className="no-scrollbar flex flex-1 items-center gap-6 overflow-x-auto">
+              {shares.map((s) => (
+                <div key={s.id} className="shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
+                    <span className="font-bold">
+                      {total > 0 ? ((s.value / total) * 100).toFixed(1) : '0'}%
+                    </span>
+                  </div>
+                  <div className="mt-0.5 max-w-[140px] truncate text-xs text-slate-500">{s.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </button>
   )
 }
