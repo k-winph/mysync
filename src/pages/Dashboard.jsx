@@ -109,34 +109,32 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Balance hero — tap to open the yearly income/expense breakdown */}
+      {/* Balance + income/expense in one card — tap to open the yearly breakdown */}
       <button onClick={() => navigate('/balance')} className="block w-full text-left">
-        <Card className="bg-gradient-to-br from-brand-600 to-brand-700 text-white">
-          <div className="flex items-center justify-between">
-            <p className="text-sm opacity-80">{strings.dashboard.balance}</p>
-            <ChevronRight size={18} className="opacity-80" />
+        <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800">
+          {/* Top: balance */}
+          <div className="bg-gradient-to-br from-brand-600 to-brand-700 p-4 text-white">
+            <div className="flex items-center justify-between">
+              <p className="text-sm opacity-80">{strings.dashboard.balance}</p>
+              <ChevronRight size={18} className="opacity-80" />
+            </div>
+            <MoneyText satang={cur.balance} className="text-3xl font-bold" />
           </div>
-          <MoneyText satang={cur.balance} className="text-3xl font-bold" />
-        </Card>
+          {/* Bottom: income | expense, split by a divider */}
+          <div className="grid grid-cols-2 divide-x divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">
+            <div className="flex items-center gap-1 p-3">
+              <ArrowUpRight size={16} className="shrink-0 text-green-600" />
+              <span className="text-xs font-medium text-green-600">{strings.dashboard.income}</span>
+              <MoneyText satang={cur.income} className="ml-auto text-sm font-bold" />
+            </div>
+            <div className="flex items-center gap-1 p-3">
+              <ArrowDownRight size={16} className="shrink-0 text-red-600" />
+              <span className="text-xs font-medium text-red-600">{strings.dashboard.expense}</span>
+              <MoneyText satang={cur.expense} className="ml-auto text-sm font-bold" />
+            </div>
+          </div>
+        </div>
       </button>
-
-      {/* Income / Expense — compact */}
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="flex items-center justify-between py-3">
-          <div className="flex items-center gap-1.5 text-green-600">
-            <ArrowUpRight size={18} />
-            <span className="text-sm font-medium">{strings.dashboard.income}</span>
-          </div>
-          <MoneyText satang={cur.income} className="font-bold" />
-        </Card>
-        <Card className="flex items-center justify-between py-3">
-          <div className="flex items-center gap-1.5 text-red-600">
-            <ArrowDownRight size={18} />
-            <span className="text-sm font-medium">{strings.dashboard.expense}</span>
-          </div>
-          <MoneyText satang={cur.expense} className="font-bold" />
-        </Card>
-      </div>
 
       {/* Investments (Dime-style: value + today's change + portfolio shares) */}
       <InvestmentsCard portfolios={portfolios} holdings={holdings} onOpen={() => navigate('/stocks')} />

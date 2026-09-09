@@ -140,7 +140,11 @@ export default function Balance() {
                   />
                   <Tooltip
                     formatter={(value, name) => [formatMoney(Math.round(value * 100), currency), name]}
-                    contentStyle={{ borderRadius: 12, border: 'none', fontSize: 13 }}
+                    // Force a white box with dark label text so the month name is
+                    // readable in both light and dark mode.
+                    contentStyle={{ borderRadius: 12, border: 'none', fontSize: 13, backgroundColor: '#ffffff' }}
+                    labelStyle={{ color: '#0f172a', fontWeight: 600 }}
+                    itemStyle={{ paddingTop: 2, paddingBottom: 2 }}
                     cursor={{ fill: 'rgba(148,163,184,0.12)' }}
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
