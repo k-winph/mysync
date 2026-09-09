@@ -1,10 +1,8 @@
-import { Delete, Check } from 'lucide-react'
+import { Delete } from 'lucide-react'
 
-// Numeric keypad + dot display for entering a 4–6 digit PIN.
-// Controlled: parent owns `value`. `onSubmit` fires when the check key is tapped
-// (enabled only for a 4–6 digit value).
-export default function PinPad({ value, onChange, onSubmit }) {
-  const canSubmit = value.length >= 4 && value.length <= 6
+// Numeric keypad + 6-dot display for entering a 6-digit PIN.
+// Controlled: parent owns `value` and auto-submits once it reaches 6 digits.
+export default function PinPad({ value, onChange }) {
   const press = (d) => value.length < 6 && onChange(value + d)
   const back = () => onChange(value.slice(0, -1))
 
@@ -43,12 +41,10 @@ export default function PinPad({ value, onChange, onSubmit }) {
             {d}
           </Key>
         ))}
-        <Key onClick={back} label="Delete">
-          <Delete size={24} />
-        </Key>
+        <span />
         <Key onClick={() => press('0')}>0</Key>
-        <Key onClick={() => canSubmit && onSubmit()} disabled={!canSubmit} label="Confirm">
-          <Check size={24} className="text-brand-600" />
+        <Key onClick={back} disabled={value.length === 0} label="Delete">
+          <Delete size={24} />
         </Key>
       </div>
     </div>

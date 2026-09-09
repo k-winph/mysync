@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Lock } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -21,6 +21,12 @@ export default function LockScreen({ onUnlock }) {
     }
   }
 
+  // Auto-verify once all 6 digits are entered.
+  useEffect(() => {
+    if (value.length === 6) submit()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 px-8 dark:bg-slate-950">
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-600 text-white">
@@ -30,7 +36,7 @@ export default function LockScreen({ onUnlock }) {
       <p className="mt-1 text-sm text-slate-500">{strings.lock.unlockTitle}</p>
       <div className="mt-2 h-5 text-sm font-medium text-red-600">{error}</div>
       <div className="w-full max-w-xs">
-        <PinPad value={value} onChange={(v) => { setValue(v); setError('') }} onSubmit={submit} />
+        <PinPad value={value} onChange={(v) => { setValue(v); setError('') }} />
       </div>
     </div>
   )

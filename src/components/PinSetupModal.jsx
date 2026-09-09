@@ -57,6 +57,12 @@ export default function PinSetupModal({ open, mode, onClose }) {
     }
   }
 
+  // Auto-advance/verify once all 6 digits are entered.
+  useEffect(() => {
+    if (value.length === 6) submit()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
   const title =
     mode === 'disable'
       ? strings.lock.disableTitle
@@ -68,7 +74,7 @@ export default function PinSetupModal({ open, mode, onClose }) {
     <Modal open={open} onClose={onClose} title={strings.lock.setTitle}>
       <p className="text-center text-sm text-slate-500">{title}</p>
       <div className="h-5 text-center text-sm font-medium text-red-600">{error}</div>
-      <PinPad value={value} onChange={(v) => { setValue(v); setError('') }} onSubmit={submit} />
+      <PinPad value={value} onChange={(v) => { setValue(v); setError('') }} />
     </Modal>
   )
 }

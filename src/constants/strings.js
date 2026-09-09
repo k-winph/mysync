@@ -256,7 +256,7 @@ export const strings = {
 
   lock: {
     setTitle: 'Set a PIN',
-    enterNew: 'Enter a 4–6 digit PIN',
+    enterNew: 'Enter a 6-digit PIN',
     confirmNew: 'Re-enter your PIN',
     mismatch: 'PINs do not match. Try again.',
     unlockTitle: 'Enter PIN',
