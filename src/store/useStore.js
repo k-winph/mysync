@@ -45,6 +45,7 @@ export const useStore = create(
       portfolios: [], // [{ id, name, type:'stock', note, ... }]
       holdings: [], // [{ id, portfolioId, symbol, shares, avgCost(cents), currency, lastPrice, lastPriceAt, ... }]
       fx: null, // cached FX rates: { base, rates: {CUR: perBase}, at } for converting to primary currency
+      savingsGoals: [], // [{ id, name, targetAmount(satang), currentAmount(satang), deadline|null, ... }]
       settings: { ...DEFAULT_SETTINGS },
 
       // --- Seeding ---------------------------------------------------------
@@ -191,6 +192,30 @@ export const useStore = create(
           ),
         })),
 
+      // --- Savings goals ---------------------------------------------------
+      addGoal: (data) =>
+        set((s) => ({ savingsGoals: [...s.savingsGoals, withStamps({ currentAmount: 0, ...data })] })),
+
+      updateGoal: (id, patch) =>
+        set((s) => ({
+          savingsGoals: s.savingsGoals.map((g) =>
+            g.id === id ? { ...g, ...patch, updatedAt: now() } : g
+          ),
+        })),
+
+      deleteGoal: (id) =>
+        set((s) => ({ savingsGoals: s.savingsGoals.filter((g) => g.id !== id) })),
+
+      // Add (or, with a negative delta, withdraw) money to a goal; never below 0.
+      addToGoal: (id, deltaCents) =>
+        set((s) => ({
+          savingsGoals: s.savingsGoals.map((g) =>
+            g.id === id
+              ? { ...g, currentAmount: Math.max(0, g.currentAmount + deltaCents), updatedAt: now() }
+              : g
+          ),
+        })),
+
       // --- Settings --------------------------------------------------------
       updateSettings: (patch) =>
         set((s) => ({ settings: { ...s.settings, ...patch } })),
@@ -201,7 +226,7 @@ export const useStore = create(
       // --- Import / restore ------------------------------------------------
       // Replace transactions and categories from an imported backup.
       // Settings are intentionally left as-is (device-specific).
-      replaceData: ({ transactions, categories, tags, debts, portfolios, holdings }) =>
+      replaceData: ({ transactions, categories, tags, debts, portfolios, holdings, savingsGoals }) =>
         set((s) => ({
           transactions: Array.isArray(transactions) ? transactions : [],
           categories: Array.isArray(categories) ? categories : s.categories,
@@ -209,6 +234,7 @@ export const useStore = create(
           debts: Array.isArray(debts) ? debts : s.debts,
           portfolios: Array.isArray(portfolios) ? portfolios : s.portfolios,
           holdings: Array.isArray(holdings) ? holdings : s.holdings,
+          savingsGoals: Array.isArray(savingsGoals) ? savingsGoals : s.savingsGoals,
         })),
     }),
     {
@@ -224,6 +250,7 @@ export const useStore = create(
         portfolios: s.portfolios,
         holdings: s.holdings,
         fx: s.fx,
+        savingsGoals: s.savingsGoals,
         settings: s.settings,
       }),
     }

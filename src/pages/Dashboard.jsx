@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus,
-  CircleAlert, CalendarClock, ChevronRight, LineChart, Save, X,
+  CircleAlert, CalendarClock, ChevronRight, LineChart, Save, X, PiggyBank,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -34,6 +34,7 @@ export default function Dashboard() {
   const debts = useStore((s) => s.debts)
   const holdings = useStore((s) => s.holdings)
   const portfolios = useStore((s) => s.portfolios)
+  const savingsGoals = useStore((s) => s.savingsGoals)
   const settings = useStore((s) => s.settings)
   const updateSettings = useStore((s) => s.updateSettings)
 
@@ -166,6 +167,9 @@ export default function Dashboard() {
       {/* Investments (Dime-style: value + today's change + portfolio shares) */}
       <InvestmentsCard portfolios={portfolios} holdings={holdings} onOpen={() => navigate('/stocks')} />
 
+      {/* Savings goals */}
+      <SavingsCard goals={savingsGoals} onOpen={() => navigate('/savings')} />
+
       {/* Upcoming / overdue debts */}
       {upcomingDebts.length > 0 && (
         <button onClick={() => navigate('/debt')} className="block w-full text-left">
@@ -284,6 +288,52 @@ function Ring({ segments, size = 68 }) {
     >
       <div className="absolute inset-[26%] rounded-full bg-white dark:bg-slate-900" />
     </div>
+  )
+}
+
+// Savings goals summary: overall progress across all goals, or a simple entry
+// point to set the first one. Taps through to the /savings page.
+function SavingsCard({ goals, onOpen }) {
+  // Empty state — a simple call to action.
+  if (goals.length === 0) {
+    return (
+      <button onClick={onOpen} className="block w-full text-left">
+        <Card className="flex items-center gap-3">
+          <PiggyBank size={22} className="text-brand-600" />
+          <div className="flex-1">
+            <div className="font-semibold">{strings.savings.title}</div>
+            <div className="text-sm text-slate-500">{strings.savings.trackSavings}</div>
+          </div>
+          <ChevronRight size={18} className="text-slate-400" />
+        </Card>
+      </button>
+    )
+  }
+
+  const totalSaved = goals.reduce((s, g) => s + g.currentAmount, 0)
+  const totalTarget = goals.reduce((s, g) => s + g.targetAmount, 0)
+  const pct = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0
+
+  return (
+    <button onClick={onOpen} className="block w-full text-left">
+      <Card className="space-y-2">
+        <div className="flex items-center gap-2">
+          <PiggyBank size={18} className="text-brand-600" />
+          <span className="flex-1 text-sm font-semibold text-slate-500">{strings.savings.title}</span>
+          <ChevronRight size={16} className="text-slate-400" />
+        </div>
+        <div className="flex items-baseline justify-between">
+          <MoneyText satang={totalSaved} className="text-xl font-bold" />
+          <span className="text-sm font-bold tabular-nums text-brand-600">{pct.toFixed(0)}%</span>
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+          <div
+            className={`h-full rounded-full ${pct >= 100 ? 'bg-emerald-500' : 'bg-brand-600'}`}
+            style={{ width: `${Math.min(100, pct)}%` }}
+          />
+        </div>
+      </Card>
+    </button>
   )
 }
 

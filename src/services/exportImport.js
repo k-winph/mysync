@@ -150,6 +150,30 @@ function holdingToRow(h) {
   }
 }
 
+function goalToRow(g) {
+  return {
+    id: g.id,
+    name: g.name,
+    targetAmount: g.targetAmount,
+    currentAmount: g.currentAmount,
+    deadline: g.deadline ?? '',
+    createdAt: g.createdAt,
+    updatedAt: g.updatedAt,
+  }
+}
+
+function rowToGoal(r) {
+  return {
+    id: r.id,
+    name: r.name,
+    targetAmount: Number(r.targetAmount) || 0,
+    currentAmount: Number(r.currentAmount) || 0,
+    deadline: r.deadline || null,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+  }
+}
+
 function rowToHolding(r) {
   return {
     id: r.id,
@@ -176,6 +200,7 @@ export function exportExcel({
   debts = [],
   portfolios = [],
   holdings = [],
+  savingsGoals = [],
 }) {
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(transactions.map(txToRow)), 'Transactions')
@@ -184,6 +209,7 @@ export function exportExcel({
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(debts.map(debtToRow)), 'Debts')
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(portfolios.map(portfolioToRow)), 'Portfolios')
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(holdings.map(holdingToRow)), 'Holdings')
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(savingsGoals.map(goalToRow)), 'SavingsGoals')
   XLSX.writeFile(wb, `mysync-backup-${stamp()}.xlsx`)
 }
 
@@ -227,6 +253,9 @@ function importExcel(file) {
         const hRows = wb.Sheets['Holdings']
           ? XLSX.utils.sheet_to_json(wb.Sheets['Holdings'])
           : []
+        const goalRows = wb.Sheets['SavingsGoals']
+          ? XLSX.utils.sheet_to_json(wb.Sheets['SavingsGoals'])
+          : []
         resolve({
           transactions: txRows.map(rowToTx),
           categories: catRows.map(rowToCat),
@@ -234,6 +263,7 @@ function importExcel(file) {
           debts: debtRows.map(rowToDebt),
           portfolios: pfRows.map(rowToPortfolio),
           holdings: hRows.map(rowToHolding),
+          savingsGoals: goalRows.map(rowToGoal),
         })
       } catch (err) {
         reject(err)
@@ -258,6 +288,7 @@ function importCSV(file) {
             debts: null,
             portfolios: null,
             holdings: null,
+            savingsGoals: null,
           })
         } catch (err) {
           reject(err)

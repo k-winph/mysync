@@ -483,32 +483,56 @@ finance-app/
 
 ## 16. เฟส 3 — กลุ่มแจ้งเตือน & ความปลอดภัย (เสร็จแล้ว)
 
-**เตือน backup:** banner เหลืองบน Dashboard เมื่อมีข้อมูล + ไม่ backup เกิน 14 วัน
-(จาก `settings.lastBackupAt`) กดไป Settings / กากบาทปิด (session)
+**เตือน backup:** banner สีเหลืองบน Dashboard เมื่อมีข้อมูลและไม่ได้ backup เกิน 14 วัน
+(เช็กจาก `settings.lastBackupAt`) กดไปหน้า Settings หรือกากบาทปิดได้ (ปิดแบบ session)
 
-**ล็อกด้วย PIN (6 หลัก):**
-- `utils/pin.js` (hashPin SHA-256, ไม่เก็บ PIN ตรงๆ), `PinPad` (6 หลัก auto-submit ไม่มีปุ่มยืนยัน),
-  `LockScreen` (เต็มจอ ล็อกทุก reload ปลดล็อกแค่ session), `PinSetupModal` (ตั้ง 2 ครั้ง / ปิดต้องยืนยัน)
-- Settings > Security & alerts > App lock
-- **บั๊กที่แก้:** `unlocked` init = `!pinEnabled` — เปิด PIN กลาง session ไม่โดนล็อกเตะออกทันที
-  (ล็อกรอบ reload ถัดไป)
+**ล็อกแอพด้วย PIN:**
+- `utils/pin.js`: hashPin (SHA-256 + prefix), verifyPin — ไม่เก็บ PIN ตรงๆ เก็บแค่ hash
+- `components/PinPad.jsx`: คีย์แพดตัวเลข (dots + 0-9 + ลบ + ยืนยัน) 4-6 หลัก
+- `components/LockScreen.jsx`: หน้าล็อกเต็มจอ ก่อนเข้าแอพ (ล็อกทุกครั้งที่ reload, ปลดล็อกแค่ session)
+- `components/PinSetupModal.jsx`: ตั้ง PIN (กรอก 2 ครั้ง) / ปิดล็อก (ยืนยัน PIN เดิม)
+- Settings > Security & alerts: toggle App lock
+- **หมายเหตุความปลอดภัย:** เป็น casual lock กันคนแอบดู ไม่ใช่ security จริง (ข้อมูลยังอยู่ localStorage)
 
-**ปลดล็อกด้วย biometric (ลายนิ้วมือ/Face):**
-- `utils/webauthn.js`: registerBiometric / verifyBiometric / biometricAvailable (WebAuthn platform
-  authenticator, ไม่มีเซิร์ฟเวอร์ — ceremony ผ่าน = ปลดล็อก)
-- Settings toggle "Unlock with biometrics" (โผล่เฉพาะเมื่อเปิด PIN + เครื่องรองรับ) —
-  เปิด = ลงทะเบียน credential เก็บ id ใน localStorage
-- LockScreen: auto-prompt biometric ตอนเปิด + ปุ่ม "Use biometrics" (fallback เป็น PIN เสมอ)
-- ปิด PIN = เคลียร์ biometric ด้วย | **casual lock ไม่ใช่การเข้ารหัสข้อมูล**
+**แจ้งเตือนหนี้ใกล้ครบ:**
+- `utils/notify.js`: requestNotificationPermission, showNotification (ผ่าน SW registration ก่อน)
+- App mount: ถ้าเปิด `debtNotify` + permission granted → เตือนหนี้ที่ due ภายใน 3 วัน/เกินกำหนด
+  วันละครั้ง (`lastDebtNotifyAt`)
+- Settings > Security & alerts: toggle Debt due reminders (ขอ permission ตอนเปิด)
+- **ข้อจำกัดสถาปัตยกรรม:** ไม่มีหลังบ้าน → เตือนได้เฉพาะตอน "เปิดแอพ" (foreground)
+  push ตอนแอพปิดต้องมีเซิร์ฟเวอร์ push ซึ่งขัดกับหลัก privacy-first
 
-**แจ้งเตือนหนี้:** `utils/notify.js` — App mount ถ้าเปิด `debtNotify`+granted → เตือนหนี้ due ≤3วัน/overdue
-วันละครั้ง (`lastDebtNotifyAt`) | **ข้อจำกัด:** เตือนได้เฉพาะตอนเปิดแอพ (ไม่มี push server)
-
-**ทดสอบ:** PIN ตั้ง/auto-submit/ล็อก-ปลดล็อก, biometric register+verify (virtual authenticator),
-backup banner, 0 console error
+**ทดสอบ (headless):** PIN ตั้ง/ล็อกตอน reload/ใส่ผิดขึ้น error/ใส่ถูกปลดล็อก, banner backup โผล่
+เมื่อ stale, Security section + toggle ทำงาน, 0 console error
 
 ### เหลือในเฟส 3
 - เป้าหมายการออม (Savings Goal)
 - สรุปยื่นภาษีอัตโนมัติ (ดึงรายได้ทั้งปี → Tax)
 - หลายสกุลเงิน
 - ภาษาไทย/อังกฤษ (i18next)
+
+---
+
+## 17. เฟส 3 — กลุ่มปรับแต่ง (เสร็จแล้ว)
+
+**หลายสกุลเงิน:**
+- `utils/money.js`: formatMoney รองรับทุก ISO currency (Intl `narrowSymbol` → ฿ $ € ¥ £ …)
+  + export `CURRENCIES` (THB/USD/EUR/GBP/JPY/SGD/AUD/CNY)
+- Settings: เลือก "สกุลเงินหลัก" (dropdown)
+- **การตัดสินใจ:** เปลี่ยนสกุลเงิน = เปลี่ยนแค่สัญลักษณ์/รูปแบบการแสดงผล **ไม่แปลงตัวเลขข้อมูลเดิม**
+  (ไม่มี FX server, การแปลงย้อนหลังจะเพี้ยน) — มีโน้ตเตือนใน Settings | พอร์ตหุ้นยังแยกตามสกุลเหมือนเดิม
+- (ถ้าจะเพิ่ม FX แปลงสดจริง ค่อยต่อ free rates API ทีหลัง)
+
+**ภาษาไทย/อังกฤษ (i18n แบบเบา ไม่ใช้ i18next):**
+- `constants/strings.js` เปลี่ยนเป็น `{ en, th }` (แปลไทยครบทั้งแอพ)
+- กลไก: `strings` เป็น **Proxy** อ่านภาษาปัจจุบันจากตัวแปร `_lang`; `<App>` เรียก `setLang(settings.language)`
+  ทุก render + subscribe `language` → เปลี่ยนภาษาแล้ว re-render ทั้งต้นไม้ทันที
+- **ข้อดี:** โค้ดเดิมที่เรียก `strings.x` ไม่ต้องแก้เลย (ยกเว้น BottomNav ที่อ่านตอน module-load → ย้ายเข้า component)
+- Settings: สลับ EN/ไทย (segmented) | `getStrings(lang)` สำหรับโค้ดนอก component (เช่น notify ใน App)
+- **หมายเหตุ:** ชื่อหมวด/แท็ก/พอร์ต เป็น "ข้อมูล" ไม่แปลตามภาษา (ผู้ใช้ตั้งเอง)
+
+**ทดสอบ:** สลับ EN↔ไทยทั้งแอพ (nav/settings/ฟอร์ม), เปลี่ยนสกุลเงิน → สัญลักษณ์เปลี่ยน ($), 0 console error
+
+### เหลือในเฟส 3 (กลุ่มการเงินเพิ่มเติม)
+- เป้าหมายการออม (Savings Goal)
+- สรุปยื่นภาษีอัตโนมัติ (ดึงรายได้ทั้งปี → Tax)
