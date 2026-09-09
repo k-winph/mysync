@@ -92,6 +92,12 @@ export function combineToPrimary(groups, field, convert, primary) {
   return { primaryMinor, natives, ok }
 }
 
+/** Sum one field across per-currency groups (native numbers). Currency-agnostic
+ * ratios (e.g. gain%) are computed from these so they work even without FX. */
+export function sumField(groups, field) {
+  return groups.reduce((s, g) => s + (g[field] || 0), 0)
+}
+
 /** Wrap a single amount as a combineToPrimary-shaped result (for one holding). */
 export function singleToPrimary(minor, currency, convert, primary) {
   const c = currency === primary ? minor : convert(minor, currency)

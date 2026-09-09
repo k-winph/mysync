@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Plus, RefreshCw, Pencil, KeyRound, ChevronRight } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { holdingMetrics, totalsByCurrency, combineToPrimary, singleToPrimary } from '../utils/portfolio'
+import { holdingMetrics, totalsByCurrency, combineToPrimary, singleToPrimary, sumField } from '../utils/portfolio'
 import { formatMoney } from '../utils/money'
 import { useQuotes } from '../hooks/useQuotes'
 import { useFx } from '../hooks/useFx'
@@ -99,9 +99,9 @@ export default function PortfolioDetail() {
   const totals = totalsByCurrency(holdings, quoteMap)
   const valueC = combineToPrimary(totals, 'value', convert, primary)
   const gainC = combineToPrimary(totals, 'gain', convert, primary)
-  const costC = combineToPrimary(totals, 'cost', convert, primary)
   const priced = totals.some((g) => g.priced > 0)
-  const gainPct = costC.primaryMinor > 0 ? (gainC.primaryMinor / costC.primaryMinor) * 100 : 0
+  const rawCost = sumField(totals, 'cost')
+  const gainPct = rawCost > 0 ? (sumField(totals, 'gain') / rawCost) * 100 : 0
 
   const openNewHolding = () => {
     setEditingHolding(null)

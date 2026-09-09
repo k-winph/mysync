@@ -7,7 +7,7 @@ import {
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { getMonthRange, isWithin, daysUntil, formatDate } from '../utils/date'
-import { totalsByCurrency, sumValue, combineToPrimary } from '../utils/portfolio'
+import { totalsByCurrency, sumValue, combineToPrimary, sumField } from '../utils/portfolio'
 import { useFx } from '../hooks/useFx'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
@@ -325,13 +325,15 @@ function InvestmentsCard({ portfolios, holdings, onOpen }) {
   // Combine to the primary currency (converted) with native amounts shown small.
   const valueC = combineToPrimary(grand, 'value', convert, primary)
   const gainC = combineToPrimary(grand, 'gain', convert, primary)
-  const costC = combineToPrimary(grand, 'cost', convert, primary)
   const todayC = combineToPrimary(grand, 'todayChange', convert, primary)
   const hasToday = grand.some((g) => g.hasTodayChange)
   const priced = grand.some((g) => g.priced > 0)
-  const gainPct = costC.primaryMinor > 0 ? (gainC.primaryMinor / costC.primaryMinor) * 100 : 0
-  const tBase = valueC.primaryMinor - todayC.primaryMinor
-  const todayPct = tBase > 0 ? (todayC.primaryMinor / tBase) * 100 : 0
+  // % from native sums (currency-agnostic) — correct even without FX rates.
+  const rawCost = sumField(grand, 'cost')
+  const rawToday = sumField(grand, 'todayChange')
+  const rawValue = sumField(grand, 'value')
+  const gainPct = rawCost > 0 ? (sumField(grand, 'gain') / rawCost) * 100 : 0
+  const todayPct = rawValue - rawToday > 0 ? (rawToday / (rawValue - rawToday)) * 100 : 0
   const changeC = hasToday ? todayC : gainC
   const changePct = hasToday ? todayPct : gainPct
   const changeLabel = hasToday ? strings.stock.today : strings.stock.allGainLoss

@@ -1,18 +1,31 @@
 // Foreign-exchange rates for converting holdings into the primary currency.
-// Uses frankfurter.app — free, no API key, CORS-enabled. Rates are ECB
-// reference rates (updated daily) — fine for a personal net-worth view.
+// Free, no API key, CORS-enabled. We try several providers in order so a single
+// outage/block doesn't disable conversion. All return rates expressed PER base
+// (e.g. base THB → { USD: 0.0274 } meaning 1 THB = 0.0274 USD).
+
+const PROVIDERS = [
+  (base) => `https://api.frankfurter.dev/v1/latest?base=${base}`,
+  (base) => `https://api.frankfurter.app/latest?from=${base}`,
+  (base) => `https://open.er-api.com/v6/latest/${base}`,
+]
 
 /**
- * Fetch conversion rates FROM `base` TO each of `symbols`.
- * @returns {Promise<Record<string, number>>} e.g. { USD: 0.0274, EUR: 0.025 }
- *   meaning 1 <base> = 0.0274 USD. Empty object if nothing to fetch.
+ * Fetch conversion rates FROM `base` to the needed `symbols`.
+ * Returns all available rates (per base); callers pick what they need.
+ * @returns {Promise<Record<string, number>>}
  */
 export async function fetchRates(base, symbols) {
-  const list = [...new Set(symbols)].filter((c) => c && c !== base)
-  if (list.length === 0) return {}
-  const url = `https://api.frankfurter.app/latest?from=${encodeURIComponent(base)}&to=${list.join(',')}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error('FX_HTTP_' + res.status)
-  const data = await res.json()
-  return data.rates || {}
+  const need = [...new Set(symbols)].filter((c) => c && c !== base)
+  if (need.length === 0) return {}
+  for (const build of PROVIDERS) {
+    try {
+      const res = await fetch(build(base))
+      if (!res.ok) continue
+      const data = await res.json()
+      if (data && data.rates && Object.keys(data.rates).length) return data.rates
+    } catch {
+      // try the next provider
+    }
+  }
+  throw new Error('FX_UNAVAILABLE')
 }

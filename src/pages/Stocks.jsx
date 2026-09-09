@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, Plus, RefreshCw, Eye, EyeOff, ChevronRight, KeyRound } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { totalsByCurrency, combineToPrimary } from '../utils/portfolio'
+import { totalsByCurrency, combineToPrimary, sumField } from '../utils/portfolio'
 import { useQuotes } from '../hooks/useQuotes'
 import { useFx } from '../hooks/useFx'
 import Card from '../components/ui/Card'
@@ -32,9 +32,13 @@ export default function Stocks() {
   const todayC = combineToPrimary(grand, 'todayChange', convert, primary)
   const hasToday = grand.some((g) => g.hasTodayChange)
   const priced = grand.some((g) => g.priced > 0)
-  const gainPct = costC.primaryMinor > 0 ? (gainC.primaryMinor / costC.primaryMinor) * 100 : 0
-  const todayBase = valueC.primaryMinor - todayC.primaryMinor
-  const todayPct = todayBase > 0 ? (todayC.primaryMinor / todayBase) * 100 : 0
+  // Percentages come from native sums (currency-agnostic) so they're correct
+  // even before/without FX rates.
+  const rawCost = sumField(grand, 'cost')
+  const rawToday = sumField(grand, 'todayChange')
+  const rawValue = sumField(grand, 'value')
+  const gainPct = rawCost > 0 ? (sumField(grand, 'gain') / rawCost) * 100 : 0
+  const todayPct = rawValue - rawToday > 0 ? (rawToday / (rawValue - rawToday)) * 100 : 0
 
   return (
     <div className="space-y-5">
@@ -108,8 +112,9 @@ export default function Stocks() {
             const pv = combineToPrimary(totals, 'value', convert, primary)
             const pt = combineToPrimary(totals, 'todayChange', convert, primary)
             const pfHasToday = totals.some((g) => g.hasTodayChange)
-            const ptBase = pv.primaryMinor - pt.primaryMinor
-            const ptPct = ptBase > 0 ? (pt.primaryMinor / ptBase) * 100 : 0
+            const rawV = sumField(totals, 'value')
+            const rawT = sumField(totals, 'todayChange')
+            const ptPct = rawV - rawT > 0 ? (rawT / (rawV - rawT)) * 100 : 0
             return (
               <button key={pf.id} onClick={() => navigate(`/stocks/${pf.id}`)} className="block w-full text-left">
                 <Card className="flex items-center gap-3">
