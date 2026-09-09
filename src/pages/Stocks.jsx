@@ -172,16 +172,17 @@ export default function Stocks() {
   )
 }
 
-// White variant of the change line for use on the colored hero card.
+// Change line for the colored hero card — green/red, tuned for contrast on the
+// brand gradient.
 function ChangeLineWhite({ cents, pct, currency, label }) {
   if (cents == null) return null
   const up = cents >= 0
   return (
-    <span className="inline-flex items-center gap-1 text-sm font-medium text-white/90">
+    <span className={`inline-flex items-center gap-1 text-sm font-medium ${up ? 'text-emerald-300' : 'text-rose-300'}`}>
       {up ? '▲' : '▼'}
       <MoneyText satang={Math.abs(cents)} currency={currency} />
       {pct != null && <span>({up ? '+' : '-'}{Math.abs(pct).toFixed(2)}%)</span>}
-      {label && <span className="opacity-70">{label}</span>}
+      {label && <span className="text-white/70">{label}</span>}
     </span>
   )
 }

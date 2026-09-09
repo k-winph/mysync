@@ -166,11 +166,20 @@ export const useStore = create(
 
       deleteHolding: (id) => set((s) => ({ holdings: s.holdings.filter((h) => h.id !== id) })),
 
-      // Cache the latest fetched price so it can show instantly next open.
-      cacheHoldingPrice: (id, priceCents, at) =>
+      // Cache the latest fetched quote (price + today's change) so it can show
+      // instantly next open — including on the dashboard, which never calls the API.
+      cacheHoldingPrice: (id, quote, at) =>
         set((s) => ({
           holdings: s.holdings.map((h) =>
-            h.id === id ? { ...h, lastPrice: priceCents, lastPriceAt: at } : h
+            h.id === id
+              ? {
+                  ...h,
+                  lastPrice: quote.priceCents,
+                  lastChangeCents: quote.changeCents ?? null,
+                  lastChangePct: quote.changePct ?? null,
+                  lastPriceAt: at,
+                }
+              : h
           ),
         })),
 

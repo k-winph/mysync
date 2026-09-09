@@ -7,7 +7,7 @@ import {
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { getMonthRange, getPrevMonthRange, isWithin, percentChange, daysUntil, formatDate } from '../utils/date'
-import { totalsByCurrency } from '../utils/portfolio'
+import { totalsByCurrency, sumValue } from '../utils/portfolio'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import TransactionItem from '../components/TransactionItem'
@@ -54,6 +54,7 @@ export default function Dashboard() {
   const categories = useStore((s) => s.categories)
   const debts = useStore((s) => s.debts)
   const holdings = useStore((s) => s.holdings)
+  const portfolios = useStore((s) => s.portfolios)
   const settings = useStore((s) => s.settings)
   const updateSettings = useStore((s) => s.updateSettings)
 
@@ -123,8 +124,6 @@ export default function Dashboard() {
       .sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1))
   }, [debts])
 
-  // Portfolio value using CACHED prices only (no API call on the dashboard).
-  const portfolioTotals = useMemo(() => totalsByCurrency(holdings, {}), [holdings])
 
   return (
     <div className="space-y-5">
@@ -173,6 +172,9 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {/* Investments (Dime-style: value + today's change + portfolio shares) */}
+      <InvestmentsCard portfolios={portfolios} holdings={holdings} onOpen={() => navigate('/stocks')} />
+
       {/* Quick add */}
       <button
         onClick={() => {
@@ -218,33 +220,6 @@ export default function Dashboard() {
           </Card>
         </button>
       )}
-
-      {/* Investments (cached value; tap to view live) */}
-      <button onClick={() => navigate('/stocks')} className="block w-full text-left">
-        <Card className="flex items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
-            bg-brand-50 text-brand-600 dark:bg-brand-600/20">
-            <LineChart size={20} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <div className="font-semibold">{strings.stock.title}</div>
-            {portfolioTotals.length === 0 && (
-              <div className="text-xs text-slate-500">{strings.dashboard.trackStocks}</div>
-            )}
-          </div>
-          <div className="text-right">
-            {portfolioTotals.map((g) => (
-              <MoneyText
-                key={g.currency}
-                satang={g.value}
-                currency={g.currency}
-                className="block font-bold"
-              />
-            ))}
-          </div>
-          <ChevronRight size={18} className="shrink-0 text-slate-400" />
-        </Card>
-      </button>
 
       {/* Spending by category (donut) */}
       <div>
@@ -294,5 +269,108 @@ export default function Dashboard() {
         }}
       />
     </div>
+  )
+}
+
+// Colors assigned to portfolios in the proportion donut (by index, stable order).
+const PF_COLORS = ['#22c55e', '#0ea5e9', '#f97316', '#a855f7', '#eab308', '#ec4899', '#14b8a6', '#94a3b8']
+
+// A conic-gradient donut ring. `segments`: [{ pct, color }]. Hole matches the card.
+function Ring({ segments, size = 68 }) {
+  let acc = 0
+  const stops = segments.map((s) => {
+    const start = acc
+    acc += s.pct
+    return `${s.color} ${start}% ${acc}%`
+  })
+  if (acc < 100) stops.push(`#e2e8f0 ${acc}% 100%`)
+  return (
+    <div
+      className="relative shrink-0"
+      style={{ width: size, height: size, borderRadius: '9999px', background: `conic-gradient(${stops.join(',')})` }}
+    >
+      <div className="absolute inset-[26%] rounded-full bg-white dark:bg-slate-900" />
+    </div>
+  )
+}
+
+// Dime-style investments summary: gradient value hero + today's change, with a
+// separate card showing each portfolio's share of the total. Uses CACHED prices
+// (last fetched), so it never calls the API from the dashboard.
+function InvestmentsCard({ portfolios, holdings, onOpen }) {
+  const grand = totalsByCurrency(holdings, {})
+
+  // Empty state — a simple entry point.
+  if (holdings.length === 0) {
+    return (
+      <button onClick={onOpen} className="block w-full text-left">
+        <Card className="flex items-center gap-3 bg-gradient-to-br from-brand-600 to-brand-700 text-white">
+          <LineChart size={22} className="opacity-90" />
+          <div className="flex-1">
+            <div className="font-semibold">{strings.stock.title}</div>
+            <div className="text-sm text-white/80">{strings.dashboard.trackStocks}</div>
+          </div>
+          <ChevronRight size={18} className="text-white/80" />
+        </Card>
+      </button>
+    )
+  }
+
+  // Portfolio shares of the (numeric) total, for the proportion donut.
+  const total = sumValue(holdings, {})
+  const shares = portfolios
+    .map((pf, i) => {
+      const v = sumValue(holdings.filter((h) => h.portfolioId === pf.id), {})
+      return { id: pf.id, name: pf.name, value: v, color: PF_COLORS[i % PF_COLORS.length] }
+    })
+    .filter((p) => p.value > 0)
+    .sort((a, b) => b.value - a.value)
+  const segments = total > 0 ? shares.map((s) => ({ pct: (s.value / total) * 100, color: s.color })) : []
+
+  return (
+    <button onClick={onOpen} className="block w-full space-y-2 text-left">
+      {/* Value + today's change hero */}
+      <Card className="bg-gradient-to-br from-brand-600 to-brand-700 text-white">
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-sm opacity-80">{strings.stock.title}</span>
+          <ChevronRight size={18} className="opacity-80" />
+        </div>
+        {grand.map((g) => {
+          const up = g.hasTodayChange ? g.todayChange >= 0 : g.gain >= 0
+          const cents = g.hasTodayChange ? g.todayChange : g.gain
+          const pct = g.hasTodayChange ? g.todayPct : g.gainPct
+          const label = g.hasTodayChange ? strings.stock.today : strings.stock.allGainLoss
+          return (
+            <div key={g.currency} className="mb-2 last:mb-0">
+              <MoneyText satang={g.value} currency={g.currency} className="text-3xl font-bold" />
+              {(g.hasTodayChange || g.priced > 0) && (
+                <div className={`mt-1 text-sm font-medium ${up ? 'text-emerald-300' : 'text-rose-300'}`}>
+                  {up ? '▲' : '▼'} <MoneyText satang={Math.abs(cents)} currency={g.currency} />{' '}
+                  ({up ? '+' : '-'}{Math.abs(pct).toFixed(2)}%) <span className="opacity-70">{label}</span>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </Card>
+
+      {/* Portfolio proportions */}
+      {shares.length > 0 && (
+        <Card className="flex items-center gap-4">
+          <Ring segments={segments} />
+          <div className="min-w-0 flex-1 space-y-1.5">
+            {shares.map((s) => (
+              <div key={s.id} className="flex items-center gap-2 text-sm">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+                <span className="min-w-0 flex-1 truncate">{s.name}</span>
+                <span className="font-semibold">
+                  {total > 0 ? ((s.value / total) * 100).toFixed(1) : '0'}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+    </button>
   )
 }

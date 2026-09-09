@@ -40,7 +40,7 @@ export function useQuotes(holdings) {
       // Cache each fetched price onto every holding using that symbol.
       for (const h of current) {
         const q = quotes[(h.symbol || '').toUpperCase()]
-        if (q) cacheHoldingPrice(h.id, q.priceCents, at)
+        if (q) cacheHoldingPrice(h.id, q, at)
       }
       if (Object.keys(errors).length > 0) setError('PARTIAL')
     } catch {

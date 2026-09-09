@@ -146,7 +146,7 @@ export default function PortfolioDetail() {
             <div key={g.currency} className="mb-2 last:mb-0">
               <MoneyText satang={g.value} currency={g.currency} className="text-3xl font-bold" />
               {g.priced > 0 && (
-                <div className="mt-1 text-sm text-white/90">
+                <div className={`mt-1 text-sm font-medium ${g.gain >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
                   {g.gain >= 0 ? '▲' : '▼'}{' '}
                   <MoneyText satang={Math.abs(g.gain)} currency={g.currency} />{' '}
                   ({g.gain >= 0 ? '+' : '-'}{Math.abs(g.gainPct).toFixed(2)}%)

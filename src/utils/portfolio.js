@@ -6,16 +6,20 @@
 // portfolio/grand totals are all COMPUTED here and never stored (per spec §6).
 // Only lastPrice / lastPriceAt are cached on the holding for instant display.
 
-/** Metrics for one holding given an optional fresh quote. */
+/** Metrics for one holding given an optional fresh quote.
+ * Falls back to the cached price/change on the holding so pages that don't
+ * fetch (e.g. the dashboard) still show today's change and market value. */
 export function holdingMetrics(h, quote) {
   const priceCents = quote?.priceCents ?? h.lastPrice ?? null
   const hasPrice = priceCents != null
+  const changeCents = quote?.changeCents ?? h.lastChangeCents ?? null
+  const changePct = quote?.changePct ?? h.lastChangePct ?? null
   const cost = h.shares * h.avgCost
   const value = hasPrice ? h.shares * priceCents : null
   const gain = hasPrice ? value - cost : null
   const gainPct = hasPrice && cost > 0 ? (gain / cost) * 100 : null
-  const todayChange = quote?.changeCents != null ? h.shares * quote.changeCents : null
-  return { priceCents, hasPrice, cost, value, gain, gainPct, todayChange, changePct: quote?.changePct ?? null }
+  const todayChange = changeCents != null ? h.shares * changeCents : null
+  return { priceCents, hasPrice, cost, value, gain, gainPct, todayChange, changePct }
 }
 
 /**
@@ -60,6 +64,12 @@ export function totalsByCurrency(holdings, quoteMap = {}) {
         ? (g.todayChange / (g.value - g.todayChange)) * 100
         : 0,
   }))
+}
+
+/** Numeric total value across holdings (all currencies summed). Used only for
+ * rough proportion/share calculations on the dashboard donut. */
+export function sumValue(holdings, quoteMap = {}) {
+  return totalsByCurrency(holdings, quoteMap).reduce((s, g) => s + g.value, 0)
 }
 
 /** Unique, uppercased symbols across holdings (for batch quote fetches). */

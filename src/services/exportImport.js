@@ -142,6 +142,8 @@ function holdingToRow(h) {
     avgCost: h.avgCost, // cents
     currency: h.currency,
     lastPrice: h.lastPrice ?? '',
+    lastChangeCents: h.lastChangeCents ?? '',
+    lastChangePct: h.lastChangePct ?? '',
     lastPriceAt: h.lastPriceAt ?? '',
     createdAt: h.createdAt,
     updatedAt: h.updatedAt,
@@ -157,6 +159,8 @@ function rowToHolding(r) {
     avgCost: Number(r.avgCost) || 0,
     currency: r.currency || 'THB',
     lastPrice: r.lastPrice === '' || r.lastPrice == null ? null : Number(r.lastPrice),
+    lastChangeCents: r.lastChangeCents === '' || r.lastChangeCents == null ? null : Number(r.lastChangeCents),
+    lastChangePct: r.lastChangePct === '' || r.lastChangePct == null ? null : Number(r.lastChangePct),
     lastPriceAt: r.lastPriceAt || null,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
