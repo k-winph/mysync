@@ -27,6 +27,8 @@ const DEFAULT_SETTINGS = {
   pinEnabled: false,
   pinHash: null,
   lastBackupAt: null,
+  stockProvider: 'finnhub',
+  stockApiKey: '', // user's own free API key, stored on-device only
 }
 
 export const useStore = create(
@@ -36,6 +38,8 @@ export const useStore = create(
       categories: [],
       tags: [], // managed tag list: [{ id, name, ... }]
       debts: [], // [{ id, creditor, amount(satang), dueDate, isPaid, note, ... }]
+      portfolios: [], // [{ id, name, type:'stock', note, ... }]
+      holdings: [], // [{ id, portfolioId, symbol, shares, avgCost(cents), currency, lastPrice, lastPriceAt, ... }]
       settings: { ...DEFAULT_SETTINGS },
 
       // --- Seeding ---------------------------------------------------------
@@ -130,6 +134,46 @@ export const useStore = create(
           ),
         })),
 
+      // --- Portfolios & holdings ------------------------------------------
+      addPortfolio: (data) =>
+        set((s) => ({ portfolios: [...s.portfolios, withStamps({ type: 'stock', ...data })] })),
+
+      updatePortfolio: (id, patch) =>
+        set((s) => ({
+          portfolios: s.portfolios.map((p) =>
+            p.id === id ? { ...p, ...patch, updatedAt: now() } : p
+          ),
+        })),
+
+      // Deleting a portfolio also removes its holdings (no orphans).
+      deletePortfolio: (id) =>
+        set((s) => ({
+          portfolios: s.portfolios.filter((p) => p.id !== id),
+          holdings: s.holdings.filter((h) => h.portfolioId !== id),
+        })),
+
+      addHolding: (data) =>
+        set((s) => ({
+          holdings: [...s.holdings, withStamps({ lastPrice: null, lastPriceAt: null, ...data })],
+        })),
+
+      updateHolding: (id, patch) =>
+        set((s) => ({
+          holdings: s.holdings.map((h) =>
+            h.id === id ? { ...h, ...patch, updatedAt: now() } : h
+          ),
+        })),
+
+      deleteHolding: (id) => set((s) => ({ holdings: s.holdings.filter((h) => h.id !== id) })),
+
+      // Cache the latest fetched price so it can show instantly next open.
+      cacheHoldingPrice: (id, priceCents, at) =>
+        set((s) => ({
+          holdings: s.holdings.map((h) =>
+            h.id === id ? { ...h, lastPrice: priceCents, lastPriceAt: at } : h
+          ),
+        })),
+
       // --- Settings --------------------------------------------------------
       updateSettings: (patch) =>
         set((s) => ({ settings: { ...s.settings, ...patch } })),
@@ -140,12 +184,14 @@ export const useStore = create(
       // --- Import / restore ------------------------------------------------
       // Replace transactions and categories from an imported backup.
       // Settings are intentionally left as-is (device-specific).
-      replaceData: ({ transactions, categories, tags, debts }) =>
+      replaceData: ({ transactions, categories, tags, debts, portfolios, holdings }) =>
         set((s) => ({
           transactions: Array.isArray(transactions) ? transactions : [],
           categories: Array.isArray(categories) ? categories : s.categories,
           tags: Array.isArray(tags) ? tags : s.tags,
           debts: Array.isArray(debts) ? debts : s.debts,
+          portfolios: Array.isArray(portfolios) ? portfolios : s.portfolios,
+          holdings: Array.isArray(holdings) ? holdings : s.holdings,
         })),
     }),
     {
@@ -158,6 +204,8 @@ export const useStore = create(
         categories: s.categories,
         tags: s.tags,
         debts: s.debts,
+        portfolios: s.portfolios,
+        holdings: s.holdings,
         settings: s.settings,
       }),
     }

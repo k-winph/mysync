@@ -111,18 +111,75 @@ function rowToDebt(r) {
   }
 }
 
+function portfolioToRow(p) {
+  return {
+    id: p.id,
+    name: p.name,
+    type: p.type || 'stock',
+    note: p.note || '',
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
+  }
+}
+
+function rowToPortfolio(r) {
+  return {
+    id: r.id,
+    name: r.name,
+    type: r.type || 'stock',
+    note: r.note || '',
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+  }
+}
+
+function holdingToRow(h) {
+  return {
+    id: h.id,
+    portfolioId: h.portfolioId,
+    symbol: h.symbol,
+    shares: h.shares,
+    avgCost: h.avgCost, // cents
+    currency: h.currency,
+    lastPrice: h.lastPrice ?? '',
+    lastPriceAt: h.lastPriceAt ?? '',
+    createdAt: h.createdAt,
+    updatedAt: h.updatedAt,
+  }
+}
+
+function rowToHolding(r) {
+  return {
+    id: r.id,
+    portfolioId: r.portfolioId,
+    symbol: r.symbol,
+    shares: Number(r.shares) || 0,
+    avgCost: Number(r.avgCost) || 0,
+    currency: r.currency || 'THB',
+    lastPrice: r.lastPrice === '' || r.lastPrice == null ? null : Number(r.lastPrice),
+    lastPriceAt: r.lastPriceAt || null,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+  }
+}
+
 // --- export -----------------------------------------------------------------
 
-export function exportExcel({ transactions, categories, tags = [], debts = [] }) {
+export function exportExcel({
+  transactions,
+  categories,
+  tags = [],
+  debts = [],
+  portfolios = [],
+  holdings = [],
+}) {
   const wb = XLSX.utils.book_new()
-  const txSheet = XLSX.utils.json_to_sheet(transactions.map(txToRow))
-  const catSheet = XLSX.utils.json_to_sheet(categories.map(catToRow))
-  const tagSheet = XLSX.utils.json_to_sheet(tags.map(tagToRow))
-  const debtSheet = XLSX.utils.json_to_sheet(debts.map(debtToRow))
-  XLSX.utils.book_append_sheet(wb, txSheet, 'Transactions')
-  XLSX.utils.book_append_sheet(wb, catSheet, 'Categories')
-  XLSX.utils.book_append_sheet(wb, tagSheet, 'Tags')
-  XLSX.utils.book_append_sheet(wb, debtSheet, 'Debts')
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(transactions.map(txToRow)), 'Transactions')
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(categories.map(catToRow)), 'Categories')
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(tags.map(tagToRow)), 'Tags')
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(debts.map(debtToRow)), 'Debts')
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(portfolios.map(portfolioToRow)), 'Portfolios')
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(holdings.map(holdingToRow)), 'Holdings')
   XLSX.writeFile(wb, `mysync-backup-${stamp()}.xlsx`)
 }
 
@@ -160,11 +217,19 @@ function importExcel(file) {
         const debtRows = wb.Sheets['Debts']
           ? XLSX.utils.sheet_to_json(wb.Sheets['Debts'])
           : []
+        const pfRows = wb.Sheets['Portfolios']
+          ? XLSX.utils.sheet_to_json(wb.Sheets['Portfolios'])
+          : []
+        const hRows = wb.Sheets['Holdings']
+          ? XLSX.utils.sheet_to_json(wb.Sheets['Holdings'])
+          : []
         resolve({
           transactions: txRows.map(rowToTx),
           categories: catRows.map(rowToCat),
           tags: tagRows.map(rowToTag),
           debts: debtRows.map(rowToDebt),
+          portfolios: pfRows.map(rowToPortfolio),
+          holdings: hRows.map(rowToHolding),
         })
       } catch (err) {
         reject(err)
@@ -182,7 +247,14 @@ function importCSV(file) {
       skipEmptyLines: true,
       complete: (res) => {
         try {
-          resolve({ transactions: res.data.map(rowToTx), categories: null, tags: null, debts: null })
+          resolve({
+            transactions: res.data.map(rowToTx),
+            categories: null,
+            tags: null,
+            debts: null,
+            portfolios: null,
+            holdings: null,
+          })
         } catch (err) {
           reject(err)
         }

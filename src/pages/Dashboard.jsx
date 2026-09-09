@@ -2,11 +2,12 @@ import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus, TrendingUp, TrendingDown,
-  CircleAlert, CalendarClock, ChevronRight,
+  CircleAlert, CalendarClock, ChevronRight, LineChart,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { getMonthRange, getPrevMonthRange, isWithin, percentChange, daysUntil, formatDate } from '../utils/date'
+import { totalsByCurrency } from '../utils/portfolio'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import TransactionItem from '../components/TransactionItem'
@@ -52,6 +53,7 @@ export default function Dashboard() {
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
   const debts = useStore((s) => s.debts)
+  const holdings = useStore((s) => s.holdings)
   const settings = useStore((s) => s.settings)
   const updateSettings = useStore((s) => s.updateSettings)
 
@@ -120,6 +122,9 @@ export default function Dashboard() {
       .filter((d) => !d.isPaid && daysUntil(d.dueDate) <= 14)
       .sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1))
   }, [debts])
+
+  // Portfolio value using CACHED prices only (no API call on the dashboard).
+  const portfolioTotals = useMemo(() => totalsByCurrency(holdings, {}), [holdings])
 
   return (
     <div className="space-y-5">
@@ -213,6 +218,33 @@ export default function Dashboard() {
           </Card>
         </button>
       )}
+
+      {/* Investments (cached value; tap to view live) */}
+      <button onClick={() => navigate('/stocks')} className="block w-full text-left">
+        <Card className="flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
+            bg-brand-50 text-brand-600 dark:bg-brand-600/20">
+            <LineChart size={20} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold">{strings.stock.title}</div>
+            {portfolioTotals.length === 0 && (
+              <div className="text-xs text-slate-500">{strings.dashboard.trackStocks}</div>
+            )}
+          </div>
+          <div className="text-right">
+            {portfolioTotals.map((g) => (
+              <MoneyText
+                key={g.currency}
+                satang={g.value}
+                currency={g.currency}
+                className="block font-bold"
+              />
+            ))}
+          </div>
+          <ChevronRight size={18} className="shrink-0 text-slate-400" />
+        </Card>
+      </button>
 
       {/* Spending by category (donut) */}
       <div>

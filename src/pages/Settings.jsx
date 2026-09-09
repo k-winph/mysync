@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react'
-import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag } from 'lucide-react'
+import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate } from '../utils/date'
 import { exportExcel, exportCSV, importFile } from '../services/exportImport'
+import { PROVIDERS } from '../services/stockApi'
 import Card from '../components/ui/Card'
 import CategoryManager from '../components/CategoryManager'
 import TagManager from '../components/TagManager'
@@ -56,6 +57,8 @@ export default function Settings() {
   const categories = useStore((s) => s.categories)
   const tags = useStore((s) => s.tags)
   const debts = useStore((s) => s.debts)
+  const portfolios = useStore((s) => s.portfolios)
+  const holdings = useStore((s) => s.holdings)
 
   const fileRef = useRef(null)
   const [catOpen, setCatOpen] = useState(false)
@@ -63,7 +66,7 @@ export default function Settings() {
   const [importMsg, setImportMsg] = useState('')
 
   const doExportExcel = () => {
-    exportExcel({ transactions, categories, tags, debts })
+    exportExcel({ transactions, categories, tags, debts, portfolios, holdings })
     markBackupNow()
   }
   const doExportCSV = () => {
@@ -83,6 +86,8 @@ export default function Settings() {
         categories: data.categories ?? categories,
         tags: data.tags ?? tags,
         debts: data.debts ?? debts,
+        portfolios: data.portfolios ?? portfolios,
+        holdings: data.holdings ?? holdings,
       })
       // Make sure any tag names inside imported transactions become chips too.
       syncTagsFromTransactions()
@@ -130,6 +135,37 @@ export default function Settings() {
             label={strings.tagManage.title}
             onClick={() => setTagManageOpen(true)}
           />
+        </Card>
+      </div>
+
+      {/* Stocks */}
+      <div>
+        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.settings.stocks}</h2>
+        <Card className="space-y-3">
+          <div className="flex items-center gap-3">
+            <LineChart size={20} className="text-slate-500" />
+            <span className="flex-1 font-medium">{strings.settings.stockApiKey}</span>
+          </div>
+          <input
+            type="text"
+            value={settings.stockApiKey || ''}
+            onChange={(e) => updateSettings({ stockApiKey: e.target.value.trim() })}
+            placeholder="••••••••••••"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            className="input-base font-mono text-sm"
+          />
+          <p className="text-xs text-slate-500">{strings.settings.stockApiKeyHint}</p>
+          <a
+            href={PROVIDERS[settings.stockProvider || 'finnhub']?.keyUrl || PROVIDERS.finnhub.keyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-sm font-medium text-brand-600"
+          >
+            {strings.settings.getFreeKey} ({PROVIDERS[settings.stockProvider || 'finnhub']?.label})
+            <ExternalLink size={14} />
+          </a>
         </Card>
       </div>
 

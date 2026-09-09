@@ -445,3 +445,36 @@ finance-app/
 
 ### เหลือในเฟส 2 (กลุ่ม C)
 - Stock Portfolio (แยกพอร์ต + ดึงราคาหุ้นจาก API)
+
+---
+
+## 15. เฟส 2 — กลุ่ม C (เสร็จแล้ว) → ปิดเฟส 2
+
+**Stock Portfolio** (เข้าจากการ์ด "Investments" บน Dashboard — คงเมนูล่าง 5 แท็บ):
+- store: `portfolios[]` + `holdings[]` + actions (add/update/delete/cascade) +
+  `cacheHoldingPrice` | settings: `stockProvider`, `stockApiKey`
+- `services/stockApi.js`: service layer สลับ provider ได้ (เริ่มด้วย Finnhub) —
+  getQuote/fetchQuotes คืนราคาเป็นหน่วย cents
+- `utils/portfolio.js`: pure calc (holdingMetrics, totalsByCurrency, uniqueSymbols)
+  — มูลค่า/กำไร/วันนี้ คำนวณสด ไม่เก็บ, cache แค่ lastPrice/lastPriceAt
+- `hooks/useQuotes.js`: ดึง+cache ราคา (auto ตอนเปิด + ปุ่ม refresh) ใช้ร่วม 2 หน้า
+- หน้า **Stocks** (ภาพรวม): มูลค่ารวมทุกพอร์ต (แยกตามสกุลเงิน ไม่ปลอม FX) +
+  วันนี้ + กำไร/ขาดทุนรวม + ปุ่ม 👁 + รายการพอร์ต + refresh
+- หน้า **PortfolioDetail**: รายหุ้น (symbol, จำนวน, ราคา, %วันนี้, มูลค่า,
+  กำไร/ขาดทุน, ต้นทุนเฉลี่ย) + เพิ่ม/แก้/ลบ + refresh + แก้พอร์ต
+- Dashboard: การ์ด Investments โชว์มูลค่า (ใช้ราคา cache ไม่ยิง API) แตะไปหน้า Stocks
+- Settings: ส่วน Stocks ใส่ API key (เก็บในเครื่อง) + ลิงก์ขอ key ฟรี
+- export/import: รวม Portfolios + Holdings sheets แล้ว
+
+**เงินหน่วย cents:** avgCost/lastPrice เก็บเป็น cents ของสกุลเงินนั้นๆ (เช่น USD)
+รองรับหุ้นไทย .BK (Finnhub ฟรีอาจไม่ครบ) — provider สลับได้ในอนาคต
+
+**ข้อควรรู้:** privacy-first ไม่มีหลังบ้าน ผู้ใช้ใส่ API key ฟรีของตัวเอง |
+เหตุ Zustand v5: selector ห้ามคืน array ใหม่ (เช่น .filter) ต้อง select ดิบ
+แล้ว useMemo ไม่งั้น loop (React #185) — แก้ที่ PortfolioDetail แล้ว
+
+**ทดสอบ:** unit test portfolio calc 14/14, functional (mock Finnhub) —
+มูลค่า/กำไร/วันนี้/overview/dashboard cache ถูกต้อง, 0 console error
+
+### สรุปเฟส 2: กลุ่ม A + B + C เสร็จครบแล้ว 🎉
+เหลือเฟส 3 (แจ้งเตือน, PIN, หลายสกุลเงิน, i18n ไทย, เป้าหมายออม, auto-tax)
