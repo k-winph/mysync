@@ -1,21 +1,23 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import {
-  ChevronLeft, Plus, RefreshCw, Pencil, TrendingUp, TrendingDown, KeyRound, ChevronRight,
-} from 'lucide-react'
+import { ChevronLeft, Plus, RefreshCw, Pencil, KeyRound, ChevronRight } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { holdingMetrics, totalsByCurrency } from '../utils/portfolio'
+import { holdingMetrics, totalsByCurrency, combineToPrimary, singleToPrimary } from '../utils/portfolio'
 import { formatMoney } from '../utils/money'
 import { useQuotes } from '../hooks/useQuotes'
+import { useFx } from '../hooks/useFx'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
+import DualMoney from '../components/DualMoney'
+import FxChange from '../components/FxChange'
 import PortfolioModal from '../components/PortfolioModal'
 import HoldingModal from '../components/HoldingModal'
 
-function HoldingRow({ holding, quote, onEdit }) {
+// Value & gain convert to the primary currency (native shown smaller); the
+// per-share price stays in the stock's own currency.
+function HoldingRow({ holding, quote, onEdit, convert, primary }) {
   const m = holdingMetrics(holding, quote)
-  const gainUp = m.gain != null && m.gain >= 0
   const todayUp = m.changePct != null && m.changePct >= 0
   return (
     <button onClick={() => onEdit(holding)} className="flex w-full items-center gap-3 px-2 py-3 text-left">
@@ -38,11 +40,19 @@ function HoldingRow({ holding, quote, onEdit }) {
       <div className="text-right">
         {m.hasPrice ? (
           <>
-            <MoneyText satang={m.value} currency={holding.currency} className="font-semibold" />
-            <div className={`flex items-center justify-end gap-0.5 text-xs font-medium ${gainUp ? 'text-green-600' : 'text-red-600'}`}>
-              {gainUp ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-              <MoneyText satang={Math.abs(m.gain)} currency={holding.currency} />
-              {m.gainPct != null && <span>({gainUp ? '+' : '-'}{Math.abs(m.gainPct).toFixed(1)}%)</span>}
+            <DualMoney
+              combined={singleToPrimary(m.value, holding.currency, convert, primary)}
+              primary={primary}
+              className="font-semibold"
+              nativeClassName="text-slate-400"
+              stacked
+            />
+            <div className="mt-0.5 flex justify-end">
+              <FxChange
+                combined={singleToPrimary(m.gain, holding.currency, convert, primary)}
+                pct={m.gainPct}
+                primary={primary}
+              />
             </div>
           </>
         ) : (
@@ -66,7 +76,9 @@ export default function PortfolioDetail() {
     [allHoldings, portfolioId]
   )
 
+  const primary = useStore((s) => s.settings.primaryCurrency)
   const { quoteMap, loading, hasKey, error, refresh } = useQuotes(holdings)
+  const { convert } = useFx(holdings.map((h) => h.currency), primary)
 
   const [editPf, setEditPf] = useState(false)
   const [holdingOpen, setHoldingOpen] = useState(false)
@@ -85,6 +97,11 @@ export default function PortfolioDetail() {
   }
 
   const totals = totalsByCurrency(holdings, quoteMap)
+  const valueC = combineToPrimary(totals, 'value', convert, primary)
+  const gainC = combineToPrimary(totals, 'gain', convert, primary)
+  const costC = combineToPrimary(totals, 'cost', convert, primary)
+  const priced = totals.some((g) => g.priced > 0)
+  const gainPct = costC.primaryMinor > 0 ? (gainC.primaryMinor / costC.primaryMinor) * 100 : 0
 
   const openNewHolding = () => {
     setEditingHolding(null)
@@ -140,20 +157,16 @@ export default function PortfolioDetail() {
       <Card className="bg-gradient-to-br from-brand-600 to-brand-700 text-white">
         <p className="text-sm opacity-80">{strings.stock.totalValue}</p>
         {totals.length === 0 ? (
-          <MoneyText satang={0} currency="THB" className="text-3xl font-bold" />
+          <MoneyText satang={0} currency={primary} className="text-3xl font-bold" />
         ) : (
-          totals.map((g) => (
-            <div key={g.currency} className="mb-2 last:mb-0">
-              <MoneyText satang={g.value} currency={g.currency} className="text-3xl font-bold" />
-              {g.priced > 0 && (
-                <div className={`mt-1 text-sm font-medium ${g.gain >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
-                  {g.gain >= 0 ? '▲' : '▼'}{' '}
-                  <MoneyText satang={Math.abs(g.gain)} currency={g.currency} />{' '}
-                  ({g.gain >= 0 ? '+' : '-'}{Math.abs(g.gainPct).toFixed(2)}%)
-                </div>
-              )}
-            </div>
-          ))
+          <>
+            <DualMoney combined={valueC} primary={primary} className="text-3xl font-bold" nativeClassName="text-white/70" stacked />
+            {priced && (
+              <div className="mt-1">
+                <FxChange combined={gainC} pct={gainPct} primary={primary} onGradient />
+              </div>
+            )}
+          </>
         )}
       </Card>
 
@@ -173,6 +186,8 @@ export default function PortfolioDetail() {
                 holding={h}
                 quote={quoteMap[(h.symbol || '').toUpperCase()]}
                 onEdit={openEditHolding}
+                convert={convert}
+                primary={primary}
               />
             ))}
           </Card>

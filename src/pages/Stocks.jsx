@@ -1,32 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  ChevronLeft, Plus, RefreshCw, Eye, EyeOff, ChevronRight,
-  TrendingUp, TrendingDown, KeyRound,
-} from 'lucide-react'
+import { ChevronLeft, Plus, RefreshCw, Eye, EyeOff, ChevronRight, KeyRound } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { totalsByCurrency } from '../utils/portfolio'
+import { totalsByCurrency, combineToPrimary } from '../utils/portfolio'
 import { useQuotes } from '../hooks/useQuotes'
+import { useFx } from '../hooks/useFx'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
+import DualMoney from '../components/DualMoney'
+import FxChange from '../components/FxChange'
 import PortfolioModal from '../components/PortfolioModal'
-
-// Colored gain/today figure: value (in cents of `currency`) + percentage.
-function ChangeLine({ cents, pct, currency, label }) {
-  if (cents == null) return null
-  const up = cents >= 0
-  const Icon = up ? TrendingUp : TrendingDown
-  const cls = up ? 'text-green-600' : 'text-red-600'
-  return (
-    <span className={`inline-flex items-center gap-1 text-sm font-medium ${cls}`}>
-      <Icon size={14} />
-      <MoneyText satang={Math.abs(cents)} currency={currency} />
-      {pct != null && <span>({up ? '+' : '-'}{Math.abs(pct).toFixed(2)}%)</span>}
-      {label && <span className="text-slate-400">{label}</span>}
-    </span>
-  )
-}
 
 export default function Stocks() {
   const navigate = useNavigate()
@@ -34,12 +18,23 @@ export default function Stocks() {
   const holdings = useStore((s) => s.holdings)
   const settings = useStore((s) => s.settings)
   const updateSettings = useStore((s) => s.updateSettings)
+  const primary = settings.primaryCurrency
 
   const { quoteMap, loading, error, hasKey, refresh } = useQuotes(holdings)
+  const { convert } = useFx(holdings.map((h) => h.currency), primary)
 
   const [addOpen, setAddOpen] = useState(false)
 
   const grand = totalsByCurrency(holdings, quoteMap)
+  const valueC = combineToPrimary(grand, 'value', convert, primary)
+  const gainC = combineToPrimary(grand, 'gain', convert, primary)
+  const costC = combineToPrimary(grand, 'cost', convert, primary)
+  const todayC = combineToPrimary(grand, 'todayChange', convert, primary)
+  const hasToday = grand.some((g) => g.hasTodayChange)
+  const priced = grand.some((g) => g.priced > 0)
+  const gainPct = costC.primaryMinor > 0 ? (gainC.primaryMinor / costC.primaryMinor) * 100 : 0
+  const todayBase = valueC.primaryMinor - todayC.primaryMinor
+  const todayPct = todayBase > 0 ? (todayC.primaryMinor / todayBase) * 100 : 0
 
   return (
     <div className="space-y-5">
@@ -81,29 +76,21 @@ export default function Stocks() {
           </Card>
         </button>
       )}
-      {error && hasKey && (
-        <p className="px-1 text-xs text-amber-600">{strings.stock.fetchError}</p>
-      )}
+      {error && hasKey && <p className="px-1 text-xs text-amber-600">{strings.stock.fetchError}</p>}
 
-      {/* Grand total hero (per currency) */}
+      {/* Grand total hero — primary currency (converted) + native breakdown */}
       <Card className="bg-gradient-to-br from-brand-600 to-brand-700 text-white">
         <p className="text-sm opacity-80">{strings.stock.totalValue}</p>
         {grand.length === 0 ? (
-          <MoneyText satang={0} currency={settings.primaryCurrency} className="text-3xl font-bold" />
+          <MoneyText satang={0} currency={primary} className="text-3xl font-bold" />
         ) : (
-          grand.map((g) => (
-            <div key={g.currency} className="mb-2 last:mb-0">
-              <MoneyText satang={g.value} currency={g.currency} className="text-3xl font-bold" />
-              <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-                {g.hasTodayChange && (
-                  <ChangeLineWhite cents={g.todayChange} pct={g.todayPct} currency={g.currency} label={strings.stock.today} />
-                )}
-                {g.priced > 0 && (
-                  <ChangeLineWhite cents={g.gain} pct={g.gainPct} currency={g.currency} label={strings.stock.allGainLoss} />
-                )}
-              </div>
+          <>
+            <DualMoney combined={valueC} primary={primary} className="text-3xl font-bold" nativeClassName="text-white/70" stacked />
+            <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+              {hasToday && <FxChange combined={todayC} pct={todayPct} primary={primary} onGradient label={strings.stock.today} />}
+              {priced && <FxChange combined={gainC} pct={gainPct} primary={primary} onGradient label={strings.stock.allGainLoss} />}
             </div>
-          ))
+          </>
         )}
       </Card>
 
@@ -118,33 +105,30 @@ export default function Stocks() {
           {portfolios.map((pf) => {
             const pfHoldings = holdings.filter((h) => h.portfolioId === pf.id)
             const totals = totalsByCurrency(pfHoldings, quoteMap)
+            const pv = combineToPrimary(totals, 'value', convert, primary)
+            const pt = combineToPrimary(totals, 'todayChange', convert, primary)
+            const pfHasToday = totals.some((g) => g.hasTodayChange)
+            const ptBase = pv.primaryMinor - pt.primaryMinor
+            const ptPct = ptBase > 0 ? (pt.primaryMinor / ptBase) * 100 : 0
             return (
-              <button
-                key={pf.id}
-                onClick={() => navigate(`/stocks/${pf.id}`)}
-                className="block w-full text-left"
-              >
+              <button key={pf.id} onClick={() => navigate(`/stocks/${pf.id}`)} className="block w-full text-left">
                 <Card className="flex items-center gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-semibold">{pf.name}</div>
-                    <div className="text-xs text-slate-500">
-                      {strings.stock.positions(pfHoldings.length)}
-                    </div>
+                    <div className="text-xs text-slate-500">{strings.stock.positions(pfHoldings.length)}</div>
                   </div>
                   <div className="text-right">
                     {totals.length === 0 ? (
-                      <MoneyText satang={0} currency={settings.primaryCurrency} className="font-bold" />
+                      <MoneyText satang={0} currency={primary} className="font-bold" />
                     ) : (
-                      totals.map((g) => (
-                        <div key={g.currency}>
-                          <MoneyText satang={g.value} currency={g.currency} className="font-bold" />
-                          {g.hasTodayChange && (
-                            <div className="text-xs">
-                              <ChangeLine cents={g.todayChange} pct={g.todayPct} currency={g.currency} />
-                            </div>
-                          )}
-                        </div>
-                      ))
+                      <>
+                        <DualMoney combined={pv} primary={primary} className="font-bold" nativeClassName="text-slate-400" />
+                        {pfHasToday && (
+                          <div className="text-xs">
+                            <FxChange combined={pt} pct={ptPct} primary={primary} />
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                   <ChevronRight size={18} className="shrink-0 text-slate-400" />
@@ -169,20 +153,5 @@ export default function Stocks() {
 
       <PortfolioModal open={addOpen} onClose={() => setAddOpen(false)} />
     </div>
-  )
-}
-
-// Change line for the colored hero card — green/red, tuned for contrast on the
-// brand gradient.
-function ChangeLineWhite({ cents, pct, currency, label }) {
-  if (cents == null) return null
-  const up = cents >= 0
-  return (
-    <span className={`inline-flex items-center gap-1 text-sm font-medium ${up ? 'text-emerald-300' : 'text-rose-300'}`}>
-      {up ? '▲' : '▼'}
-      <MoneyText satang={Math.abs(cents)} currency={currency} />
-      {pct != null && <span>({up ? '+' : '-'}{Math.abs(pct).toFixed(2)}%)</span>}
-      {label && <span className="text-white/70">{label}</span>}
-    </span>
   )
 }

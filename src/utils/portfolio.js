@@ -72,6 +72,36 @@ export function sumValue(holdings, quoteMap = {}) {
   return totalsByCurrency(holdings, quoteMap).reduce((s, g) => s + g.value, 0)
 }
 
+/**
+ * Combine one metric (value/cost/gain/todayChange) across per-currency groups
+ * into the primary currency using convert(). Also returns the native amounts of
+ * any non-primary currencies, for showing a smaller secondary figure.
+ * `ok` is false when a needed rate is missing → callers show natives only.
+ * @returns {{ primaryMinor:number, natives:Array<{minor,currency}>, ok:boolean }}
+ */
+export function combineToPrimary(groups, field, convert, primary) {
+  let primaryMinor = 0
+  let ok = true
+  const natives = []
+  for (const g of groups) {
+    const c = g.currency === primary ? g[field] : convert(g[field], g.currency)
+    if (c == null) ok = false
+    else primaryMinor += c
+    if (g.currency !== primary && g[field]) natives.push({ minor: g[field], currency: g.currency })
+  }
+  return { primaryMinor, natives, ok }
+}
+
+/** Wrap a single amount as a combineToPrimary-shaped result (for one holding). */
+export function singleToPrimary(minor, currency, convert, primary) {
+  const c = currency === primary ? minor : convert(minor, currency)
+  return {
+    primaryMinor: c == null ? minor : c,
+    natives: currency !== primary ? [{ minor, currency }] : [],
+    ok: c != null,
+  }
+}
+
 /** Unique, uppercased symbols across holdings (for batch quote fetches). */
 export function uniqueSymbols(holdings) {
   return [...new Set(holdings.map((h) => (h.symbol || '').toUpperCase()).filter(Boolean))]

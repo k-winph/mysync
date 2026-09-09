@@ -44,6 +44,7 @@ export const useStore = create(
       debts: [], // [{ id, creditor, amount(satang), dueDate, isPaid, note, ... }]
       portfolios: [], // [{ id, name, type:'stock', note, ... }]
       holdings: [], // [{ id, portfolioId, symbol, shares, avgCost(cents), currency, lastPrice, lastPriceAt, ... }]
+      fx: null, // cached FX rates: { base, rates: {CUR: perBase}, at } for converting to primary currency
       settings: { ...DEFAULT_SETTINGS },
 
       // --- Seeding ---------------------------------------------------------
@@ -170,6 +171,9 @@ export const useStore = create(
 
       deleteHolding: (id) => set((s) => ({ holdings: s.holdings.filter((h) => h.id !== id) })),
 
+      // Cache FX rates for converting holdings to the primary currency.
+      setFx: (fx) => set({ fx }),
+
       // Cache the latest fetched quote (price + today's change) so it can show
       // instantly next open — including on the dashboard, which never calls the API.
       cacheHoldingPrice: (id, quote, at) =>
@@ -219,6 +223,7 @@ export const useStore = create(
         debts: s.debts,
         portfolios: s.portfolios,
         holdings: s.holdings,
+        fx: s.fx,
         settings: s.settings,
       }),
     }

@@ -7,9 +7,12 @@ import {
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { getMonthRange, isWithin, daysUntil, formatDate } from '../utils/date'
-import { totalsByCurrency, sumValue } from '../utils/portfolio'
+import { totalsByCurrency, sumValue, combineToPrimary } from '../utils/portfolio'
+import { useFx } from '../hooks/useFx'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
+import DualMoney from '../components/DualMoney'
+import FxChange from '../components/FxChange'
 import TransactionItem from '../components/TransactionItem'
 import ExpenseDonut from '../components/ExpenseDonut'
 import TransactionModal from '../components/TransactionModal'
@@ -288,6 +291,8 @@ function Ring({ segments, size = 68 }) {
 // separate card showing each portfolio's share of the total. Uses CACHED prices
 // (last fetched), so it never calls the API from the dashboard.
 function InvestmentsCard({ portfolios, holdings, onOpen }) {
+  const primary = useStore((s) => s.settings.primaryCurrency)
+  const { convert } = useFx(holdings.map((h) => h.currency), primary)
   const grand = totalsByCurrency(holdings, {})
 
   // Empty state — a simple entry point.
@@ -317,6 +322,20 @@ function InvestmentsCard({ portfolios, holdings, onOpen }) {
     .sort((a, b) => b.value - a.value)
   const segments = total > 0 ? shares.map((s) => ({ pct: (s.value / total) * 100, color: s.color })) : []
 
+  // Combine to the primary currency (converted) with native amounts shown small.
+  const valueC = combineToPrimary(grand, 'value', convert, primary)
+  const gainC = combineToPrimary(grand, 'gain', convert, primary)
+  const costC = combineToPrimary(grand, 'cost', convert, primary)
+  const todayC = combineToPrimary(grand, 'todayChange', convert, primary)
+  const hasToday = grand.some((g) => g.hasTodayChange)
+  const priced = grand.some((g) => g.priced > 0)
+  const gainPct = costC.primaryMinor > 0 ? (gainC.primaryMinor / costC.primaryMinor) * 100 : 0
+  const tBase = valueC.primaryMinor - todayC.primaryMinor
+  const todayPct = tBase > 0 ? (todayC.primaryMinor / tBase) * 100 : 0
+  const changeC = hasToday ? todayC : gainC
+  const changePct = hasToday ? todayPct : gainPct
+  const changeLabel = hasToday ? strings.stock.today : strings.stock.allGainLoss
+
   return (
     <button onClick={onOpen} className="block w-full text-left">
       <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800">
@@ -326,23 +345,12 @@ function InvestmentsCard({ portfolios, holdings, onOpen }) {
             <span className="text-sm opacity-80">{strings.stock.title}</span>
             <ChevronRight size={18} className="opacity-80" />
           </div>
-          {grand.map((g) => {
-            const up = g.hasTodayChange ? g.todayChange >= 0 : g.gain >= 0
-            const cents = g.hasTodayChange ? g.todayChange : g.gain
-            const pct = g.hasTodayChange ? g.todayPct : g.gainPct
-            const label = g.hasTodayChange ? strings.stock.today : strings.stock.allGainLoss
-            return (
-              <div key={g.currency} className="mb-2 last:mb-0">
-                <MoneyText satang={g.value} currency={g.currency} className="text-3xl font-bold" />
-                {(g.hasTodayChange || g.priced > 0) && (
-                  <div className={`mt-1 text-sm font-medium ${up ? 'text-emerald-300' : 'text-rose-300'}`}>
-                    {up ? '▲' : '▼'} <MoneyText satang={Math.abs(cents)} currency={g.currency} />{' '}
-                    ({up ? '+' : '-'}{Math.abs(pct).toFixed(2)}%) <span className="opacity-70">{label}</span>
-                  </div>
-                )}
-              </div>
-            )
-          })}
+          <DualMoney combined={valueC} primary={primary} className="text-3xl font-bold" nativeClassName="text-white/70" stacked />
+          {(hasToday || priced) && (
+            <div className="mt-1">
+              <FxChange combined={changeC} pct={changePct} primary={primary} onGradient label={changeLabel} />
+            </div>
+          )}
         </div>
 
         {/* Bottom: donut on the far left, portfolio shares flowing right (scrolls) */}
