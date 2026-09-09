@@ -323,18 +323,18 @@ function InvestmentsCard({ portfolios, holdings, onOpen }) {
 
         {/* Bottom: donut on the far left, portfolio shares flowing right (scrolls) */}
         {shares.length > 0 && (
-          <div className="flex items-center gap-4 bg-white p-4 dark:bg-slate-900">
-            <Ring segments={segments} size={64} />
+          <div className="flex items-center gap-3 bg-white px-4 py-2.5 dark:bg-slate-900">
+            <Ring segments={segments} size={40} />
             <div className="no-scrollbar flex flex-1 items-center gap-6 overflow-x-auto">
               {shares.map((s) => (
                 <div key={s.id} className="shrink-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-                    <span className="font-bold">
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
+                    <span className="text-sm font-bold">
                       {total > 0 ? ((s.value / total) * 100).toFixed(1) : '0'}%
                     </span>
                   </div>
-                  <div className="mt-0.5 max-w-[140px] truncate text-xs text-slate-500">{s.name}</div>
+                  <div className="mt-0.5 max-w-[140px] truncate text-[11px] text-slate-500">{s.name}</div>
                 </div>
               ))}
             </div>
