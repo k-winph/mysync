@@ -127,6 +127,8 @@ export const strings = {
     title: 'Tax Calculator',
     subtitle: 'Thai personal income tax (progressive)',
     annualIncome: 'Annual income',
+    perYear: 'year',
+    infoAria: 'How tax is calculated',
     extraDeductions: 'Extra deductions',
     extraHint: 'Insurance, RMF/SSF, donations, etc.',
     calculate: 'Calculate',
@@ -147,6 +149,29 @@ export const strings = {
     noTax: 'No tax due — taxable income is within the exempt band.',
     disclaimer:
       'Estimate only. Rates and allowances change yearly — verify with the Revenue Department. Not tax advice.',
+  },
+
+  // Educational content for the "i" info modal on the Tax page (Thai).
+  taxInfo: {
+    title: 'ภาษีเงินได้บุคคลธรรมดา (คร่าวๆ)',
+    formulaTitle: 'คิดยังไง',
+    formula: 'ไทยเก็บภาษีแบบขั้นบันได จาก "เงินได้สุทธิ" ไม่ใช่รายได้ทั้งก้อน',
+    formulaLine: 'เงินได้สุทธิ = รายได้ทั้งปี − ค่าใช้จ่าย − ค่าลดหย่อน',
+    bracketsTitle: 'อัตราขั้นบันได (คิดเฉพาะส่วนที่อยู่ในแต่ละช่วง)',
+    thresholdTitle: 'รายได้เท่าไหร่เริ่มเสียภาษี',
+    threshold:
+      'ด้วยลดหย่อนพื้นฐาน (ค่าใช้จ่าย 50% สูงสุด 100,000 + ส่วนตัว 60,000) รายได้ประมาณ ≤ 25,800 บาท/เดือน (~310,000/ปี) มักไม่ต้องเสียภาษี ยิ่งมีลดหย่อนเพิ่มเพดานยิ่งสูงขึ้น แต่ถ้าเงินได้ทั้งปีเกิน 120,000 ยังต้อง "ยื่นแบบ" แม้ภาษีเป็นศูนย์',
+    deductionsTitle: 'ค่าลดหย่อนที่เจอบ่อย',
+    deductions:
+      'นอกจากส่วนตัว 60,000: คู่สมรสไม่มีรายได้ 60,000, บุตร 30,000/คน, พ่อแม่ 30,000/คน, ประกันสังคม (สูงสุด ~9,000), ประกันชีวิต/สุขภาพ, กองทุน SSF/RMF/Thai ESG, ดอกเบี้ยบ้าน, เงินบริจาค ฯลฯ',
+    otherIncomeTitle: 'รายได้อื่นนอกจากเงินเดือน',
+    otherIncome:
+      'โบนัสนับรวมเป็นเงินเดือน (หัก 50% เพดาน 100,000 เหมือนกัน) ส่วนค่าเช่า/ฟรีแลนซ์/ค้าขาย/วิชาชีพอิสระ หักค่าใช้จ่ายคนละเรต — เครื่องคิดเลขนี้ออกแบบสำหรับเงินเดือน+โบนัส ถ้ามีรายได้ประเภทอื่นตัวเลขจะเป็นค่าประเมินคร่าวๆ',
+    usageTitle: 'วิธีใช้หน้านี้',
+    usage:
+      'ช่อง Annual income ใส่รายได้ทั้งปี (รวมโบนัส) | ช่อง Extra deductions ใส่ผลรวมลดหย่อนอื่นๆ ยกเว้นส่วนตัวกับค่าใช้จ่าย (แอพหักให้อัตโนมัติ) เช่น ประกันสังคม+ประกัน+SSF',
+    disclaimer:
+      'ข้อมูลนี้เป็นความรู้ทั่วไป ไม่ใช่คำแนะนำทางภาษี อัตรา/ค่าลดหย่อนเปลี่ยนได้ทุกปี ตรวจกับกรมสรรพากร (rd.go.th) ก่อนยื่นจริงเสมอ',
   },
 
   settings: {

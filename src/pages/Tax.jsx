@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react'
 import { Info } from 'lucide-react'
 import { strings } from '../constants/strings'
 import { calcTax } from '../utils/tax'
+import { TAX_BRACKETS } from '../constants/taxBrackets'
 import { useStore } from '../store/useStore'
 import Card from '../components/ui/Card'
+import Modal from '../components/ui/Modal'
 
 // Format a whole-baht number for display (tax figures are in baht, not satang).
 function baht(n, currency = 'THB') {
@@ -37,6 +39,7 @@ export default function Tax() {
 
   const [income, setIncome] = useState('')
   const [extra, setExtra] = useState('')
+  const [infoOpen, setInfoOpen] = useState(false)
 
   const r = useMemo(
     () => calcTax({ income: parseNum(income), extra: parseNum(extra) }),
@@ -45,15 +48,27 @@ export default function Tax() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold">{strings.tax.title}</h1>
-        <p className="text-sm text-slate-500">{strings.tax.subtitle}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">{strings.tax.title}</h1>
+          <p className="text-sm text-slate-500">{strings.tax.subtitle}</p>
+        </div>
+        <button
+          onClick={() => setInfoOpen(true)}
+          className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+          aria-label={strings.tax.infoAria}
+        >
+          <Info size={22} />
+        </button>
       </div>
 
       {/* Inputs */}
       <Card className="space-y-3">
         <div>
-          <label className="mb-1 block text-sm font-medium">{strings.tax.annualIncome}</label>
+          <label className="mb-1 block text-sm font-medium">
+            {strings.tax.annualIncome}{' '}
+            <span className="font-normal text-slate-400">({strings.tax.perYear})</span>
+          </label>
           <input
             type="number"
             inputMode="decimal"
@@ -148,6 +163,71 @@ export default function Tax() {
         <Info size={16} className="mt-0.5 shrink-0" />
         <p>{strings.tax.disclaimer}</p>
       </div>
+
+      {/* Info modal — quick primer on Thai personal income tax */}
+      <Modal open={infoOpen} onClose={() => setInfoOpen(false)} title={strings.taxInfo.title}>
+        <div className="space-y-4 text-sm leading-relaxed">
+          <section>
+            <h3 className="mb-1 font-semibold">{strings.taxInfo.formulaTitle}</h3>
+            <p className="text-slate-600 dark:text-slate-300">{strings.taxInfo.formula}</p>
+            <p className="mt-1 rounded-lg bg-slate-100 px-3 py-2 text-center text-xs font-medium
+              dark:bg-slate-800">
+              {strings.taxInfo.formulaLine}
+            </p>
+          </section>
+
+          <section>
+            <h3 className="mb-1 font-semibold">{strings.taxInfo.bracketsTitle}</h3>
+            <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+              <table className="w-full text-xs">
+                <tbody>
+                  {TAX_BRACKETS.map((b, i) => {
+                    const prev = i === 0 ? 0 : TAX_BRACKETS[i - 1].limit
+                    const range =
+                      b.limit === Infinity
+                        ? `${prev.toLocaleString()}+`
+                        : `${prev.toLocaleString()}–${b.limit.toLocaleString()}`
+                    return (
+                      <tr key={i} className="border-b border-slate-100 last:border-0 dark:border-slate-800">
+                        <td className="px-3 py-1.5 text-slate-600 dark:text-slate-300">{range}</td>
+                        <td className="px-3 py-1.5 text-right font-semibold">
+                          {b.rate === 0 ? 'ยกเว้น' : `${Math.round(b.rate * 100)}%`}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="mb-1 font-semibold">{strings.taxInfo.thresholdTitle}</h3>
+            <p className="text-slate-600 dark:text-slate-300">{strings.taxInfo.threshold}</p>
+          </section>
+
+          <section>
+            <h3 className="mb-1 font-semibold">{strings.taxInfo.deductionsTitle}</h3>
+            <p className="text-slate-600 dark:text-slate-300">{strings.taxInfo.deductions}</p>
+          </section>
+
+          <section>
+            <h3 className="mb-1 font-semibold">{strings.taxInfo.otherIncomeTitle}</h3>
+            <p className="text-slate-600 dark:text-slate-300">{strings.taxInfo.otherIncome}</p>
+          </section>
+
+          <section>
+            <h3 className="mb-1 font-semibold">{strings.taxInfo.usageTitle}</h3>
+            <p className="text-slate-600 dark:text-slate-300">{strings.taxInfo.usage}</p>
+          </section>
+
+          <div className="flex gap-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-800
+            dark:bg-amber-900/20 dark:text-amber-300">
+            <Info size={16} className="mt-0.5 shrink-0" />
+            <p>{strings.taxInfo.disclaimer}</p>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
