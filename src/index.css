@@ -31,3 +31,14 @@
       dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100;
   }
 }
+
+@layer utilities {
+  /* Hide scrollbar but keep horizontal scrolling (used by tag chip rows). */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

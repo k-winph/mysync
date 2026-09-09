@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react'
-import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags } from 'lucide-react'
+import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate } from '../utils/date'
 import { exportExcel, exportCSV, importFile } from '../services/exportImport'
 import Card from '../components/ui/Card'
 import CategoryManager from '../components/CategoryManager'
+import TagManager from '../components/TagManager'
 
 // A row with a label and a right-aligned toggle switch.
 function ToggleRow({ icon: Icon, label, checked, onChange }) {
@@ -50,15 +51,18 @@ export default function Settings() {
   const updateSettings = useStore((s) => s.updateSettings)
   const markBackupNow = useStore((s) => s.markBackupNow)
   const replaceData = useStore((s) => s.replaceData)
+  const syncTagsFromTransactions = useStore((s) => s.syncTagsFromTransactions)
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
+  const tags = useStore((s) => s.tags)
 
   const fileRef = useRef(null)
   const [catOpen, setCatOpen] = useState(false)
+  const [tagManageOpen, setTagManageOpen] = useState(false)
   const [importMsg, setImportMsg] = useState('')
 
   const doExportExcel = () => {
-    exportExcel({ transactions, categories })
+    exportExcel({ transactions, categories, tags })
     markBackupNow()
   }
   const doExportCSV = () => {
@@ -72,11 +76,14 @@ export default function Settings() {
     if (!file) return
     try {
       const data = await importFile(file)
-      // CSV imports don't include categories -> keep current ones.
+      // CSV imports only carry transactions -> keep current categories/tags.
       replaceData({
         transactions: data.transactions,
         categories: data.categories ?? categories,
+        tags: data.tags ?? tags,
       })
+      // Make sure any tag names inside imported transactions become chips too.
+      syncTagsFromTransactions()
       setImportMsg(strings.settings.importDone)
     } catch {
       setImportMsg(strings.settings.importError)
@@ -108,13 +115,18 @@ export default function Settings() {
         </Card>
       </div>
 
-      {/* Categories */}
+      {/* Categories & tags */}
       <div>
-        <Card>
+        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
           <ActionRow
             icon={Tags}
             label={strings.category.manage}
             onClick={() => setCatOpen(true)}
+          />
+          <ActionRow
+            icon={Tag}
+            label={strings.tagManage.title}
+            onClick={() => setTagManageOpen(true)}
           />
         </Card>
       </div>
@@ -157,6 +169,7 @@ export default function Settings() {
       </div>
 
       <CategoryManager open={catOpen} onClose={() => setCatOpen(false)} />
+      <TagManager open={tagManageOpen} onClose={() => setTagManageOpen(false)} />
     </div>
   )
 }

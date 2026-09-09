@@ -34,6 +34,7 @@ export const useStore = create(
     (set, get) => ({
       transactions: [],
       categories: [],
+      tags: [], // managed tag list: [{ id, name, ... }]
       settings: { ...DEFAULT_SETTINGS },
 
       // --- Seeding ---------------------------------------------------------
@@ -75,6 +76,41 @@ export const useStore = create(
       deleteCategory: (id) =>
         set((s) => ({ categories: s.categories.filter((c) => c.id !== id) })),
 
+      // --- Tags (managed list) --------------------------------------------
+      // Add a tag by name, ignoring blanks and case-insensitive duplicates.
+      // Returns the tag name so callers can immediately select it.
+      addTag: (rawName) => {
+        const name = (rawName || '').trim()
+        if (!name) return null
+        const exists = get().tags.some(
+          (t) => t.name.toLowerCase() === name.toLowerCase()
+        )
+        if (!exists) set((s) => ({ tags: [...s.tags, withStamps({ name })] }))
+        return name
+      },
+
+      deleteTag: (id) =>
+        set((s) => ({ tags: s.tags.filter((t) => t.id !== id) })),
+
+      // Make sure every tag name used by a transaction exists in the managed
+      // list. Run on mount so existing data and CSV imports (which only carry
+      // tag names) still show those tags as selectable chips.
+      syncTagsFromTransactions: () =>
+        set((s) => {
+          const known = new Set(s.tags.map((t) => t.name.toLowerCase()))
+          const additions = []
+          for (const tx of s.transactions) {
+            for (const name of tx.tags || []) {
+              const key = name.toLowerCase()
+              if (name && !known.has(key)) {
+                known.add(key)
+                additions.push(withStamps({ name }))
+              }
+            }
+          }
+          return additions.length ? { tags: [...s.tags, ...additions] } : {}
+        }),
+
       // --- Settings --------------------------------------------------------
       updateSettings: (patch) =>
         set((s) => ({ settings: { ...s.settings, ...patch } })),
@@ -85,10 +121,11 @@ export const useStore = create(
       // --- Import / restore ------------------------------------------------
       // Replace transactions and categories from an imported backup.
       // Settings are intentionally left as-is (device-specific).
-      replaceData: ({ transactions, categories }) =>
-        set(() => ({
+      replaceData: ({ transactions, categories, tags }) =>
+        set((s) => ({
           transactions: Array.isArray(transactions) ? transactions : [],
-          categories: Array.isArray(categories) ? categories : [],
+          categories: Array.isArray(categories) ? categories : s.categories,
+          tags: Array.isArray(tags) ? tags : s.tags,
         })),
     }),
     {
@@ -99,6 +136,7 @@ export const useStore = create(
       partialize: (s) => ({
         transactions: s.transactions,
         categories: s.categories,
+        tags: s.tags,
         settings: s.settings,
       }),
     }

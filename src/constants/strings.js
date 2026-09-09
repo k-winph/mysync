@@ -45,6 +45,8 @@ export const strings = {
     category: 'Category',
     tags: 'Tags',
     tagsHint: 'Comma separated, e.g. trip, work',
+    newTag: 'New tag',
+    noTagsHint: 'No tags yet. Tap Add to create one.',
     note: 'Note',
     date: 'Date',
     addTitle: 'Add transaction',
@@ -76,6 +78,13 @@ export const strings = {
     spent: 'Spent',
     received: 'Received',
     count: (n) => `${n} item${n === 1 ? '' : 's'}`,
+  },
+
+  tagManage: {
+    title: 'Manage tags',
+    name: 'New tag name',
+    empty: 'No tags yet. Create one below.',
+    deleteConfirm: 'Delete this tag? Existing transactions keep the tag on their record.',
   },
 
   category: {

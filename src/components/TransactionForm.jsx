@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { parseMoney, satangToInput } from '../utils/money'
 import { todayISO } from '../utils/date'
+import { Plus } from 'lucide-react'
 import Button from './ui/Button'
 import CategoryIcon from './CategoryIcon'
 
@@ -10,14 +11,34 @@ import CategoryIcon from './CategoryIcon'
 // the parent decides what to do with the result via onSubmit.
 export default function TransactionForm({ initial, onSubmit, onCancel }) {
   const categories = useStore((s) => s.categories)
+  const tagList = useStore((s) => s.tags)
+  const addTag = useStore((s) => s.addTag)
 
   const [type, setType] = useState(initial?.type || 'expense')
   const [amount, setAmount] = useState(initial ? satangToInput(initial.amount) : '')
   const [categoryId, setCategoryId] = useState(initial?.categoryId || '')
-  const [tags, setTags] = useState(initial?.tags?.join(', ') || '')
+  const [selectedTags, setSelectedTags] = useState(initial?.tags || [])
+  const [addingTag, setAddingTag] = useState(false)
+  const [newTag, setNewTag] = useState('')
   const [note, setNote] = useState(initial?.note || '')
   const [date, setDate] = useState(initial?.date || todayISO())
   const [error, setError] = useState('')
+
+  // Toggle a tag name in/out of the selection.
+  const toggleTag = (name) =>
+    setSelectedTags((prev) =>
+      prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name]
+    )
+
+  // Create a new tag, then auto-select it.
+  const handleAddNewTag = () => {
+    const name = addTag(newTag)
+    if (name && !selectedTags.includes(name)) {
+      setSelectedTags((prev) => [...prev, name])
+    }
+    setNewTag('')
+    setAddingTag(false)
+  }
 
   // Categories usable for the selected type (type-specific or "both").
   const options = useMemo(
@@ -40,10 +61,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
       type,
       amount: satang,
       categoryId,
-      tags: tags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean),
+      tags: selectedTags,
       note: note.trim(),
       date,
     })
@@ -132,19 +150,65 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
         />
       </div>
 
-      {/* Tags */}
+      {/* Tags — pick from managed tags (chips scroll horizontally) */}
       <div>
         <label className="mb-1 block text-sm font-medium">
           {strings.tx.tags}{' '}
           <span className="font-normal text-slate-400">({strings.common.optional})</span>
         </label>
-        <input
-          type="text"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          placeholder={strings.tx.tagsHint}
-          className="input-base"
-        />
+
+        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto py-1">
+          {tagList.map((t) => {
+            const active = selectedTags.includes(t.name)
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => toggleTag(t.name)}
+                className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+                  active
+                    ? 'border-brand-600 bg-brand-600 text-white'
+                    : 'border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-300'
+                }`}
+              >
+                #{t.name}
+              </button>
+            )
+          })}
+
+          {/* Inline add-new-tag */}
+          {addingTag ? (
+            <input
+              type="text"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleAddNewTag()
+                }
+              }}
+              onBlur={handleAddNewTag}
+              placeholder={strings.tx.newTag}
+              autoFocus
+              className="w-28 shrink-0 rounded-full border border-brand-500 bg-white px-3 py-1.5
+                text-sm outline-none dark:bg-slate-900"
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAddingTag(true)}
+              className="flex shrink-0 items-center gap-1 rounded-full border border-dashed
+                border-slate-400 px-3 py-1.5 text-sm font-medium text-slate-500
+                dark:border-slate-600"
+            >
+              <Plus size={14} /> {strings.common.add}
+            </button>
+          )}
+        </div>
+        {tagList.length === 0 && !addingTag && (
+          <p className="mt-1 text-xs text-slate-400">{strings.tx.noTagsHint}</p>
+        )}
       </div>
 
       {/* Note */}
