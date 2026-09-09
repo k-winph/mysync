@@ -246,5 +246,34 @@ export const strings = {
     getFreeKey: 'Get a free key',
     provider: 'Provider',
     saved: 'Saved',
+    security: 'Security & alerts',
+    appLock: 'App lock (PIN)',
+    debtReminders: 'Debt due reminders',
+    debtRemindersHint:
+      'Get a notification when a debt is overdue or due soon — checked when you open the app.',
+    notifBlocked: 'Notifications are blocked in your browser settings.',
+  },
+
+  lock: {
+    setTitle: 'Set a PIN',
+    enterNew: 'Enter a 4–6 digit PIN',
+    confirmNew: 'Re-enter your PIN',
+    mismatch: 'PINs do not match. Try again.',
+    unlockTitle: 'Enter PIN',
+    wrong: 'Wrong PIN. Try again.',
+    disableTitle: 'Enter PIN to turn off lock',
+    lockedNote: 'MySync is locked',
+  },
+
+  reminder: {
+    backupTitle: 'Time to back up',
+    backupBody: "It's been a while since your last backup. Export your data to keep it safe.",
+    backupAction: 'Back up now',
+  },
+
+  notify: {
+    debtTitle: 'Debt reminder',
+    debtOne: (creditor) => `${creditor} is due soon`,
+    debtMany: (n) => `${n} debts are due soon or overdue`,
   },
 }

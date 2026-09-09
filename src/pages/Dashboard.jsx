@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus,
-  CircleAlert, CalendarClock, ChevronRight, LineChart,
+  CircleAlert, CalendarClock, ChevronRight, LineChart, Save, X,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -37,7 +37,12 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [addOpen, setAddOpen] = useState(false)
   const [editing, setEditing] = useState(null)
+  const [backupDismissed, setBackupDismissed] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
+
+  // Backup reminder: stale if there's data and no backup in the last 14 days.
+  const daysSinceBackup = settings.lastBackupAt ? -daysUntil(settings.lastBackupAt) : Infinity
+  const showBackupReminder = !backupDismissed && transactions.length > 0 && daysSinceBackup >= 14
 
   // PWA quick-add shortcut lands on /?quickadd=1 — open the add form once.
   useEffect(() => {
@@ -135,6 +140,25 @@ export default function Dashboard() {
           </div>
         </div>
       </button>
+
+      {/* Backup reminder */}
+      {showBackupReminder && (
+        <Card className="flex items-center gap-2 border-amber-300 bg-amber-50 text-sm
+          text-amber-800 dark:border-amber-900/40 dark:bg-amber-900/15 dark:text-amber-300">
+          <Save size={18} className="shrink-0" />
+          <button onClick={() => navigate('/settings')} className="min-w-0 flex-1 text-left">
+            <span className="font-semibold">{strings.reminder.backupTitle}</span>
+            <span className="ml-1 opacity-80">{strings.reminder.backupBody}</span>
+          </button>
+          <button
+            onClick={() => setBackupDismissed(true)}
+            className="shrink-0 rounded-full p-1 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+            aria-label={strings.common.close}
+          >
+            <X size={16} />
+          </button>
+        </Card>
+      )}
 
       {/* Investments (Dime-style: value + today's change + portfolio shares) */}
       <InvestmentsCard portfolios={portfolios} holdings={holdings} onOpen={() => navigate('/stocks')} />

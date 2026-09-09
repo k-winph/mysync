@@ -1,13 +1,15 @@
 import { useRef, useState } from 'react'
-import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink } from 'lucide-react'
+import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate } from '../utils/date'
 import { exportExcel, exportCSV, importFile } from '../services/exportImport'
 import { PROVIDERS } from '../services/stockApi'
+import { requestNotificationPermission, notificationPermission } from '../utils/notify'
 import Card from '../components/ui/Card'
 import CategoryManager from '../components/CategoryManager'
 import TagManager from '../components/TagManager'
+import PinSetupModal from '../components/PinSetupModal'
 
 // A row with a label and a right-aligned toggle switch.
 function ToggleRow({ icon: Icon, label, checked, onChange }) {
@@ -64,6 +66,20 @@ export default function Settings() {
   const [catOpen, setCatOpen] = useState(false)
   const [tagManageOpen, setTagManageOpen] = useState(false)
   const [importMsg, setImportMsg] = useState('')
+  const [pinModal, setPinModal] = useState(null) // 'set' | 'disable' | null
+  const [notifMsg, setNotifMsg] = useState('')
+
+  // Turning the PIN on/off both go through the PIN modal (set requires entering
+  // it twice; turning off requires the current PIN).
+  const onToggleLock = (on) => setPinModal(on ? 'set' : 'disable')
+
+  const onToggleDebtNotify = async (on) => {
+    setNotifMsg('')
+    if (!on) return updateSettings({ debtNotify: false })
+    const perm = await requestNotificationPermission()
+    if (perm === 'granted') updateSettings({ debtNotify: true })
+    else setNotifMsg(strings.settings.notifBlocked)
+  }
 
   const doExportExcel = () => {
     exportExcel({ transactions, categories, tags, debts, portfolios, holdings })
@@ -120,6 +136,27 @@ export default function Settings() {
             onChange={(v) => updateSettings({ hideBalances: v })}
           />
         </Card>
+      </div>
+
+      {/* Security & alerts */}
+      <div>
+        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.settings.security}</h2>
+        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+          <ToggleRow
+            icon={Lock}
+            label={strings.settings.appLock}
+            checked={settings.pinEnabled}
+            onChange={onToggleLock}
+          />
+          <ToggleRow
+            icon={Bell}
+            label={strings.settings.debtReminders}
+            checked={settings.debtNotify}
+            onChange={onToggleDebtNotify}
+          />
+        </Card>
+        <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.debtRemindersHint}</p>
+        {notifMsg && <p className="mt-1 px-1 text-xs font-medium text-amber-600">{notifMsg}</p>}
       </div>
 
       {/* Categories & tags */}
@@ -208,6 +245,7 @@ export default function Settings() {
 
       <CategoryManager open={catOpen} onClose={() => setCatOpen(false)} />
       <TagManager open={tagManageOpen} onClose={() => setTagManageOpen(false)} />
+      <PinSetupModal open={pinModal !== null} mode={pinModal} onClose={() => setPinModal(null)} />
     </div>
   )
 }

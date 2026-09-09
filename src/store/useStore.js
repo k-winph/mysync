@@ -29,6 +29,8 @@ const DEFAULT_SETTINGS = {
   lastBackupAt: null,
   stockProvider: 'finnhub',
   stockApiKey: '', // user's own free API key, stored on-device only
+  debtNotify: false, // fire a local notification for due/overdue debts on app open
+  lastDebtNotifyAt: null, // YYYY-MM-DD of the last debt notification (once per day)
 }
 
 export const useStore = create(
