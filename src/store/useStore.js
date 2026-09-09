@@ -35,6 +35,7 @@ export const useStore = create(
       transactions: [],
       categories: [],
       tags: [], // managed tag list: [{ id, name, ... }]
+      debts: [], // [{ id, creditor, amount(satang), dueDate, isPaid, note, ... }]
       settings: { ...DEFAULT_SETTINGS },
 
       // --- Seeding ---------------------------------------------------------
@@ -111,6 +112,24 @@ export const useStore = create(
           return additions.length ? { tags: [...s.tags, ...additions] } : {}
         }),
 
+      // --- Debts -----------------------------------------------------------
+      addDebt: (data) =>
+        set((s) => ({ debts: [...s.debts, withStamps({ isPaid: false, ...data })] })),
+
+      updateDebt: (id, patch) =>
+        set((s) => ({
+          debts: s.debts.map((d) => (d.id === id ? { ...d, ...patch, updatedAt: now() } : d)),
+        })),
+
+      deleteDebt: (id) => set((s) => ({ debts: s.debts.filter((d) => d.id !== id) })),
+
+      toggleDebtPaid: (id) =>
+        set((s) => ({
+          debts: s.debts.map((d) =>
+            d.id === id ? { ...d, isPaid: !d.isPaid, updatedAt: now() } : d
+          ),
+        })),
+
       // --- Settings --------------------------------------------------------
       updateSettings: (patch) =>
         set((s) => ({ settings: { ...s.settings, ...patch } })),
@@ -121,11 +140,12 @@ export const useStore = create(
       // --- Import / restore ------------------------------------------------
       // Replace transactions and categories from an imported backup.
       // Settings are intentionally left as-is (device-specific).
-      replaceData: ({ transactions, categories, tags }) =>
+      replaceData: ({ transactions, categories, tags, debts }) =>
         set((s) => ({
           transactions: Array.isArray(transactions) ? transactions : [],
           categories: Array.isArray(categories) ? categories : s.categories,
           tags: Array.isArray(tags) ? tags : s.tags,
+          debts: Array.isArray(debts) ? debts : s.debts,
         })),
     }),
     {
@@ -137,6 +157,7 @@ export const useStore = create(
         transactions: s.transactions,
         categories: s.categories,
         tags: s.tags,
+        debts: s.debts,
         settings: s.settings,
       }),
     }

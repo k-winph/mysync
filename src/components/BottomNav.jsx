@@ -1,10 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, ListPlus, Settings } from 'lucide-react'
+import { LayoutDashboard, ListPlus, Landmark, Calculator, Settings } from 'lucide-react'
 import { strings } from '../constants/strings'
 
 const ITEMS = [
   { to: '/', label: strings.nav.dashboard, icon: LayoutDashboard, end: true },
   { to: '/transactions', label: strings.nav.transactions, icon: ListPlus },
+  { to: '/debt', label: strings.nav.debt, icon: Landmark },
+  { to: '/tax', label: strings.nav.tax, icon: Calculator },
   { to: '/settings', label: strings.nav.settings, icon: Settings },
 ]
 

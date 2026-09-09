@@ -85,16 +85,44 @@ function rowToTag(r) {
   return { id: r.id, name: r.name, createdAt: r.createdAt, updatedAt: r.updatedAt }
 }
 
+function debtToRow(d) {
+  return {
+    id: d.id,
+    creditor: d.creditor,
+    amount: d.amount, // satang
+    dueDate: d.dueDate,
+    isPaid: d.isPaid ? 1 : 0,
+    note: d.note || '',
+    createdAt: d.createdAt,
+    updatedAt: d.updatedAt,
+  }
+}
+
+function rowToDebt(r) {
+  return {
+    id: r.id,
+    creditor: r.creditor,
+    amount: Number(r.amount) || 0,
+    dueDate: r.dueDate,
+    isPaid: String(r.isPaid) === '1' || r.isPaid === true,
+    note: r.note || '',
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+  }
+}
+
 // --- export -----------------------------------------------------------------
 
-export function exportExcel({ transactions, categories, tags = [] }) {
+export function exportExcel({ transactions, categories, tags = [], debts = [] }) {
   const wb = XLSX.utils.book_new()
   const txSheet = XLSX.utils.json_to_sheet(transactions.map(txToRow))
   const catSheet = XLSX.utils.json_to_sheet(categories.map(catToRow))
   const tagSheet = XLSX.utils.json_to_sheet(tags.map(tagToRow))
+  const debtSheet = XLSX.utils.json_to_sheet(debts.map(debtToRow))
   XLSX.utils.book_append_sheet(wb, txSheet, 'Transactions')
   XLSX.utils.book_append_sheet(wb, catSheet, 'Categories')
   XLSX.utils.book_append_sheet(wb, tagSheet, 'Tags')
+  XLSX.utils.book_append_sheet(wb, debtSheet, 'Debts')
   XLSX.writeFile(wb, `mysync-backup-${stamp()}.xlsx`)
 }
 
@@ -129,10 +157,14 @@ function importExcel(file) {
         const tagRows = wb.Sheets['Tags']
           ? XLSX.utils.sheet_to_json(wb.Sheets['Tags'])
           : []
+        const debtRows = wb.Sheets['Debts']
+          ? XLSX.utils.sheet_to_json(wb.Sheets['Debts'])
+          : []
         resolve({
           transactions: txRows.map(rowToTx),
           categories: catRows.map(rowToCat),
           tags: tagRows.map(rowToTag),
+          debts: debtRows.map(rowToDebt),
         })
       } catch (err) {
         reject(err)
@@ -150,7 +182,7 @@ function importCSV(file) {
       skipEmptyLines: true,
       complete: (res) => {
         try {
-          resolve({ transactions: res.data.map(rowToTx), categories: null, tags: null })
+          resolve({ transactions: res.data.map(rowToTx), categories: null, tags: null, debts: null })
         } catch (err) {
           reject(err)
         }

@@ -1,9 +1,12 @@
 import { useMemo, useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus, TrendingUp, TrendingDown } from 'lucide-react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import {
+  Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus, TrendingUp, TrendingDown,
+  CircleAlert, CalendarClock, ChevronRight,
+} from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { getMonthRange, getPrevMonthRange, isWithin, percentChange } from '../utils/date'
+import { getMonthRange, getPrevMonthRange, isWithin, percentChange, daysUntil, formatDate } from '../utils/date'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import TransactionItem from '../components/TransactionItem'
@@ -48,9 +51,11 @@ function DeltaChip({ pct, goodWhenUp }) {
 export default function Dashboard() {
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
+  const debts = useStore((s) => s.debts)
   const settings = useStore((s) => s.settings)
   const updateSettings = useStore((s) => s.updateSettings)
 
+  const navigate = useNavigate()
   const [addOpen, setAddOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -108,6 +113,13 @@ export default function Dashboard() {
     () => [...transactions].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 5),
     [transactions]
   )
+
+  // Unpaid debts that are overdue or due within 14 days — surfaced as a warning.
+  const upcomingDebts = useMemo(() => {
+    return debts
+      .filter((d) => !d.isPaid && daysUntil(d.dueDate) <= 14)
+      .sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1))
+  }, [debts])
 
   return (
     <div className="space-y-5">
@@ -168,6 +180,39 @@ export default function Dashboard() {
       >
         <Plus size={20} /> {strings.dashboard.quickAdd}
       </button>
+
+      {/* Upcoming / overdue debts */}
+      {upcomingDebts.length > 0 && (
+        <button onClick={() => navigate('/debt')} className="block w-full text-left">
+          <Card className="border-amber-300 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-900/15">
+            <div className="mb-2 flex items-center gap-1.5 text-amber-700 dark:text-amber-400">
+              <CalendarClock size={16} />
+              <span className="text-sm font-semibold">{strings.debt.upcoming}</span>
+              <ChevronRight size={16} className="ml-auto" />
+            </div>
+            <div className="space-y-1.5">
+              {upcomingDebts.slice(0, 3).map((d) => {
+                const days = daysUntil(d.dueDate)
+                const overdue = days < 0
+                return (
+                  <div key={d.id} className="flex items-center gap-2 text-sm">
+                    {overdue ? (
+                      <CircleAlert size={13} className="shrink-0 text-red-600" />
+                    ) : (
+                      <CalendarClock size={13} className="shrink-0 text-amber-600" />
+                    )}
+                    <span className="flex-1 truncate">{d.creditor}</span>
+                    <span className={`text-xs ${overdue ? 'text-red-600' : 'text-amber-600'}`}>
+                      {overdue ? strings.debt.overdue : strings.debt.dueInDays(days)}
+                    </span>
+                    <MoneyText satang={d.amount} className="w-24 text-right font-semibold" />
+                  </div>
+                )
+              })}
+            </div>
+          </Card>
+        </button>
+      )}
 
       {/* Spending by category (donut) */}
       <div>

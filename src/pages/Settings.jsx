@@ -55,6 +55,7 @@ export default function Settings() {
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
   const tags = useStore((s) => s.tags)
+  const debts = useStore((s) => s.debts)
 
   const fileRef = useRef(null)
   const [catOpen, setCatOpen] = useState(false)
@@ -62,7 +63,7 @@ export default function Settings() {
   const [importMsg, setImportMsg] = useState('')
 
   const doExportExcel = () => {
-    exportExcel({ transactions, categories, tags })
+    exportExcel({ transactions, categories, tags, debts })
     markBackupNow()
   }
   const doExportCSV = () => {
@@ -81,6 +82,7 @@ export default function Settings() {
         transactions: data.transactions,
         categories: data.categories ?? categories,
         tags: data.tags ?? tags,
+        debts: data.debts ?? debts,
       })
       // Make sure any tag names inside imported transactions become chips too.
       syncTagsFromTransactions()

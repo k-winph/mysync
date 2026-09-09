@@ -4,6 +4,8 @@ import { useStore } from './store/useStore'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
+import Debt from './pages/Debt'
+import Tax from './pages/Tax'
 import Settings from './pages/Settings'
 
 export default function App() {
@@ -30,6 +32,8 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="transactions" element={<Transactions />} />
+        <Route path="debt" element={<Debt />} />
+        <Route path="tax" element={<Tax />} />
         <Route path="settings" element={<Settings />} />
       </Route>
     </Routes>

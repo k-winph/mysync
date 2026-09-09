@@ -38,6 +38,12 @@ export function isWithin(iso, start, end) {
   return iso >= start && iso <= end
 }
 
+/** Whole days from today until an ISO date. Negative = overdue, 0 = today. */
+export function daysUntil(iso) {
+  if (!iso) return null
+  return dayjs(iso).startOf('day').diff(dayjs().startOf('day'), 'day')
+}
+
 /** Same as getMonthRange but for the month before the given date (default now). */
 export function getPrevMonthRange(iso) {
   const d = (iso ? dayjs(iso) : dayjs()).subtract(1, 'month')

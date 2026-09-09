@@ -417,3 +417,31 @@ finance-app/
 - [x] ทดสอบ build + runtime (headless) ผ่าน: คำนวณยอดถูก, dark mode ทำงาน, 0 error
 
 *เฟส 1 พร้อมใช้งาน — รอ `npm install` บนเครื่อง + ทดสอบบนมือถือ + deploy*
+
+---
+
+## 14. เฟส 2 — กลุ่ม B (เสร็จแล้ว)
+
+**จัดการหนี้สิน (หน้าใหม่ Debt + tab):**
+- store: `debts[]` + addDebt/updateDebt/deleteDebt/toggleDebtPaid
+- หน้า Debt: การ์ดสรุป "ยอดหนี้รวม" (unpaid), รายการเรียงตามวันครบกำหนด,
+  toggle จ่ายแล้ว/ยัง, สถานะ Overdue (แดง)/Due in N days (เหลือง), แก้/ลบ, FAB เพิ่ม
+- Dashboard: การ์ด "Upcoming debts" เตือนหนี้ overdue/ครบใน 14 วัน (กดไปหน้า Debt)
+
+**Tax Calculator (หน้าใหม่ Tax + tab):**
+- `constants/taxBrackets.js` (ขั้นบันได + ค่าลดหย่อน) + `utils/tax.js` (calcTax)
+- คำนวณสด: กรอกรายได้ทั้งปี + ค่าลดหย่อนเพิ่ม → ภาษีประเมิน + effective rate +
+  รายได้หลังหักภาษี + breakdown ค่าลดหย่อน + ตารางภาษีรายขั้น + disclaimer
+- ค่าลดหย่อน: ส่วนตัว 60,000 + หักค่าใช้จ่าย 50% (สูงสุด 100,000) + ช่องกรอกเพิ่ม
+- **หมายเหตุ:** ทำงานหน่วยบาท (ไม่ใช่สตางค์) เพราะเป็นค่าคำนวณ ไม่เก็บลง store
+- auto-ดึงรายได้จาก transactions = เลื่อนไปเฟส 3 ตามแผน
+
+**อื่นๆ:** BottomNav เป็น 5 แท็บ (Dashboard/Records/Debt/Tax/Settings) —
+เปลี่ยน label "Transactions"→"Records" ให้พอดีจอ | export/import รวม Debts sheet แล้ว |
+เพิ่ม date helper `daysUntil`
+
+**ทดสอบ (headless):** build ผ่าน, ภาษี income 600k → 21,500 (taxable 440k) ถูกต้อง,
+หนี้รวม/overdue/toggle จ่าย/การ์ด Dashboard ทำงาน, nav 5 แท็บ, 0 console error
+
+### เหลือในเฟส 2 (กลุ่ม C)
+- Stock Portfolio (แยกพอร์ต + ดึงราคาหุ้นจาก API)

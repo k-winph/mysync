@@ -19,3 +19,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+#Claude
+/Claude outputs
