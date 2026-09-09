@@ -23,6 +23,14 @@ function parseNum(text) {
   return Number.isNaN(v) ? 0 : v
 }
 
+// Format a raw input value with thousands separators as the user types,
+// e.g. "500000" -> "500,000". Keeps only digits (whole baht).
+function formatThousands(text) {
+  const digits = String(text).replace(/[^0-9]/g, '')
+  if (digits === '') return ''
+  return Number(digits).toLocaleString('en-US')
+}
+
 function Line({ label, value, strong }) {
   return (
     <div className="flex items-center justify-between py-1 text-sm">
@@ -70,11 +78,10 @@ export default function Tax() {
             <span className="font-normal text-slate-400">({strings.tax.perYear})</span>
           </label>
           <input
-            type="number"
-            inputMode="decimal"
-            min="0"
+            type="text"
+            inputMode="numeric"
             value={income}
-            onChange={(e) => setIncome(e.target.value)}
+            onChange={(e) => setIncome(formatThousands(e.target.value))}
             placeholder="0"
             className="input-base text-lg font-semibold"
           />
@@ -82,11 +89,10 @@ export default function Tax() {
         <div>
           <label className="mb-1 block text-sm font-medium">{strings.tax.extraDeductions}</label>
           <input
-            type="number"
-            inputMode="decimal"
-            min="0"
+            type="text"
+            inputMode="numeric"
             value={extra}
-            onChange={(e) => setExtra(e.target.value)}
+            onChange={(e) => setExtra(formatThousands(e.target.value))}
             placeholder="0"
             className="input-base"
           />
