@@ -7,13 +7,18 @@ import { useStore } from '../store/useStore'
 import Card from '../components/ui/Card'
 import Modal from '../components/ui/Modal'
 
-// Format a whole-baht number for display (tax figures are in baht, not satang).
+// Format a whole-unit number for display (tax figures are whole, not minor).
 function baht(n, currency = 'THB') {
-  return new Intl.NumberFormat(currency === 'THB' ? 'th-TH' : 'en-US', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0,
-  }).format(Math.round(n || 0))
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'narrowSymbol',
+      maximumFractionDigits: 0,
+    }).format(Math.round(n || 0))
+  } catch {
+    return `${Math.round(n || 0).toLocaleString('en-US')} ${currency}`
+  }
 }
 
 // Parse a user-typed money string into a number (baht).

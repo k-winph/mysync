@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { useStore } from './store/useStore'
-import { strings } from './constants/strings'
+import { strings, setLang } from './constants/strings'
 import { todayISO, daysUntil } from './utils/date'
 import { notificationPermission, showNotification } from './utils/notify'
 import Layout from './components/Layout'
@@ -17,7 +17,13 @@ import Settings from './pages/Settings'
 
 export default function App() {
   const theme = useStore((s) => s.settings.theme)
+  const language = useStore((s) => s.settings.language)
   const pinEnabled = useStore((s) => s.settings.pinEnabled)
+
+  // Apply the active language before children render so `strings.x` (a live
+  // Proxy) resolves to it. Subscribing to `language` re-renders the whole tree
+  // on change, so every screen updates instantly.
+  setLang(language)
   const seedDefaults = useStore((s) => s.seedDefaults)
   const syncTagsFromTransactions = useStore((s) => s.syncTagsFromTransactions)
 

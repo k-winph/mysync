@@ -3,27 +3,32 @@
 
 const DEFAULT_CURRENCY = 'THB'
 
-// Map currency -> Intl locale + code. Extend as more currencies are added (phase 3).
-const CURRENCY_META = {
-  THB: { locale: 'th-TH', code: 'THB' },
-  USD: { locale: 'en-US', code: 'USD' },
-}
+// Currencies offered in the primary-currency picker (Settings). Any ISO 4217
+// code works with Intl; this is just the curated shortlist.
+export const CURRENCIES = ['THB', 'USD', 'EUR', 'GBP', 'JPY', 'SGD', 'AUD', 'CNY']
 
 /**
- * Format an integer satang amount into a human-readable money string.
- * @param {number} satang integer amount in satang
- * @param {string} currency currency code, default THB
+ * Format an integer minor-unit amount (satang / cents) into a money string.
+ * Uses `narrowSymbol` so any currency shows its short symbol (฿, $, €, ¥, £…)
+ * regardless of locale.
+ * @param {number} minor integer amount in minor units (1/100)
+ * @param {string} currency ISO currency code, default THB
  * @returns {string} e.g. "฿1,234.50"
  */
-export function formatMoney(satang, currency = DEFAULT_CURRENCY) {
-  const meta = CURRENCY_META[currency] || CURRENCY_META[DEFAULT_CURRENCY]
-  const baht = (satang || 0) / 100
-  return new Intl.NumberFormat(meta.locale, {
-    style: 'currency',
-    currency: meta.code,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(baht)
+export function formatMoney(minor, currency = DEFAULT_CURRENCY) {
+  const value = (minor || 0) / 100
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'narrowSymbol',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value)
+  } catch {
+    // Unknown currency code — fall back to a plain number + code.
+    return `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`
+  }
 }
 
 /**

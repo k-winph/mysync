@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from 'react'
-import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint } from 'lucide-react'
+import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
+import { CURRENCIES } from '../utils/money'
 import { formatDate } from '../utils/date'
 import { exportExcel, exportCSV, importFile } from '../services/exportImport'
 import { PROVIDERS } from '../services/stockApi'
@@ -154,7 +155,50 @@ export default function Settings() {
             checked={settings.hideBalances}
             onChange={(v) => updateSettings({ hideBalances: v })}
           />
+
+          {/* Language */}
+          <div className="flex items-center gap-3 py-2">
+            <Languages size={20} className="text-slate-500" />
+            <span className="flex-1 font-medium">{strings.settings.language}</span>
+            <div className="flex rounded-lg bg-slate-100 p-0.5 dark:bg-slate-800">
+              {[
+                ['en', 'EN'],
+                ['th', 'ไทย'],
+              ].map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => updateSettings({ language: val })}
+                  className={`rounded-md px-3 py-1 text-sm font-semibold transition ${
+                    settings.language === val
+                      ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700'
+                      : 'text-slate-500'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Primary currency */}
+          <div className="flex items-center gap-3 py-2">
+            <Coins size={20} className="text-slate-500" />
+            <span className="flex-1 font-medium">{strings.settings.currency}</span>
+            <select
+              value={settings.primaryCurrency}
+              onChange={(e) => updateSettings({ primaryCurrency: e.target.value })}
+              className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm
+                dark:border-slate-700 dark:bg-slate-900"
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
         </Card>
+        <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.currencyNote}</p>
       </div>
 
       {/* Security & alerts */}
