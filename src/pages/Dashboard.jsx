@@ -1,12 +1,12 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
-  Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus, TrendingUp, TrendingDown,
+  Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus,
   CircleAlert, CalendarClock, ChevronRight, LineChart,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { getMonthRange, getPrevMonthRange, isWithin, percentChange, daysUntil, formatDate } from '../utils/date'
+import { getMonthRange, isWithin, daysUntil, formatDate } from '../utils/date'
 import { totalsByCurrency, sumValue } from '../utils/portfolio'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
@@ -23,30 +23,6 @@ function totals(txs) {
     else expense += t.amount
   }
   return { income, expense, balance: income - expense }
-}
-
-// Small "vs last month" delta chip. `goodWhenUp` flips the color meaning
-// (income going up is good/green; expense going up is bad/red).
-function DeltaChip({ pct, goodWhenUp }) {
-  if (pct === null) {
-    return <span className="text-xs text-slate-400">{strings.dashboard.vsLastMonth}</span>
-  }
-  if (pct === 0) {
-    return <span className="text-xs text-slate-400">{strings.dashboard.noChange}</span>
-  }
-  const up = pct > 0
-  const good = goodWhenUp ? up : !up
-  const Icon = up ? TrendingUp : TrendingDown
-  return (
-    <span
-      className={`inline-flex items-center gap-0.5 text-xs font-medium ${
-        good ? 'text-green-600' : 'text-red-600'
-      }`}
-    >
-      <Icon size={13} />
-      {Math.abs(pct)}% {strings.dashboard.vsLastMonth}
-    </span>
-  )
 }
 
 export default function Dashboard() {
@@ -75,22 +51,13 @@ export default function Dashboard() {
   }, [])
 
   const month = useMemo(() => getMonthRange(), [])
-  const prevMonth = useMemo(() => getPrevMonthRange(), [])
 
   const monthTx = useMemo(
     () => transactions.filter((t) => isWithin(t.date, month.start, month.end)),
     [transactions, month]
   )
-  const prevTx = useMemo(
-    () => transactions.filter((t) => isWithin(t.date, prevMonth.start, prevMonth.end)),
-    [transactions, prevMonth]
-  )
 
   const cur = useMemo(() => totals(monthTx), [monthTx])
-  const prev = useMemo(() => totals(prevTx), [prevTx])
-
-  const incomePct = percentChange(prev.income, cur.income)
-  const expensePct = percentChange(prev.expense, cur.expense)
 
   // Expenses grouped by category -> donut data. Top 6 + "Other".
   const donutData = useMemo(() => {
@@ -142,51 +109,37 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Balance hero */}
-      <Card className="bg-gradient-to-br from-brand-600 to-brand-700 text-white">
-        <p className="text-sm opacity-80">{strings.dashboard.balance}</p>
-        <MoneyText satang={cur.balance} className="text-3xl font-bold" />
-      </Card>
+      {/* Balance hero — tap to open the yearly income/expense breakdown */}
+      <button onClick={() => navigate('/balance')} className="block w-full text-left">
+        <Card className="bg-gradient-to-br from-brand-600 to-brand-700 text-white">
+          <div className="flex items-center justify-between">
+            <p className="text-sm opacity-80">{strings.dashboard.balance}</p>
+            <ChevronRight size={18} className="opacity-80" />
+          </div>
+          <MoneyText satang={cur.balance} className="text-3xl font-bold" />
+        </Card>
+      </button>
 
-      {/* Income / Expense with month-over-month deltas */}
+      {/* Income / Expense — compact */}
       <div className="grid grid-cols-2 gap-3">
-        <Card>
-          <div className="mb-1 flex items-center gap-1.5 text-green-600">
+        <Card className="flex items-center justify-between py-3">
+          <div className="flex items-center gap-1.5 text-green-600">
             <ArrowUpRight size={18} />
             <span className="text-sm font-medium">{strings.dashboard.income}</span>
           </div>
-          <MoneyText satang={cur.income} className="text-lg font-bold" />
-          <div className="mt-1">
-            <DeltaChip pct={incomePct} goodWhenUp={true} />
-          </div>
+          <MoneyText satang={cur.income} className="font-bold" />
         </Card>
-        <Card>
-          <div className="mb-1 flex items-center gap-1.5 text-red-600">
+        <Card className="flex items-center justify-between py-3">
+          <div className="flex items-center gap-1.5 text-red-600">
             <ArrowDownRight size={18} />
             <span className="text-sm font-medium">{strings.dashboard.expense}</span>
           </div>
-          <MoneyText satang={cur.expense} className="text-lg font-bold" />
-          <div className="mt-1">
-            <DeltaChip pct={expensePct} goodWhenUp={false} />
-          </div>
+          <MoneyText satang={cur.expense} className="font-bold" />
         </Card>
       </div>
 
       {/* Investments (Dime-style: value + today's change + portfolio shares) */}
       <InvestmentsCard portfolios={portfolios} holdings={holdings} onOpen={() => navigate('/stocks')} />
-
-      {/* Quick add */}
-      <button
-        onClick={() => {
-          setEditing(null)
-          setAddOpen(true)
-        }}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed
-          border-brand-300 py-3 font-semibold text-brand-600 transition hover:bg-brand-50
-          dark:border-brand-600/50 dark:hover:bg-brand-600/10"
-      >
-        <Plus size={20} /> {strings.dashboard.quickAdd}
-      </button>
 
       {/* Upcoming / overdue debts */}
       {upcomingDebts.length > 0 && (
@@ -259,6 +212,21 @@ export default function Dashboard() {
           </Card>
         )}
       </div>
+
+      {/* Floating add (frosted/translucent so content shows through) */}
+      <button
+        onClick={() => {
+          setEditing(null)
+          setAddOpen(true)
+        }}
+        className="fixed bottom-20 right-4 z-30 flex h-14 w-14 items-center justify-center
+          rounded-full bg-brand-600/70 text-white shadow-lg shadow-brand-600/30 backdrop-blur-md
+          transition hover:bg-brand-600/90 active:scale-95"
+        style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+        aria-label={strings.dashboard.quickAdd}
+      >
+        <Plus size={26} />
+      </button>
 
       <TransactionModal
         open={addOpen}

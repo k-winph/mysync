@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import { useStore } from './store/useStore'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
+import Balance from './pages/Balance'
 import Transactions from './pages/Transactions'
 import Debt from './pages/Debt'
 import Tax from './pages/Tax'
@@ -33,6 +34,7 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Dashboard />} />
+        <Route path="balance" element={<Balance />} />
         <Route path="transactions" element={<Transactions />} />
         <Route path="debt" element={<Debt />} />
         <Route path="tax" element={<Tax />} />

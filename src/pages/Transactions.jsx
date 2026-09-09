@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Plus, SlidersHorizontal, Search, Tag, X, Filter } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -21,6 +22,22 @@ export default function Transactions() {
   const [tagOpen, setTagOpen] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Preset the date filter when arriving with ?from&to (e.g. from a month card
+  // on the Balance page). Runs once, then clears the params from the URL.
+  useEffect(() => {
+    const from = searchParams.get('from')
+    const to = searchParams.get('to')
+    if (from || to) {
+      setFilters((f) => ({ ...f, from: from || '', to: to || '' }))
+      setShowFilters(true)
+      searchParams.delete('from')
+      searchParams.delete('to')
+      setSearchParams(searchParams, { replace: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const setFilter = (patch) => setFilters((f) => ({ ...f, ...patch }))
   const hasActiveFilters =

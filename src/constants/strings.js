@@ -25,6 +25,17 @@ export const strings = {
     today: 'Today',
   },
 
+  balance: {
+    title: 'Income vs Expense',
+    income: 'Income',
+    expense: 'Expense',
+    net: 'Net',
+    totalIncome: 'Total income',
+    totalExpense: 'Total expense',
+    noData: 'No transactions in this year.',
+    tapMonthHint: 'Tap a month to see its transactions',
+  },
+
   dashboard: {
     title: 'This Month',
     income: 'Income',
