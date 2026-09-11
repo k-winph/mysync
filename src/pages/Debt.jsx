@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Check, CircleAlert, CalendarClock, Repeat, ChevronRight } from 'lucide-react'
+import { Plus, Check, CircleAlert, CalendarClock, Repeat, CreditCard, ChevronRight } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate, daysUntil } from '../utils/date'
@@ -8,7 +8,6 @@ import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
 
-// Due-status label + color for an unpaid debt.
 function dueStatus(dueDate) {
   const d = daysUntil(dueDate)
   if (d === null) return { label: '', tone: 'slate', urgent: false }
@@ -17,13 +16,8 @@ function dueStatus(dueDate) {
   return { label: strings.debt.dueInDays(d), tone: 'slate', urgent: false }
 }
 
-const TONE = {
-  red: 'text-red-600',
-  amber: 'text-amber-600',
-  slate: 'text-slate-500',
-}
+const TONE = { red: 'text-red-600', amber: 'text-amber-600', slate: 'text-slate-500' }
 
-// Sort comparators for the (one-time) debt list.
 const SORTS = {
   dueSoon: (a, b) => (a.dueDate < b.dueDate ? -1 : 1),
   dueLate: (a, b) => (a.dueDate > b.dueDate ? -1 : 1),
@@ -31,17 +25,18 @@ const SORTS = {
   cheap: (a, b) => a.amount - b.amount,
 }
 
+// Remaining balance of an installment loan (per-installment × installments left).
+const remainingOf = (d) => d.amount * Math.max(0, (d.totalInstallments || 0) - (d.paidInstallments || 0))
+const isInstallmentDone = (d) => (d.paidInstallments || 0) >= (d.totalInstallments || 0)
+
 function DebtRow({ debt, onEdit, onPay, onUnpay }) {
   const status = dueStatus(debt.dueDate)
   return (
     <div className="flex items-center gap-3 px-2 py-2.5">
-      {/* Paid toggle -> logs / removes an expense */}
       <button
         onClick={() => (debt.isPaid ? onUnpay(debt.id) : onPay(debt.id))}
         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition ${
-          debt.isPaid
-            ? 'border-green-600 bg-green-600 text-white'
-            : 'border-slate-300 dark:border-slate-600'
+          debt.isPaid ? 'border-green-600 bg-green-600 text-white' : 'border-slate-300 dark:border-slate-600'
         }`}
         aria-label={debt.isPaid ? strings.debt.markUnpaid : strings.debt.markPaid}
       >
@@ -74,6 +69,36 @@ function DebtRow({ debt, onEdit, onPay, onUnpay }) {
   )
 }
 
+// A tappable summary card that leads to a sub-page (recurring / installments).
+function SummaryCard({ icon: Icon, title, count, totalLabel, total, next, onOpen }) {
+  return (
+    <button onClick={onOpen} className="block w-full text-left">
+      <Card className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Icon size={18} className="text-brand-600" />
+          <span className="flex-1 text-sm font-semibold text-slate-500">{title}</span>
+          <span className="text-xs text-slate-400">{strings.debt.countItems(count)}</span>
+          <ChevronRight size={16} className="text-slate-400" />
+        </div>
+        <div className="flex items-baseline justify-between">
+          <span className="text-xs text-slate-500">{totalLabel}</span>
+          <MoneyText satang={total} className="text-xl font-bold" />
+        </div>
+        {next && (
+          <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-sm dark:border-slate-800">
+            <span className="flex items-center gap-1 text-slate-500">
+              <CalendarClock size={13} /> {strings.debt.nextDue}: {next.creditor}
+            </span>
+            <span className="font-medium">
+              <MoneyText satang={next.amount} /> · {formatDate(next.dueDate)}
+            </span>
+          </div>
+        )}
+      </Card>
+    </button>
+  )
+}
+
 export default function Debt() {
   const debts = useStore((s) => s.debts)
   const payDebt = useStore((s) => s.payDebt)
@@ -84,22 +109,31 @@ export default function Debt() {
   const [editing, setEditing] = useState(null)
   const [sortKey, setSortKey] = useState('dueSoon')
 
-  // Split one-time debts from subscriptions (recurrence !== 'none').
-  const { unpaid, paid, totalOutstanding, subs, subsTotal, nextSub } = useMemo(() => {
-    const oneTime = debts.filter((d) => (d.recurrence || 'none') === 'none')
-    const subList = debts.filter((d) => (d.recurrence || 'none') !== 'none')
-    const unpaidList = oneTime.filter((d) => !d.isPaid).sort(SORTS[sortKey])
-    const paidList = oneTime.filter((d) => d.isPaid)
-    const total = unpaidList.reduce((s, d) => s + d.amount, 0)
-    const sTotal = subList.reduce((s, d) => s + d.amount, 0)
-    const next = [...subList].sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1))[0] || null
+  const data = useMemo(() => {
+    const once = debts.filter((d) => (d.kind || 'once') === 'once')
+    const recurring = debts.filter((d) => d.kind === 'recurring')
+    const installments = debts.filter((d) => d.kind === 'installment')
+    const activeInst = installments.filter((d) => !isInstallmentDone(d))
+
+    const unpaid = once.filter((d) => !d.isPaid).sort(SORTS[sortKey])
+    const paid = once.filter((d) => d.isPaid)
+
+    const onceOutstanding = unpaid.reduce((s, d) => s + d.amount, 0)
+    const instRemaining = activeInst.reduce((s, d) => s + remainingOf(d), 0)
+
+    const nearest = (list) => [...list].sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1))[0] || null
+
     return {
-      unpaid: unpaidList,
-      paid: paidList,
-      totalOutstanding: total,
-      subs: subList,
-      subsTotal: sTotal,
-      nextSub: next,
+      once,
+      unpaid,
+      paid,
+      recurring,
+      installmentsActive: activeInst,
+      totalOutstanding: onceOutstanding + instRemaining,
+      recurringTotal: recurring.reduce((s, d) => s + d.amount, 0),
+      recurringNext: nearest(recurring),
+      instRemaining,
+      instNext: nearest(activeInst),
     }
   }, [debts, sortKey])
 
@@ -112,98 +146,92 @@ export default function Debt() {
     setModalOpen(true)
   }
 
-  const oneTimeCount = unpaid.length + paid.length
+  const nothing =
+    data.once.length === 0 && data.recurring.length === 0 && data.installmentsActive.length === 0
 
   return (
     <div className="space-y-5">
       <h1 className="text-2xl font-bold">{strings.debt.title}</h1>
 
-      {/* Total outstanding — one-time debts only */}
+      {/* Total outstanding = one-time debts + installment remaining balances */}
       <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">
         <p className="text-sm opacity-80">{strings.debt.totalOutstanding}</p>
-        <MoneyText satang={totalOutstanding} className="text-3xl font-bold" />
+        <MoneyText satang={data.totalOutstanding} className="text-3xl font-bold" />
       </Card>
 
-      {/* Subscriptions summary — tap to manage */}
-      {subs.length > 0 && (
-        <button onClick={() => navigate('/debt/subscriptions')} className="block w-full text-left">
-          <Card className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Repeat size={18} className="text-brand-600" />
-              <span className="flex-1 text-sm font-semibold text-slate-500">
-                {strings.debt.subsTitle}
-              </span>
-              <span className="text-xs text-slate-400">{strings.debt.subsCount(subs.length)}</span>
-              <ChevronRight size={16} className="text-slate-400" />
-            </div>
-            <div className="flex items-baseline justify-between">
-              <span className="text-xs text-slate-500">{strings.debt.subsTotal}</span>
-              <MoneyText satang={subsTotal} className="text-xl font-bold" />
-            </div>
-            {nextSub && (
-              <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-sm dark:border-slate-800">
-                <span className="flex items-center gap-1 text-slate-500">
-                  <CalendarClock size={13} /> {strings.debt.nextDue}: {nextSub.creditor}
-                </span>
-                <span className="font-medium">
-                  <MoneyText satang={nextSub.amount} /> · {formatDate(nextSub.dueDate)}
-                </span>
-              </div>
-            )}
-          </Card>
-        </button>
+      {/* Recurring + Installment summary cards */}
+      {data.recurring.length > 0 && (
+        <SummaryCard
+          icon={Repeat}
+          title={strings.debt.recurringTitle}
+          count={data.recurring.length}
+          totalLabel={strings.debt.recurringTotal}
+          total={data.recurringTotal}
+          next={data.recurringNext}
+          onOpen={() => navigate('/debt/recurring')}
+        />
+      )}
+      {data.installmentsActive.length > 0 && (
+        <SummaryCard
+          icon={CreditCard}
+          title={strings.debt.installmentTitle}
+          count={data.installmentsActive.length}
+          totalLabel={strings.debt.installmentTotalRemaining}
+          total={data.instRemaining}
+          next={data.instNext}
+          onOpen={() => navigate('/debt/installments')}
+        />
       )}
 
-      {oneTimeCount === 0 ? (
-        subs.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center
-            text-sm text-slate-500 dark:border-slate-700">
-            {strings.debt.empty}
-          </div>
-        )
+      {nothing ? (
+        <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center
+          text-sm text-slate-500 dark:border-slate-700">
+          {strings.debt.empty}
+        </div>
       ) : (
-        <>
-          {/* Sort control (only worth showing with a couple of items) */}
-          {unpaid.length > 1 && (
-            <div className="flex items-center justify-end gap-2">
-              <span className="text-xs text-slate-500">{strings.debt.sortLabel}</span>
-              <select
-                value={sortKey}
-                onChange={(e) => setSortKey(e.target.value)}
-                className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm
-                  dark:border-slate-700 dark:bg-slate-900"
-              >
-                <option value="dueSoon">{strings.debt.sortDueSoon}</option>
-                <option value="dueLate">{strings.debt.sortDueLate}</option>
-                <option value="expensive">{strings.debt.sortExpensive}</option>
-                <option value="cheap">{strings.debt.sortCheap}</option>
-              </select>
-            </div>
-          )}
+        data.once.length > 0 && (
+          <>
+            {data.unpaid.length > 1 && (
+              <div className="flex items-center justify-end gap-2">
+                <span className="text-xs text-slate-500">{strings.debt.sortLabel}</span>
+                <select
+                  value={sortKey}
+                  onChange={(e) => setSortKey(e.target.value)}
+                  className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm
+                    dark:border-slate-700 dark:bg-slate-900"
+                >
+                  <option value="dueSoon">{strings.debt.sortDueSoon}</option>
+                  <option value="dueLate">{strings.debt.sortDueLate}</option>
+                  <option value="expensive">{strings.debt.sortExpensive}</option>
+                  <option value="cheap">{strings.debt.sortCheap}</option>
+                </select>
+              </div>
+            )}
 
-          {unpaid.length > 0 ? (
-            <Card className="divide-y divide-slate-100 dark:divide-slate-800">
-              {unpaid.map((d) => (
-                <DebtRow key={d.id} debt={d} onEdit={openEdit} onPay={payDebt} onUnpay={unpayDebt} />
-              ))}
-            </Card>
-          ) : (
-            <Card className="text-center text-sm font-medium text-green-600">
-              {strings.debt.allPaid}
-            </Card>
-          )}
-
-          {paid.length > 0 && (
-            <div>
-              <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.debt.paid}</h2>
+            {data.unpaid.length > 0 ? (
               <Card className="divide-y divide-slate-100 dark:divide-slate-800">
-                {paid.map((d) => (
+                {data.unpaid.map((d) => (
                   <DebtRow key={d.id} debt={d} onEdit={openEdit} onPay={payDebt} onUnpay={unpayDebt} />
                 ))}
               </Card>
-            </div>
-          )}
-        </>
+            ) : (
+              <Card className="text-center text-sm font-medium text-green-600">
+                {strings.debt.allPaid}
+              </Card>
+            )}
+
+            {data.paid.length > 0 && (
+              <div>
+                <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.debt.paid}</h2>
+                <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {data.paid.map((d) => (
+                    <DebtRow key={d.id} debt={d} onEdit={openEdit} onPay={payDebt} onUnpay={unpayDebt} />
+                  ))}
+                </Card>
+              </div>
+            )}
+          </>
+        )
       )}
 
       {/* Floating add (one-time debt) */}
@@ -221,6 +249,7 @@ export default function Debt() {
       <DebtModal
         open={modalOpen}
         editing={editing}
+        defaultKind="once"
         onClose={() => {
           setModalOpen(false)
           setEditing(null)

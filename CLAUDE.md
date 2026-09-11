@@ -132,12 +132,17 @@ Salary ฯลฯ) แล้วผู้ใช้เพิ่มเองได�
 | `creditor` | string | เจ้าหนี้/ที่ไหน เช่น `"บัตร KTC"` |
 | `amount` | number | ยอดหนี้ (สตางค์) |
 | `dueDate` | string | วันครบกำหนด (ISO) |
-| `isPaid` | boolean | จ่ายแล้วหรือยัง (หนี้ปกติ) |
-| `recurrence` | `"none"`\|`"weekly"`\|`"monthly"`\|`"yearly"` | ไม่ซ้ำ = หนี้ปกติ, อื่นๆ = Subscription (ข้อ 20) |
+| `isPaid` | boolean | หนี้ก้อนเดียว: จ่ายแล้วยัง · หนี้ผ่อน: ผ่อนครบแล้วยัง |
+| `kind` | `"once"`\|`"recurring"`\|`"installment"` | ก้อนเดียว / รายจ่ายประจำ / หนี้ผ่อน (ดูข้อ 20) |
+| `frequency` | `"weekly"`\|`"monthly"`\|`"yearly"` | ความถี่ (สำหรับ recurring + installment) |
+| `totalInstallments` | number | จำนวนงวดทั้งหมด (installment) |
+| `paidInstallments` | number | จ่ายไปแล้วกี่งวด (installment) |
 | `categoryId` | string | หมวดรายจ่าย (ใช้ตอนกดจ่าย→สร้าง expense) |
 | `tags` | string[] | แท็ก (ติดไปกับ expense ตอนจ่าย) |
-| `paidTxId` | string \| null | id ของ transaction ที่สร้างตอนจ่าย (ไว้ undo) |
+| `paidTxId` | string \| null | id ของ transaction ที่สร้างตอนจ่าย (once, ไว้ undo) |
 | `note` | string | โน้ต (ไม่บังคับ) |
+
+*`amount` = once: ยอดหนี้ทั้งก้อน · recurring: ยอดต่อรอบ · installment: ยอดต่องวด*
 
 ### 3.4 Portfolio (พอร์ตหุ้น) — แรงบันดาลใจจากหน้า "สินทรัพย์" ของแอพ Dime
 | Field | Type | คำอธิบาย |
@@ -591,32 +596,48 @@ reload แล้ว persist, สลับไทยติด, เงินโช�
 
 ---
 
-## 20. เฟส 3 — กลุ่ม Debt: recurrence + subscription + จ่าย→รายจ่าย + sorting (เสร็จแล้ว)
+## 20. เฟส 3 — กลุ่ม Debt: หนี้ 3 ประเภท + จ่าย→รายจ่าย + sorting (เสร็จแล้ว)
 
-**โครงสร้างข้อมูล (เพิ่มใน Debt):** `recurrence`, `categoryId`, `tags[]`, `paidTxId` (ดู 3.3)
-— recurrence !== 'none' = "Subscription"
+> **ปรับใหญ่จากดีไซน์เดิม** (เดิมมีแค่ ปกติ/subscription) เพราะ "ค่าผ่อนรถ" ไม่ใช่ subscription
+> เส้นแบ่ง: *จ่ายครบแล้วได้เป็นเจ้าของ/มีจำนวนงวดแน่นอนมั้ย?* ใช่=หนี้ผ่อน, ไม่ใช่=รายจ่ายประจำ
 
-**DebtModal:** เพิ่มตัวเลือก recurrence (segmented), หมวดหมู่ (grid เฉพาะหมวดรายจ่าย), แท็ก (chips)
-| prop `defaultRecurrence` (หน้า Subscriptions เปิดด้วย 'monthly')
+**3 ประเภท (`kind`):**
+- **once (หนี้ก้อนเดียว):** ยืมเงิน/ค่าหมอ/ยอดบัตรเดือนนี้ — จ่ายครั้งเดียวจบ
+- **recurring (รายจ่ายประจำ):** ค่าเช่าบ้าน/คอนโด, ค่าไฟ, ค่าโทรศัพท์, Netflix, YT — ไม่มีต้นค้าง ไม่มีวันจบ
+- **installment (หนี้ผ่อน):** ผ่อนรถ/บ้าน/มือถือ — มี `totalInstallments` + `paidInstallments`, มียอดคงเหลือที่ลดลง, มีวันจบ
 
-**กดจ่าย → สร้างรายจ่ายจริง (store):**
-- `payDebt(id)` — หนี้ปกติ: สร้าง expense (amount/category/tags/note จากหนี้, date=วันนี้), mark isPaid,
-  เก็บ `paidTxId` | ยอดเงินคงเหลือลดเองเพราะ balance = รายรับ−รายจ่าย
-- `unpayDebt(id)` — ลบ transaction ที่ผูกไว้ (`paidTxId`) + unmark
-- `paySubscription(id)` — สร้าง expense + **เลื่อน dueDate ไปงวดถัดไป** (`addPeriod` ใน utils/date) ไม่ mark paid
-- fallback หมวด: ถ้าหนี้ไม่มี categoryId → ใช้หมวดรายจ่ายตัวแรก
+**DebtModal:** เลือก kind (segmented 3 ปุ่ม + hint), amount label เปลี่ยนตาม kind (ยอดหนี้/ต่อรอบ/ต่องวด),
+recurring+installment โชว์ความถี่, installment โชว์ จำนวนงวด + จ่ายไปแล้ว (onboard หนี้ที่ผ่อนไปแล้วได้),
++ หมวดหมู่ + แท็ก | prop `defaultKind` (แต่ละหน้าเปิด kind ของตัวเอง)
+
+**กดจ่าย → สร้างรายจ่ายจริง (store, helper `expenseFromDebt`):**
+- `payDebt(id)` — once: สร้าง expense (amount/category/tags/note), mark isPaid, เก็บ `paidTxId`
+- `unpayDebt(id)` — ลบ transaction ที่ผูกไว้ + unmark
+- `payRecurring(id)` — สร้าง expense + เลื่อน dueDate 1 รอบ (`addPeriod`) ไม่มีวันจบ
+- `payInstallment(id)` — สร้าง expense + `paidInstallments++` + เลื่อน dueDate; ครบงวด → `isPaid=true` (จบเอง)
+- fallback หมวด: ถ้าไม่มี categoryId → ใช้หมวดรายจ่ายตัวแรก
+- **migration v1→v2:** debt เก่าที่มี `recurrence` → map เป็น kind (recurrence≠none → recurring, else once) + frequency
 
 **หน้า Debt:**
-- Total outstanding = **เฉพาะหนี้ปกติที่ยังไม่จ่าย** (ไม่รวม subscription)
-- การ์ด Subscriptions สรุป (ยอดรวม + อันใกล้จ่ายสุด) → แตะไป `/debt/subscriptions`
-- Sorting หนี้ปกติ: ใกล้กำหนด/ไกลกำหนด/แพงสุด/ถูกสุด (default ใกล้กำหนด)
+- **Total outstanding = หนี้ก้อนเดียว(ยังไม่จ่าย) + ยอดคงเหลือหนี้ผ่อนทุกก้อน** (หนี้จริงที่มีต้นค้าง)
+  รายจ่ายประจำ **ไม่นับ** (ไม่ใช่หนี้)
+- การ์ดสรุป "รายจ่ายประจำ" → `/debt/recurring` | การ์ดสรุป "หนี้ผ่อน" → `/debt/installments`
+- Sorting หนี้ก้อนเดียว: ใกล้กำหนด/ไกลกำหนด/แพงสุด/ถูกสุด
 
-**หน้า Subscriptions (`/debt/subscriptions`):** 1 subscription = 1 การ์ด (ชื่อ/ยอด/ความถี่/วันครบกำหนดถัดไป/
-วันเหลือ) + ปุ่ม "จ่ายงวดนี้" + แตะแก้ไข, การ์ดสรุปยอดรวมด้านบน, FAB (defaultRecurrence monthly), empty state
+**หน้า Recurring (`/debt/recurring`):** 1 การ์ด/รายการ (ชื่อ/ยอด/ความถี่/วันถัดไป) + ปุ่มจ่ายงวดนี้ + สรุปยอดรวม
+**หน้า Installments (`/debt/installments`):** 1 การ์ด/ก้อน (ยอดต่องวด/ความถี่/progress งวด x/y + %/ยอดคงเหลือ/
+วันถัดไป) + ปุ่มจ่ายงวดนี้ + สรุปยอดคงเหลือรวม + section "ผ่อนครบแล้ว" (พับเก็บประวัติ)
+- ยอดคงเหลือ = ยอดต่องวด × งวดที่เหลือ (ตัวเลขประมาณ ไม่คิดดอกเบี้ยแบบธนาคาร)
 
-**ทดสอบ (mocked):** สร้างหนี้+หมวด+แท็ก, กดจ่าย→expense เข้า Records (ยอด/หมวด/แท็กถูก) + balance ลด,
-unpay→expense หาย, สร้าง subscription→จ่ายงวด→dueDate +1 เดือน (11 Sep→11 Oct) + expense เข้า,
-Total outstanding ไม่รวม subs, sorting แพง/ถูกสลับลำดับถูก, 0 console error
+**เตือนงวดใกล้ครบ:** Dashboard (การ์ดหนี้ใกล้ครบ) + notify ครอบคลุมทั้ง 3 ประเภท (filter `!isPaid && daysUntil≤n`
+ใช้ได้กับทุก kind เพราะ recurring/installment ที่ยัง active มี isPaid=false)
+
+**หมายเหตุ:** ไฟล์เก่า `pages/Subscriptions.jsx` ถูกแทนด้วย `Recurring.jsx` + `Installments.jsx` แล้ว
+→ ควร `git rm src/pages/Subscriptions.jsx` (ลบไฟล์ที่ไม่ใช้แล้ว)
+
+**ทดสอบ (mocked, 14 เคส):** once→outstanding, recurring แยกไม่นับ outstanding, installment 8,000×48 จ่ายแล้ว 12
+→ คงเหลือ 288,000 + progress 12/48, outstanding = once+installment (293,000), จ่ายงวด→13/48 คงเหลือ 280,000
++ expense เข้า Records, migration recurrence→recurring, 0 console error
 
 ---
 

@@ -89,10 +89,13 @@ function debtToRow(d) {
   return {
     id: d.id,
     creditor: d.creditor,
-    amount: d.amount, // satang
+    amount: d.amount, // satang (once: total owed; recurring/installment: per period)
     dueDate: d.dueDate,
     isPaid: d.isPaid ? 1 : 0,
-    recurrence: d.recurrence || 'none',
+    kind: d.kind || 'once',
+    frequency: d.frequency || 'monthly',
+    totalInstallments: d.totalInstallments || 0,
+    paidInstallments: d.paidInstallments || 0,
     categoryId: d.categoryId || '',
     tags: (d.tags || []).join('|'),
     paidTxId: d.paidTxId ?? '',
@@ -103,13 +106,19 @@ function debtToRow(d) {
 }
 
 function rowToDebt(r) {
+  // Back-compat: older backups used `recurrence` instead of kind/frequency.
+  const rec = r.recurrence
+  const kind = r.kind || (rec && rec !== 'none' ? 'recurring' : 'once')
   return {
     id: r.id,
     creditor: r.creditor,
     amount: Number(r.amount) || 0,
     dueDate: r.dueDate,
     isPaid: String(r.isPaid) === '1' || r.isPaid === true,
-    recurrence: r.recurrence || 'none',
+    kind,
+    frequency: r.frequency || (rec && rec !== 'none' ? rec : 'monthly'),
+    totalInstallments: Number(r.totalInstallments) || 0,
+    paidInstallments: Number(r.paidInstallments) || 0,
     categoryId: r.categoryId || '',
     tags: r.tags ? String(r.tags).split('|').filter(Boolean) : [],
     paidTxId: r.paidTxId || null,

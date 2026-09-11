@@ -9,12 +9,12 @@ import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
 import CategoryIcon from './CategoryIcon'
 
-const RECUR_OPTIONS = ['none', 'weekly', 'monthly', 'yearly']
+const KINDS = ['once', 'recurring', 'installment']
+const FREQS = ['weekly', 'monthly', 'yearly']
 
-// Add / edit / delete a single debt. `editing` = debt object or null for new.
-// `defaultRecurrence` presets the repeat cycle for new debts (the Subscriptions
-// page opens this with 'monthly').
-export default function DebtModal({ open, editing, defaultRecurrence = 'none', onClose }) {
+// Add / edit / delete a debt of any of the three kinds. `editing` = debt or null.
+// `defaultKind` presets the type for new debts (each page opens its own kind).
+export default function DebtModal({ open, editing, defaultKind = 'once', onClose }) {
   const addDebt = useStore((s) => s.addDebt)
   const updateDebt = useStore((s) => s.updateDebt)
   const deleteDebt = useStore((s) => s.deleteDebt)
@@ -22,10 +22,17 @@ export default function DebtModal({ open, editing, defaultRecurrence = 'none', o
   const tagList = useStore((s) => s.tags)
   const addTag = useStore((s) => s.addTag)
 
+  const [kind, setKind] = useState(editing?.kind || defaultKind)
   const [creditor, setCreditor] = useState(editing?.creditor || '')
   const [amount, setAmount] = useState(editing ? formatMoneyInput(satangToInput(editing.amount)) : '')
+  const [frequency, setFrequency] = useState(editing?.frequency || 'monthly')
+  const [totalInstallments, setTotalInstallments] = useState(
+    editing?.totalInstallments ? String(editing.totalInstallments) : ''
+  )
+  const [paidInstallments, setPaidInstallments] = useState(
+    editing?.paidInstallments ? String(editing.paidInstallments) : '0'
+  )
   const [dueDate, setDueDate] = useState(editing?.dueDate || todayISO())
-  const [recurrence, setRecurrence] = useState(editing?.recurrence || defaultRecurrence)
   const [categoryId, setCategoryId] = useState(editing?.categoryId || '')
   const [selectedTags, setSelectedTags] = useState(editing?.tags || [])
   const [addingTag, setAddingTag] = useState(false)
@@ -33,7 +40,6 @@ export default function DebtModal({ open, editing, defaultRecurrence = 'none', o
   const [note, setNote] = useState(editing?.note || '')
   const [error, setError] = useState('')
 
-  // Debts are money going out -> only expense categories make sense.
   const expenseCategories = useMemo(
     () => categories.filter((c) => c.type === 'expense' || c.type === 'both'),
     [categories]
@@ -51,19 +57,37 @@ export default function DebtModal({ open, editing, defaultRecurrence = 'none', o
     setAddingTag(false)
   }
 
+  const amountLabel =
+    kind === 'installment'
+      ? strings.debt.perInstallment
+      : kind === 'recurring'
+        ? strings.debt.perCycle
+        : strings.debt.amount
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const satang = parseMoney(amount)
     if (!creditor.trim()) return setError(strings.debt.creditor)
-    if (satang <= 0) return setError(strings.debt.amount + ' > 0')
+    if (satang <= 0) return setError(amountLabel + ' > 0')
+
     const data = {
+      kind,
       creditor: creditor.trim(),
       amount: satang,
       dueDate,
-      recurrence,
       categoryId,
       tags: selectedTags,
       note: note.trim(),
+    }
+    if (kind !== 'once') data.frequency = frequency
+    if (kind === 'installment') {
+      const total = parseInt(totalInstallments, 10) || 0
+      const paid = parseInt(paidInstallments, 10) || 0
+      if (total <= 0) return setError(strings.debt.totalInstallments + ' > 0')
+      if (paid < 0 || paid > total) return setError(strings.debt.paidInstallments + ' 0–' + total)
+      data.totalInstallments = total
+      data.paidInstallments = paid
+      data.isPaid = paid >= total
     }
     if (editing) updateDebt(editing.id, data)
     else addDebt(data)
@@ -80,6 +104,30 @@ export default function DebtModal({ open, editing, defaultRecurrence = 'none', o
   return (
     <Modal open={open} onClose={onClose} title={editing ? strings.debt.editTitle : strings.debt.addTitle}>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Kind selector */}
+        <div>
+          <label className="mb-1 block text-sm font-medium">{strings.debt.kind}</label>
+          <div className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+            {KINDS.map((k) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setKind(k)}
+                className={`rounded-lg py-1.5 text-xs font-semibold transition ${
+                  kind === k ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700' : 'text-slate-500'
+                }`}
+              >
+                {k === 'once'
+                  ? strings.debt.kindOnce
+                  : k === 'recurring'
+                    ? strings.debt.kindRecurring
+                    : strings.debt.kindInstallment}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-slate-400">{strings.debt.kindHint}</p>
+        </div>
+
         <div>
           <label className="mb-1 block text-sm font-medium">{strings.debt.creditor}</label>
           <input
@@ -93,7 +141,7 @@ export default function DebtModal({ open, editing, defaultRecurrence = 'none', o
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">{strings.debt.amount}</label>
+          <label className="mb-1 block text-sm font-medium">{amountLabel}</label>
           <MoneyInput
             value={amount}
             onChange={setAmount}
@@ -102,29 +150,61 @@ export default function DebtModal({ open, editing, defaultRecurrence = 'none', o
           />
         </div>
 
-        {/* Repeat cycle — 'none' = one-time debt, anything else = subscription */}
-        <div>
-          <label className="mb-1 block text-sm font-medium">{strings.debt.repeat}</label>
-          <div className="grid grid-cols-4 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
-            {RECUR_OPTIONS.map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setRecurrence(r)}
-                className={`rounded-lg py-1.5 text-xs font-semibold transition ${
-                  recurrence === r
-                    ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700'
-                    : 'text-slate-500'
-                }`}
-              >
-                {strings.debt.recur[r]}
-              </button>
-            ))}
+        {/* Frequency — recurring & installment only */}
+        {kind !== 'once' && (
+          <div>
+            <label className="mb-1 block text-sm font-medium">{strings.debt.recurringTitle}</label>
+            <div className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+              {FREQS.map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setFrequency(f)}
+                  className={`rounded-lg py-1.5 text-xs font-semibold transition ${
+                    frequency === f ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700' : 'text-slate-500'
+                  }`}
+                >
+                  {strings.debt.freq[f]}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Installment counts */}
+        {kind === 'installment' && (
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium">{strings.debt.totalInstallments}</label>
+              <input
+                type="number"
+                inputMode="numeric"
+                min="1"
+                value={totalInstallments}
+                onChange={(e) => setTotalInstallments(e.target.value)}
+                placeholder="48"
+                className="input-base"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">{strings.debt.paidInstallments}</label>
+              <input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                value={paidInstallments}
+                onChange={(e) => setPaidInstallments(e.target.value)}
+                placeholder="0"
+                className="input-base"
+              />
+            </div>
+          </div>
+        )}
 
         <div>
-          <label className="mb-1 block text-sm font-medium">{strings.debt.dueDate}</label>
+          <label className="mb-1 block text-sm font-medium">
+            {kind === 'once' ? strings.debt.dueDate : strings.debt.nextDue}
+          </label>
           <input
             type="date"
             value={dueDate}
@@ -133,7 +213,7 @@ export default function DebtModal({ open, editing, defaultRecurrence = 'none', o
           />
         </div>
 
-        {/* Category (used for the expense created when the debt is paid) */}
+        {/* Category (used for the expense created when paid) */}
         <div>
           <label className="mb-1 block text-sm font-medium">
             {strings.debt.category}{' '}

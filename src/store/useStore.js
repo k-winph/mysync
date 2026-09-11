@@ -9,7 +9,7 @@ import { todayISO, addPeriod } from '../utils/date'
 // (e.g. dashboard needs transactions + categories) are simpler this way.
 
 const STORAGE_KEY = 'mysync-store'
-const STORE_VERSION = 1
+const STORE_VERSION = 2
 
 const now = () => new Date().toISOString()
 
@@ -19,6 +19,22 @@ const withStamps = (obj) => ({
   updatedAt: now(),
   ...obj,
 })
+
+// Build an expense transaction from a debt (used when a debt or a period/
+// installment is paid). Falls back to the first expense category if the debt
+// has none, so the created expense is never left uncategorized-and-broken.
+const expenseFromDebt = (d, categories) => {
+  const catId =
+    d.categoryId || categories.find((c) => c.type === 'expense' || c.type === 'both')?.id || ''
+  return withStamps({
+    type: 'expense',
+    amount: d.amount,
+    categoryId: catId,
+    tags: d.tags || [],
+    note: d.note || d.creditor,
+    date: todayISO(),
+  })
+}
 
 const DEFAULT_SETTINGS = {
   theme: 'light',
@@ -124,13 +140,27 @@ export const useStore = create(
         }),
 
       // --- Debts -----------------------------------------------------------
-      // A debt with recurrence !== 'none' is a "subscription": paying it logs an
-      // expense and rolls its due date forward instead of marking it done.
+      // Three kinds (field `kind`):
+      //  - 'once'        : a one-off debt. Pay once -> logs an expense, done.
+      //  - 'recurring'   : rent / bills / subscriptions. No end, no balance.
+      //                    Pay a cycle -> logs an expense + rolls dueDate forward.
+      //  - 'installment' : a loan you pay off (car/house). Has totalInstallments;
+      //                    each payment logs an expense, advances the count + date,
+      //                    and finishes (isPaid=true) once all installments are paid.
       addDebt: (data) =>
         set((s) => ({
           debts: [
             ...s.debts,
-            withStamps({ isPaid: false, recurrence: 'none', categoryId: '', tags: [], ...data }),
+            withStamps({
+              kind: 'once',
+              isPaid: false,
+              frequency: 'monthly',
+              totalInstallments: 0,
+              paidInstallments: 0,
+              categoryId: '',
+              tags: [],
+              ...data,
+            }),
           ],
         })),
 
@@ -141,13 +171,6 @@ export const useStore = create(
 
       deleteDebt: (id) => set((s) => ({ debts: s.debts.filter((d) => d.id !== id) })),
 
-      toggleDebtPaid: (id) =>
-        set((s) => ({
-          debts: s.debts.map((d) =>
-            d.id === id ? { ...d, isPaid: !d.isPaid, updatedAt: now() } : d
-          ),
-        })),
-
       // Pay a one-time debt: create a matching expense (amount/category/tags from
       // the debt), mark it paid, and remember the created transaction so unpaying
       // can remove it. No-op if the debt is already paid.
@@ -155,18 +178,7 @@ export const useStore = create(
         set((s) => {
           const d = s.debts.find((x) => x.id === id)
           if (!d || d.isPaid) return {}
-          const catId =
-            d.categoryId ||
-            s.categories.find((c) => c.type === 'expense' || c.type === 'both')?.id ||
-            ''
-          const tx = withStamps({
-            type: 'expense',
-            amount: d.amount,
-            categoryId: catId,
-            tags: d.tags || [],
-            note: d.note || d.creditor,
-            date: todayISO(),
-          })
+          const tx = expenseFromDebt(d, s.categories)
           return {
             transactions: [tx, ...s.transactions],
             debts: s.debts.map((x) =>
@@ -191,29 +203,42 @@ export const useStore = create(
           }
         }),
 
-      // Pay one cycle of a subscription: log an expense and advance the due date
-      // by one period. History isn't reversible (each cycle is a real expense).
-      paySubscription: (id) =>
+      // Pay one cycle of a recurring bill: log an expense and advance the due
+      // date. History isn't reversible (each cycle is a real expense).
+      payRecurring: (id) =>
         set((s) => {
           const d = s.debts.find((x) => x.id === id)
           if (!d) return {}
-          const catId =
-            d.categoryId ||
-            s.categories.find((c) => c.type === 'expense' || c.type === 'both')?.id ||
-            ''
-          const tx = withStamps({
-            type: 'expense',
-            amount: d.amount,
-            categoryId: catId,
-            tags: d.tags || [],
-            note: d.note || d.creditor,
-            date: todayISO(),
-          })
+          const tx = expenseFromDebt(d, s.categories)
+          return {
+            transactions: [tx, ...s.transactions],
+            debts: s.debts.map((x) =>
+              x.id === id ? { ...x, dueDate: addPeriod(x.dueDate, x.frequency), updatedAt: now() } : x
+            ),
+          }
+        }),
+
+      // Pay one installment of a loan: log an expense, bump the paid count and
+      // roll the due date. When the last installment is paid, mark it finished
+      // (isPaid=true) so it drops out of the outstanding total.
+      payInstallment: (id) =>
+        set((s) => {
+          const d = s.debts.find((x) => x.id === id)
+          if (!d || d.kind !== 'installment' || d.paidInstallments >= d.totalInstallments) return {}
+          const tx = expenseFromDebt(d, s.categories)
+          const nextPaid = d.paidInstallments + 1
+          const done = nextPaid >= d.totalInstallments
           return {
             transactions: [tx, ...s.transactions],
             debts: s.debts.map((x) =>
               x.id === id
-                ? { ...x, dueDate: addPeriod(x.dueDate, x.recurrence), updatedAt: now() }
+                ? {
+                    ...x,
+                    paidInstallments: nextPaid,
+                    isPaid: done,
+                    dueDate: done ? x.dueDate : addPeriod(x.dueDate, x.frequency),
+                    updatedAt: now(),
+                  }
                 : x
             ),
           }
@@ -319,6 +344,24 @@ export const useStore = create(
     {
       name: STORAGE_KEY,
       version: STORE_VERSION,
+      // v1 -> v2: debts gained `kind` (once/recurring/installment). Old debts used
+      // `recurrence` ('none' | weekly | monthly | yearly); map it forward so
+      // existing subscriptions become 'recurring' and everything else 'once'.
+      migrate: (state, version) => {
+        if (state && version < 2 && Array.isArray(state.debts)) {
+          state.debts = state.debts.map((d) => {
+            const rec = d.recurrence
+            return {
+              ...d,
+              kind: d.kind || (rec && rec !== 'none' ? 'recurring' : 'once'),
+              frequency: d.frequency || (rec && rec !== 'none' ? rec : 'monthly'),
+              totalInstallments: d.totalInstallments || 0,
+              paidInstallments: d.paidInstallments || 0,
+            }
+          })
+        }
+        return state
+      },
       // Only persist data, not action functions (zustand handles this, but we
       // keep it explicit for clarity and future-proofing).
       partialize: (s) => ({
