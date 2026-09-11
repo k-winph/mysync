@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard'
 import Balance from './pages/Balance'
 import Transactions from './pages/Transactions'
 import Debt from './pages/Debt'
+import Subscriptions from './pages/Subscriptions'
 import Tax from './pages/Tax'
 import Stocks from './pages/Stocks'
 import PortfolioDetail from './pages/PortfolioDetail'
@@ -73,6 +74,7 @@ export default function App() {
         <Route path="balance" element={<Balance />} />
         <Route path="transactions" element={<Transactions />} />
         <Route path="debt" element={<Debt />} />
+        <Route path="debt/subscriptions" element={<Subscriptions />} />
         <Route path="tax" element={<Tax />} />
         <Route path="stocks" element={<Stocks />} />
         <Route path="stocks/:portfolioId" element={<PortfolioDetail />} />

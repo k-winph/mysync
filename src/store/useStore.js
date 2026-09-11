@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { uuid } from '../utils/id'
 import { DEFAULT_CATEGORIES } from '../constants/categories'
+import { todayISO, addPeriod } from '../utils/date'
 
 // Single source of truth for the whole app, persisted to localStorage.
 // Kept as ONE store on purpose: the app is small and cross-slice reads
@@ -123,8 +124,15 @@ export const useStore = create(
         }),
 
       // --- Debts -----------------------------------------------------------
+      // A debt with recurrence !== 'none' is a "subscription": paying it logs an
+      // expense and rolls its due date forward instead of marking it done.
       addDebt: (data) =>
-        set((s) => ({ debts: [...s.debts, withStamps({ isPaid: false, ...data })] })),
+        set((s) => ({
+          debts: [
+            ...s.debts,
+            withStamps({ isPaid: false, recurrence: 'none', categoryId: '', tags: [], ...data }),
+          ],
+        })),
 
       updateDebt: (id, patch) =>
         set((s) => ({
@@ -139,6 +147,77 @@ export const useStore = create(
             d.id === id ? { ...d, isPaid: !d.isPaid, updatedAt: now() } : d
           ),
         })),
+
+      // Pay a one-time debt: create a matching expense (amount/category/tags from
+      // the debt), mark it paid, and remember the created transaction so unpaying
+      // can remove it. No-op if the debt is already paid.
+      payDebt: (id) =>
+        set((s) => {
+          const d = s.debts.find((x) => x.id === id)
+          if (!d || d.isPaid) return {}
+          const catId =
+            d.categoryId ||
+            s.categories.find((c) => c.type === 'expense' || c.type === 'both')?.id ||
+            ''
+          const tx = withStamps({
+            type: 'expense',
+            amount: d.amount,
+            categoryId: catId,
+            tags: d.tags || [],
+            note: d.note || d.creditor,
+            date: todayISO(),
+          })
+          return {
+            transactions: [tx, ...s.transactions],
+            debts: s.debts.map((x) =>
+              x.id === id ? { ...x, isPaid: true, paidTxId: tx.id, updatedAt: now() } : x
+            ),
+          }
+        }),
+
+      // Reverse payDebt for a one-time debt: delete the linked expense (if any)
+      // and mark it unpaid again.
+      unpayDebt: (id) =>
+        set((s) => {
+          const d = s.debts.find((x) => x.id === id)
+          if (!d || !d.isPaid) return {}
+          return {
+            transactions: d.paidTxId
+              ? s.transactions.filter((t) => t.id !== d.paidTxId)
+              : s.transactions,
+            debts: s.debts.map((x) =>
+              x.id === id ? { ...x, isPaid: false, paidTxId: null, updatedAt: now() } : x
+            ),
+          }
+        }),
+
+      // Pay one cycle of a subscription: log an expense and advance the due date
+      // by one period. History isn't reversible (each cycle is a real expense).
+      paySubscription: (id) =>
+        set((s) => {
+          const d = s.debts.find((x) => x.id === id)
+          if (!d) return {}
+          const catId =
+            d.categoryId ||
+            s.categories.find((c) => c.type === 'expense' || c.type === 'both')?.id ||
+            ''
+          const tx = withStamps({
+            type: 'expense',
+            amount: d.amount,
+            categoryId: catId,
+            tags: d.tags || [],
+            note: d.note || d.creditor,
+            date: todayISO(),
+          })
+          return {
+            transactions: [tx, ...s.transactions],
+            debts: s.debts.map((x) =>
+              x.id === id
+                ? { ...x, dueDate: addPeriod(x.dueDate, x.recurrence), updatedAt: now() }
+                : x
+            ),
+          }
+        }),
 
       // --- Portfolios & holdings ------------------------------------------
       addPortfolio: (data) =>

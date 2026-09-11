@@ -483,56 +483,93 @@ finance-app/
 
 ## 16. เฟส 3 — กลุ่มแจ้งเตือน & ความปลอดภัย (เสร็จแล้ว)
 
-**เตือน backup:** banner สีเหลืองบน Dashboard เมื่อมีข้อมูลและไม่ได้ backup เกิน 14 วัน
-(เช็กจาก `settings.lastBackupAt`) กดไปหน้า Settings หรือกากบาทปิดได้ (ปิดแบบ session)
+**เตือน backup:** banner เหลืองบน Dashboard เมื่อมีข้อมูล + ไม่ backup เกิน 14 วัน
+(จาก `settings.lastBackupAt`) กดไป Settings / กากบาทปิด (session)
 
-**ล็อกแอพด้วย PIN:**
-- `utils/pin.js`: hashPin (SHA-256 + prefix), verifyPin — ไม่เก็บ PIN ตรงๆ เก็บแค่ hash
-- `components/PinPad.jsx`: คีย์แพดตัวเลข (dots + 0-9 + ลบ + ยืนยัน) 4-6 หลัก
-- `components/LockScreen.jsx`: หน้าล็อกเต็มจอ ก่อนเข้าแอพ (ล็อกทุกครั้งที่ reload, ปลดล็อกแค่ session)
-- `components/PinSetupModal.jsx`: ตั้ง PIN (กรอก 2 ครั้ง) / ปิดล็อก (ยืนยัน PIN เดิม)
-- Settings > Security & alerts: toggle App lock
-- **หมายเหตุความปลอดภัย:** เป็น casual lock กันคนแอบดู ไม่ใช่ security จริง (ข้อมูลยังอยู่ localStorage)
+**ล็อกด้วย PIN (6 หลัก):**
+- `utils/pin.js` (hashPin SHA-256, ไม่เก็บ PIN ตรงๆ), `PinPad` (6 หลัก auto-submit ไม่มีปุ่มยืนยัน),
+  `LockScreen` (เต็มจอ ล็อกทุก reload ปลดล็อกแค่ session), `PinSetupModal` (ตั้ง 2 ครั้ง / ปิดต้องยืนยัน)
+- Settings > Security & alerts > App lock
+- **บั๊กที่แก้:** `unlocked` init = `!pinEnabled` — เปิด PIN กลาง session ไม่โดนล็อกเตะออกทันที
+  (ล็อกรอบ reload ถัดไป)
 
-**แจ้งเตือนหนี้ใกล้ครบ:**
-- `utils/notify.js`: requestNotificationPermission, showNotification (ผ่าน SW registration ก่อน)
-- App mount: ถ้าเปิด `debtNotify` + permission granted → เตือนหนี้ที่ due ภายใน 3 วัน/เกินกำหนด
-  วันละครั้ง (`lastDebtNotifyAt`)
-- Settings > Security & alerts: toggle Debt due reminders (ขอ permission ตอนเปิด)
-- **ข้อจำกัดสถาปัตยกรรม:** ไม่มีหลังบ้าน → เตือนได้เฉพาะตอน "เปิดแอพ" (foreground)
-  push ตอนแอพปิดต้องมีเซิร์ฟเวอร์ push ซึ่งขัดกับหลัก privacy-first
+**ปลดล็อกด้วย biometric (ลายนิ้วมือ/Face):**
+- `utils/webauthn.js`: registerBiometric / verifyBiometric / biometricAvailable (WebAuthn platform
+  authenticator, ไม่มีเซิร์ฟเวอร์ — ceremony ผ่าน = ปลดล็อก)
+- Settings toggle "Unlock with biometrics" (โผล่เฉพาะเมื่อเปิด PIN + เครื่องรองรับ) —
+  เปิด = ลงทะเบียน credential เก็บ id ใน localStorage
+- LockScreen: auto-prompt biometric ตอนเปิด + ปุ่ม "Use biometrics" (fallback เป็น PIN เสมอ)
+- ปิด PIN = เคลียร์ biometric ด้วย | **casual lock ไม่ใช่การเข้ารหัสข้อมูล**
 
-**ทดสอบ (headless):** PIN ตั้ง/ล็อกตอน reload/ใส่ผิดขึ้น error/ใส่ถูกปลดล็อก, banner backup โผล่
-เมื่อ stale, Security section + toggle ทำงาน, 0 console error
+**แจ้งเตือนหนี้:** `utils/notify.js` — App mount ถ้าเปิด `debtNotify`+granted → เตือนหนี้ due ≤3วัน/overdue
+วันละครั้ง (`lastDebtNotifyAt`) | **ข้อจำกัด:** เตือนได้เฉพาะตอนเปิดแอพ (ไม่มี push server)
+
+**ทดสอบ:** PIN ตั้ง/auto-submit/ล็อก-ปลดล็อก, biometric register+verify (virtual authenticator),
+backup banner, 0 console error
 
 ### เหลือในเฟส 3
-- เป้าหมายการออม (Savings Goal)
-- สรุปยื่นภาษีอัตโนมัติ (ดึงรายได้ทั้งปี → Tax)
-- หลายสกุลเงิน
-- ภาษาไทย/อังกฤษ (i18next)
+- ~~เป้าหมายการออม (Savings Goal)~~ ✅ เสร็จ (ดูข้อ 18)
+- ~~หลายสกุลเงิน~~ ✅ เสร็จ (ดูข้อ 17)
+- ~~ภาษาไทย/อังกฤษ~~ ✅ เสร็จ (ดูข้อ 17)
+- สรุปยื่นภาษีอัตโนมัติ (ดึงรายได้ทั้งปี → Tax) — **ทดไว้ก่อน ยังไม่ทำ** (ผู้ใช้บอกยังไม่จำเป็น)
 
 ---
 
-## 17. เฟส 3 — กลุ่มปรับแต่ง (เสร็จแล้ว)
+## 17. เฟส 3 — กลุ่มปรับแต่ง: หลายสกุลเงิน + i18n ไทย/อังกฤษ (เสร็จแล้ว)
 
-**หลายสกุลเงิน:**
-- `utils/money.js`: formatMoney รองรับทุก ISO currency (Intl `narrowSymbol` → ฿ $ € ¥ £ …)
-  + export `CURRENCIES` (THB/USD/EUR/GBP/JPY/SGD/AUD/CNY)
-- Settings: เลือก "สกุลเงินหลัก" (dropdown)
-- **การตัดสินใจ:** เปลี่ยนสกุลเงิน = เปลี่ยนแค่สัญลักษณ์/รูปแบบการแสดงผล **ไม่แปลงตัวเลขข้อมูลเดิม**
-  (ไม่มี FX server, การแปลงย้อนหลังจะเพี้ยน) — มีโน้ตเตือนใน Settings | พอร์ตหุ้นยังแยกตามสกุลเหมือนเดิม
-- (ถ้าจะเพิ่ม FX แปลงสดจริง ค่อยต่อ free rates API ทีหลัง)
+**ระบบ 2 ภาษา (ทำเองแบบเบา ไม่ใช้ i18next):**
+- `constants/strings.js` export `{ en, th }` + `strings` เป็น **Proxy** ที่อ่าน `_lang` ระดับโมดูล
+- `setLang(lang)` เรียกใน `App` ตอน render (subscribe `settings.language`) → เปลี่ยนภาษาทั้งแอพทันที
+- `getStrings(lang)` สำหรับโค้ดที่ไม่ใช่ component | component ใช้ `strings.x` ได้เลยไม่ต้องแก้
+- Settings > Appearance > Language (segmented EN / ไทย)
+- **เลือกทำเองแทน i18next** เพราะเบากว่า ไม่ต้อง provider/hook และ strings แยกไว้ตั้งแต่ต้นอยู่แล้ว
 
-**ภาษาไทย/อังกฤษ (i18n แบบเบา ไม่ใช้ i18next):**
-- `constants/strings.js` เปลี่ยนเป็น `{ en, th }` (แปลไทยครบทั้งแอพ)
-- กลไก: `strings` เป็น **Proxy** อ่านภาษาปัจจุบันจากตัวแปร `_lang`; `<App>` เรียก `setLang(settings.language)`
-  ทุก render + subscribe `language` → เปลี่ยนภาษาแล้ว re-render ทั้งต้นไม้ทันที
-- **ข้อดี:** โค้ดเดิมที่เรียก `strings.x` ไม่ต้องแก้เลย (ยกเว้น BottomNav ที่อ่านตอน module-load → ย้ายเข้า component)
-- Settings: สลับ EN/ไทย (segmented) | `getStrings(lang)` สำหรับโค้ดนอก component (เช่น notify ใน App)
-- **หมายเหตุ:** ชื่อหมวด/แท็ก/พอร์ต เป็น "ข้อมูล" ไม่แปลตามภาษา (ผู้ใช้ตั้งเอง)
+**หลายสกุลเงิน (FX):**
+- `services/fx.js`: ลองหลาย provider ฟรีไม่ต้อง key ตามลำดับ (frankfurter.dev, frankfurter.app,
+  open.er-api.com) — rate เป็น "ต่อ base" | `hooks/useFx.js` cache ใน store (`fx`), คืน `convert(minor, from)`
+- `utils/portfolio.js`: `combineToPrimary(groups, field, convert, primary)` → {primaryMinor, natives, ok},
+  `singleToPrimary`, `sumField`
+- Settings > Appearance > Primary currency (THB/USD/EUR/GBP/JPY/SGD/AUD/CNY)
+- **% คิดจากผลรวม native (currency-agnostic)** → ถูกต้องเสมอแม้ FX จะล้มเหลว (ไม่โชว์ +0.00% ผิดๆ)
+- **บั๊กที่แก้:** frankfurter.app ล้มบางจังหวะ → multi-provider fallback + % จาก native sums
 
-**ทดสอบ:** สลับ EN↔ไทยทั้งแอพ (nav/settings/ฟอร์ม), เปลี่ยนสกุลเงิน → สัญลักษณ์เปลี่ยน ($), 0 console error
+**Component แสดงเงิน 2 สกุล:**
+- `DualMoney` — สกุลหลัก (ตัวใหญ่) + native (ตัวเล็ก) | props: combined, primary, className,
+  nativeClassName, stacked, abs
+- `FxChange` — ลูกศร + จำนวน + % (สี เขียว/แดง)
 
-### เหลือในเฟส 3 (กลุ่มการเงินเพิ่มเติม)
-- เป้าหมายการออม (Savings Goal)
-- สรุปยื่นภาษีอัตโนมัติ (ดึงรายได้ทั้งปี → Tax)
+**สกุลเงินในหน้าหุ้น (ตามที่ผู้ใช้ขอ):**
+- **มูลค่า/ยอดรวม** → โชว์ทั้ง THB (หลัก ตัวใหญ่) + USD (รอง ตัวเล็ก) ด้วย `DualMoney`
+- **กำไร/ขาดทุน (การ์ดพอร์ต + หุ้นแต่ละตัว)** → โชว์ **แค่ THB + %** ไม่โชว์ USD (`FxChange` เขียนใหม่:
+  ใช้ native เฉพาะตอน rate ยังไม่พร้อมเป็น fallback)
+- **ราคาต่อหุ้น** → คง USD ตามเดิม
+
+**ทดสอบ:** mock FX providers + Finnhub, ยืนยัน THB แปลงถูก, USD รองตัวเล็กเฉพาะที่ควรมี,
+กำไร/ขาดทุนโชว์ THB+% ล้วน, สลับภาษาไทยติดทั้งแอพ, 0 console error
+
+---
+
+## 18. เฟส 3 — กลุ่มการเงินเพิ่มเติม: เป้าหมายการออม (เสร็จแล้ว)
+
+> ทำเฉพาะ Savings Goal ตามที่ผู้ใช้สั่ง — auto-tax-summary ทดไว้ก่อน
+
+**Store (`useStore.js`):** `savingsGoals: []` + actions `addGoal` / `updateGoal` / `deleteGoal` /
+`addToGoal(id, deltaCents)` (clamp ≥ 0) | อยู่ใน `partialize` + `replaceData`
+- schema: `{ id, name, targetAmount(satang), currentAmount(satang), deadline|null, ... }`
+
+**หน้า/Component:**
+- `pages/Savings.jsx` (route `/savings`) — header ปุ่มย้อนกลับ, การ์ดสรุป "Total saved" (gradient) +
+  progress รวม, การ์ดเป้าหมายแต่ละอัน (progress bar, ยอดออม/เป้า, วันเหลือถ้ามี deadline, ปุ่ม Add money,
+  แตะการ์ดเพื่อแก้ไข), FAB เพิ่มเป้าหมาย, empty state (ไอคอนกระปุก)
+- `components/GoalModal.jsx` — สร้าง/แก้/ลบ (ชื่อ, ยอดเป้า, ออมแล้ว, วันที่ตั้งเป้า optional)
+- `components/AddFundsModal.jsx` — เพิ่มเงินเข้าเป้า (โชว์ยอดที่เหลือ), แก้/ถอนผ่านหน้าแก้ไขเป้าหมาย
+- **Dashboard:** การ์ด `SavingsCard` — ว่าง = CTA "Set a savings goal →", มีเป้า = ยอดออมรวม + progress %
+  → แตะไป `/savings` (เข้าถึงจาก Dashboard เหมือนหน้าหุ้น ไม่อยู่ใน bottom nav)
+
+**Backup:** `exportImport.js` เพิ่มชีต `SavingsGoals` (ตอนนี้ 7 ชีต) + goalToRow/rowToGoal,
+import อ่านชีตนี้ | Settings export/import ผูก `savingsGoals` แล้ว
+
+**i18n:** เพิ่ม block `savings` ครบทั้ง en + th
+
+**ทดสอบ (mocked playwright):** สร้างเป้า → ยอด/เป้า/progress ถูก, Add money → progress ขยับ,
+reload แล้ว persist, สลับไทยติด, เงินโชว์ THB (satang→บาท) ถูก, 0 console error

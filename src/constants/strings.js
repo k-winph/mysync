@@ -66,6 +66,14 @@ const en = {
     deleteConfirm: 'Delete this debt?', overdue: 'Overdue',
     dueInDays: (n) => (n === 0 ? 'Due today' : `Due in ${n} day${n === 1 ? '' : 's'}`),
     allPaid: 'All debts paid. Nice!', showPaid: 'Show paid',
+    repeat: 'Repeat', category: 'Category', tags: 'Tags',
+    recur: { none: 'One-time', weekly: 'Weekly', monthly: 'Monthly', yearly: 'Yearly' },
+    subsTitle: 'Subscriptions', subsTotal: 'Subscriptions total',
+    subsEmpty: 'No subscriptions yet. Tap + to add one.',
+    subsCount: (n) => `${n} subscription${n === 1 ? '' : 's'}`,
+    nextDue: 'Next due', payPeriod: 'Pay this period', payConfirm: 'Log this payment as an expense?',
+    sortLabel: 'Sort', sortExpensive: 'Most expensive', sortCheap: 'Cheapest',
+    sortDueSoon: 'Due soonest', sortDueLate: 'Due latest',
   },
 
   tax: {
@@ -245,6 +253,14 @@ const th = {
     deleteConfirm: 'ลบหนี้รายการนี้?', overdue: 'เกินกำหนด',
     dueInDays: (n) => (n === 0 ? 'ครบกำหนดวันนี้' : `อีก ${n} วัน`),
     allPaid: 'จ่ายครบทุกรายการแล้ว เยี่ยม!', showPaid: 'แสดงที่จ่ายแล้ว',
+    repeat: 'ตั้งซ้ำ', category: 'หมวดหมู่', tags: 'แท็ก',
+    recur: { none: 'ไม่ซ้ำ', weekly: 'ทุกสัปดาห์', monthly: 'ทุกเดือน', yearly: 'ทุกปี' },
+    subsTitle: 'ค่าสมาชิก/บริการ', subsTotal: 'ยอดรวมค่าสมาชิก',
+    subsEmpty: 'ยังไม่มีค่าสมาชิก แตะ + เพื่อเพิ่ม',
+    subsCount: (n) => `${n} รายการ`,
+    nextDue: 'ครบกำหนดถัดไป', payPeriod: 'จ่ายงวดนี้', payConfirm: 'บันทึกการจ่ายนี้เป็นรายจ่าย?',
+    sortLabel: 'เรียง', sortExpensive: 'แพงสุด', sortCheap: 'ถูกสุด',
+    sortDueSoon: 'ใกล้กำหนดสุด', sortDueLate: 'ไกลกำหนดสุด',
   },
 
   tax: {
