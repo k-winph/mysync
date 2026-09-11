@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus,
-  CircleAlert, CalendarClock, ChevronRight, LineChart, Save, X, PiggyBank,
+  CircleAlert, CalendarClock, ChevronRight, LineChart, Save, X, PiggyBank, Users,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -249,6 +249,15 @@ export default function Dashboard() {
           </Card>
         )}
       </div>
+
+      {/* Split-the-bill entry — low-key tool link */}
+      <button
+        onClick={() => navigate('/split')}
+        className="flex w-full items-center justify-center gap-1.5 py-1 text-sm font-medium
+          text-slate-400 hover:text-brand-600"
+      >
+        <Users size={15} /> {strings.split.cta}
+      </button>
 
       {/* Floating add (frosted/translucent so content shows through) */}
       <button

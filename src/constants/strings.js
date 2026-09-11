@@ -154,6 +154,26 @@ const en = {
     daysLeft: (n) => (n < 0 ? 'Past target date' : n === 0 ? 'Due today' : `${n} days left`),
   },
 
+  split: {
+    title: 'Split the bill',
+    cta: 'Split a bill with friends →',
+    people: 'People',
+    addPerson: 'Add name',
+    personHint: 'Name',
+    needPeople: 'Add who is splitting first.',
+    items: 'Items',
+    itemName: 'Item',
+    price: 'Price',
+    addItem: 'Add item',
+    whoShared: 'Who shared this?',
+    noItems: 'Add items and tick who shared each one.',
+    total: 'Total bill',
+    perPerson: 'Each person pays',
+    unassigned: 'Some items have nobody selected yet.',
+    clear: 'Clear all',
+    clearConfirm: 'Clear everything?',
+  },
+
   settings: {
     title: 'Settings', appearance: 'Appearance', darkMode: 'Dark mode', hideBalances: 'Hide balances',
     language: 'Language', currency: 'Primary currency',
@@ -344,6 +364,26 @@ const th = {
     saved: 'ออมแล้ว',
     totalSaved: 'ออมรวมทั้งหมด',
     daysLeft: (n) => (n < 0 ? 'เลยกำหนดแล้ว' : n === 0 ? 'ครบกำหนดวันนี้' : `เหลืออีก ${n} วัน`),
+  },
+
+  split: {
+    title: 'หารบิล',
+    cta: 'หารบิลกับเพื่อน →',
+    people: 'คนที่หาร',
+    addPerson: 'เพิ่มชื่อ',
+    personHint: 'ชื่อ',
+    needPeople: 'เพิ่มคนที่จะหารก่อน',
+    items: 'รายการ',
+    itemName: 'รายการ',
+    price: 'ราคา',
+    addItem: 'เพิ่มรายการ',
+    whoShared: 'ใครหารรายการนี้บ้าง?',
+    noItems: 'เพิ่มรายการแล้วติ๊กว่าใครหารบ้าง',
+    total: 'ยอดรวมทั้งบิล',
+    perPerson: 'แต่ละคนต้องจ่าย',
+    unassigned: 'บางรายการยังไม่ได้เลือกคน',
+    clear: 'ล้างทั้งหมด',
+    clearConfirm: 'ล้างทั้งหมด?',
   },
 
   settings: {
