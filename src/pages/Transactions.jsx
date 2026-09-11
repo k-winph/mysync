@@ -75,7 +75,12 @@ export default function Transactions() {
       return true
     })
 
-    const sorted = [...matches].sort((a, b) => (a.date < b.date ? 1 : -1))
+    // Newest first: by date, then by creation time within the same day.
+    const sorted = [...matches].sort((a, b) =>
+      a.date !== b.date
+        ? a.date < b.date ? 1 : -1
+        : (a.createdAt || '') < (b.createdAt || '') ? 1 : -1
+    )
     const groups = {}
     for (const t of sorted) (groups[t.date] ||= []).push(t)
     return { grouped: Object.entries(groups), count: matches.length }

@@ -83,6 +83,40 @@ export default function PortfolioDetail() {
   const [editPf, setEditPf] = useState(false)
   const [holdingOpen, setHoldingOpen] = useState(false)
   const [editingHolding, setEditingHolding] = useState(null)
+  const [sortKey, setSortKey] = useState('default')
+
+  // Sort holdings by a metric converted to the primary currency so different
+  // currencies compare fairly. Holdings missing the needed data sink to the
+  // bottom regardless of direction.
+  const sortedHoldings = useMemo(() => {
+    if (sortKey === 'default') return holdings
+    const toPrimary = (minor, cur) => {
+      if (minor == null) return null
+      if (cur === primary) return minor
+      const c = convert(minor, cur)
+      return c == null ? minor : c
+    }
+    const rows = holdings.map((h) => {
+      const m = holdingMetrics(h, quoteMap[(h.symbol || '').toUpperCase()])
+      return {
+        h,
+        gain: toPrimary(m.gain, h.currency),
+        value: toPrimary(m.value ?? m.cost, h.currency),
+        today: toPrimary(m.todayChange, h.currency),
+      }
+    })
+    const field = sortKey.startsWith('gain') ? 'gain' : sortKey.startsWith('value') ? 'value' : 'today'
+    const dir = sortKey.endsWith('Asc') ? 'asc' : 'desc'
+    rows.sort((a, b) => {
+      const av = a[field]
+      const bv = b[field]
+      if (av == null && bv == null) return 0
+      if (av == null) return 1 // missing -> bottom
+      if (bv == null) return -1
+      return dir === 'asc' ? av - bv : bv - av
+    })
+    return rows.map((r) => r.h)
+  }, [holdings, quoteMap, sortKey, convert, primary])
 
   // Portfolio removed (e.g. deleted from edit modal) -> go back to overview.
   if (!portfolio) {
@@ -172,7 +206,26 @@ export default function PortfolioDetail() {
 
       {/* Holdings */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.stock.holdings}</h2>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-slate-500">{strings.stock.holdings}</h2>
+          {holdings.length > 1 && (
+            <select
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value)}
+              className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs
+                dark:border-slate-700 dark:bg-slate-900"
+              aria-label={strings.stock.sortLabel}
+            >
+              <option value="default">{strings.stock.sortLabel}</option>
+              <option value="gainDesc">{strings.stock.sortGainDesc}</option>
+              <option value="gainAsc">{strings.stock.sortGainAsc}</option>
+              <option value="valueDesc">{strings.stock.sortValueDesc}</option>
+              <option value="valueAsc">{strings.stock.sortValueAsc}</option>
+              <option value="todayDesc">{strings.stock.sortTodayDesc}</option>
+              <option value="todayAsc">{strings.stock.sortTodayAsc}</option>
+            </select>
+          )}
+        </div>
         {holdings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center
             text-sm text-slate-500 dark:border-slate-700">
@@ -180,7 +233,7 @@ export default function PortfolioDetail() {
           </div>
         ) : (
           <Card className="divide-y divide-slate-100 dark:divide-slate-800">
-            {holdings.map((h) => (
+            {sortedHoldings.map((h) => (
               <HoldingRow
                 key={h.id}
                 holding={h}

@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
-import { Moon, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { CURRENCIES } from '../utils/money'
@@ -73,6 +73,7 @@ export default function Settings() {
   const [notifMsg, setNotifMsg] = useState('')
   const [bioAvailable, setBioAvailable] = useState(false)
   const [bioMsg, setBioMsg] = useState('')
+  const [showKey, setShowKey] = useState(false)
 
   useEffect(() => {
     biometricAvailable().then(setBioAvailable)
@@ -260,16 +261,27 @@ export default function Settings() {
             <LineChart size={20} className="text-slate-500" />
             <span className="flex-1 font-medium">{strings.settings.stockApiKey}</span>
           </div>
-          <input
-            type="text"
-            value={settings.stockApiKey || ''}
-            onChange={(e) => updateSettings({ stockApiKey: e.target.value.trim() })}
-            placeholder="••••••••••••"
-            autoCorrect="off"
-            autoCapitalize="none"
-            spellCheck={false}
-            className="input-base font-mono text-sm"
-          />
+          <div className="relative">
+            <input
+              type={showKey ? 'text' : 'password'}
+              value={settings.stockApiKey || ''}
+              onChange={(e) => updateSettings({ stockApiKey: e.target.value.trim() })}
+              placeholder="••••••••••••"
+              autoCorrect="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              className="input-base pr-11 font-mono text-sm"
+            />
+            <button
+              type="button"
+              onClick={() => setShowKey((v) => !v)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-slate-500
+                hover:bg-slate-100 dark:hover:bg-slate-800"
+              aria-label={showKey ? strings.stock.hideKey : strings.stock.showKey}
+            >
+              {showKey ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
           <p className="text-xs text-slate-500">{strings.settings.stockApiKeyHint}</p>
           <a
             href={PROVIDERS[settings.stockProvider || 'finnhub']?.keyUrl || PROVIDERS.finnhub.keyUrl}

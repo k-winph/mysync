@@ -126,6 +126,11 @@ const en = {
     noKey: 'Add your stock API key in Settings to fetch live prices.',
     fetchError: 'Could not fetch some prices — check the symbol or your API key.',
     thaiHint: 'Thai (SET) symbols use a .BK suffix and may have limited free coverage.',
+    sortLabel: 'Sort', sortDefault: 'Default',
+    sortGainDesc: 'Gain: high → low', sortGainAsc: 'Gain: low → high',
+    sortValueDesc: 'Value: high → low', sortValueAsc: 'Value: low → high',
+    sortTodayDesc: "Today: high → low", sortTodayAsc: "Today: low → high",
+    showKey: 'Show key', hideKey: 'Hide key',
   },
 
   savings: {
@@ -313,6 +318,11 @@ const th = {
     noKey: 'ใส่ API key หุ้นในตั้งค่าเพื่อดึงราคาล่าสุด',
     fetchError: 'ดึงราคาบางตัวไม่ได้ — ตรวจสัญลักษณ์หรือ API key',
     thaiHint: 'หุ้นไทย (SET) ใช้ .BK ต่อท้าย แผนฟรีอาจไม่ครบ',
+    sortLabel: 'เรียง', sortDefault: 'ค่าเริ่มต้น',
+    sortGainDesc: 'กำไร: มาก → น้อย', sortGainAsc: 'กำไร: น้อย → มาก',
+    sortValueDesc: 'มูลค่า: มาก → น้อย', sortValueAsc: 'มูลค่า: น้อย → มาก',
+    sortTodayDesc: 'วันนี้: มาก → น้อย', sortTodayAsc: 'วันนี้: น้อย → มาก',
+    showKey: 'แสดงคีย์', hideKey: 'ซ่อนคีย์',
   },
 
   savings: {

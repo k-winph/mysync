@@ -88,8 +88,16 @@ export default function Dashboard() {
     return [...top, { id: '__other', name: 'Other', color: '#94a3b8', icon: 'ellipsis', value: otherValue }]
   }, [monthTx, categories])
 
+  // Newest first: by date, then by creation time so same-day items keep order.
   const recent = useMemo(
-    () => [...transactions].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 5),
+    () =>
+      [...transactions]
+        .sort((a, b) =>
+          a.date !== b.date
+            ? a.date < b.date ? 1 : -1
+            : (a.createdAt || '') < (b.createdAt || '') ? 1 : -1
+        )
+        .slice(0, 10),
     [transactions]
   )
 

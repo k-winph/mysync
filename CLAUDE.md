@@ -132,7 +132,11 @@ Salary ฯลฯ) แล้วผู้ใช้เพิ่มเองได�
 | `creditor` | string | เจ้าหนี้/ที่ไหน เช่น `"บัตร KTC"` |
 | `amount` | number | ยอดหนี้ (สตางค์) |
 | `dueDate` | string | วันครบกำหนด (ISO) |
-| `isPaid` | boolean | จ่ายแล้วหรือยัง |
+| `isPaid` | boolean | จ่ายแล้วหรือยัง (หนี้ปกติ) |
+| `recurrence` | `"none"`\|`"weekly"`\|`"monthly"`\|`"yearly"` | ไม่ซ้ำ = หนี้ปกติ, อื่นๆ = Subscription (ข้อ 20) |
+| `categoryId` | string | หมวดรายจ่าย (ใช้ตอนกดจ่าย→สร้าง expense) |
+| `tags` | string[] | แท็ก (ติดไปกับ expense ตอนจ่าย) |
+| `paidTxId` | string \| null | id ของ transaction ที่สร้างตอนจ่าย (ไว้ undo) |
 | `note` | string | โน้ต (ไม่บังคับ) |
 
 ### 3.4 Portfolio (พอร์ตหุ้น) — แรงบันดาลใจจากหน้า "สินทรัพย์" ของแอพ Dime
@@ -573,3 +577,68 @@ import อ่านชีตนี้ | Settings export/import ผูก `saving
 
 **ทดสอบ (mocked playwright):** สร้างเป้า → ยอด/เป้า/progress ถูก, Add money → progress ขยับ,
 reload แล้ว persist, สลับไทยติด, เงินโชว์ THB (satang→บาท) ถูก, 0 console error
+
+---
+
+## 19. MoneyInput — ช่องกรอกเงินขึ้น comma อัตโนมัติ (เสร็จแล้ว)
+
+- `components/ui/MoneyInput.jsx` + export `formatMoneyInput()` — `type="text"` ขึ้น , ระหว่างพิมพ์,
+  ทศนิยม 2 ตำแหน่ง, รักษาตำแหน่ง cursor ไม่ให้เด้งตอนพิมพ์แทรกกลาง (นับ digit ซ้าย caret แล้ว map กลับ)
+- **เหตุผล:** `<input type=number>` ใส่ comma ไม่ได้ (เบราว์เซอร์มองว่าไม่ใช่ตัวเลข) → ต้องเป็น text
+- ใช้แทนช่อง number ใน: TransactionForm, DebtModal, GoalModal, AddFundsModal, HoldingModal (avgCost)
+- **ไม่แตะ:** ช่อง shares (จำนวนหน่วย ไม่ใช่เงิน) และหน้า Tax (มี comma อยู่แล้วของเดิม)
+- `parseMoney` ตัด comma ออกให้อยู่แล้ว → state เก็บสตริงมี comma ได้ ไม่ต้องแก้ตอน submit
+
+---
+
+## 20. เฟส 3 — กลุ่ม Debt: recurrence + subscription + จ่าย→รายจ่าย + sorting (เสร็จแล้ว)
+
+**โครงสร้างข้อมูล (เพิ่มใน Debt):** `recurrence`, `categoryId`, `tags[]`, `paidTxId` (ดู 3.3)
+— recurrence !== 'none' = "Subscription"
+
+**DebtModal:** เพิ่มตัวเลือก recurrence (segmented), หมวดหมู่ (grid เฉพาะหมวดรายจ่าย), แท็ก (chips)
+| prop `defaultRecurrence` (หน้า Subscriptions เปิดด้วย 'monthly')
+
+**กดจ่าย → สร้างรายจ่ายจริง (store):**
+- `payDebt(id)` — หนี้ปกติ: สร้าง expense (amount/category/tags/note จากหนี้, date=วันนี้), mark isPaid,
+  เก็บ `paidTxId` | ยอดเงินคงเหลือลดเองเพราะ balance = รายรับ−รายจ่าย
+- `unpayDebt(id)` — ลบ transaction ที่ผูกไว้ (`paidTxId`) + unmark
+- `paySubscription(id)` — สร้าง expense + **เลื่อน dueDate ไปงวดถัดไป** (`addPeriod` ใน utils/date) ไม่ mark paid
+- fallback หมวด: ถ้าหนี้ไม่มี categoryId → ใช้หมวดรายจ่ายตัวแรก
+
+**หน้า Debt:**
+- Total outstanding = **เฉพาะหนี้ปกติที่ยังไม่จ่าย** (ไม่รวม subscription)
+- การ์ด Subscriptions สรุป (ยอดรวม + อันใกล้จ่ายสุด) → แตะไป `/debt/subscriptions`
+- Sorting หนี้ปกติ: ใกล้กำหนด/ไกลกำหนด/แพงสุด/ถูกสุด (default ใกล้กำหนด)
+
+**หน้า Subscriptions (`/debt/subscriptions`):** 1 subscription = 1 การ์ด (ชื่อ/ยอด/ความถี่/วันครบกำหนดถัดไป/
+วันเหลือ) + ปุ่ม "จ่ายงวดนี้" + แตะแก้ไข, การ์ดสรุปยอดรวมด้านบน, FAB (defaultRecurrence monthly), empty state
+
+**ทดสอบ (mocked):** สร้างหนี้+หมวด+แท็ก, กดจ่าย→expense เข้า Records (ยอด/หมวด/แท็กถูก) + balance ลด,
+unpay→expense หาย, สร้าง subscription→จ่ายงวด→dueDate +1 เดือน (11 Sep→11 Oct) + expense เข้า,
+Total outstanding ไม่รวม subs, sorting แพง/ถูกสลับลำดับถูก, 0 console error
+
+---
+
+## 21. หุ้น sorting + ซ่อน API key + เรียงรายการใหม่→เก่า (เสร็จแล้ว)
+
+**Sorting หุ้นในพอร์ต (PortfolioDetail):** dropdown เรียงหุ้นแต่ละตัวได้ — กำไร มาก↔น้อย,
+มูลค่า มาก↔น้อย, กำไรวันนี้ มาก↔น้อย (6 แบบ + ค่าเริ่มต้น)
+- แปลงเป็นสกุลหลัก (`convert`) ก่อนเทียบ เพื่อเทียบข้ามสกุลได้ถูก | หุ้นที่ยังไม่มีข้อมูล (ไม่มีราคา) → ดันไปท้าย
+- โชว์เฉพาะเมื่อมีหุ้น > 1 ตัว
+
+**ซ่อน Stock API key (Settings):** input เป็น `password` โดยดีฟอลต์ + ปุ่มไอคอนตา (Eye/EyeOff) สลับซ่อน/แสดง
+
+**เรียงใหม่→เก่า + โชว์ 10:**
+- Records (Transactions) และ Dashboard "Recent" เรียงตาม `date` ใหม่สุดก่อน แล้ว tiebreak ด้วย `createdAt`
+  (วันเดียวกัน อันที่สร้างทีหลังขึ้นก่อน)
+- Dashboard Recent โชว์สูงสุด **10 รายการ** (เดิม 5) | Records โชว์ครบทุกรายการ
+
+**ทดสอบ (mocked):** สร้าง 12 รายการ → Records โชว์ครบ 12 + ใหม่สุดขึ้นก่อน, Dashboard โชว์ 10
+(ซ่อน TX01/TX02), ซ่อน/แสดง API key สลับ type ถูก, เรียงหุ้น value/gain มาก→น้อย ลำดับถูก, 0 console error
+
+---
+
+## หมายเหตุการซิงก์ CLAUDE.md
+รอบก่อนๆ มีบางครั้งที่ CLAUDE.md ที่อัปเดตไม่ได้ถูก commit ขึ้น git (โดน revert กลับ)
+→ เวลา push ให้ `git add -A` ทุกครั้ง เพื่อให้ CLAUDE.md ติดไปด้วย ไม่งั้น doc จะตกรุ่น
