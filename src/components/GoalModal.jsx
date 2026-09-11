@@ -5,6 +5,7 @@ import { strings } from '../constants/strings'
 import { parseMoney, satangToInput } from '../utils/money'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
+import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
 
 // Create / edit / delete a savings goal.
 export default function GoalModal({ open, editing, onClose }) {
@@ -13,8 +14,8 @@ export default function GoalModal({ open, editing, onClose }) {
   const deleteGoal = useStore((s) => s.deleteGoal)
 
   const [name, setName] = useState(editing?.name || '')
-  const [target, setTarget] = useState(editing ? satangToInput(editing.targetAmount) : '')
-  const [current, setCurrent] = useState(editing ? satangToInput(editing.currentAmount) : '')
+  const [target, setTarget] = useState(editing ? formatMoneyInput(satangToInput(editing.targetAmount)) : '')
+  const [current, setCurrent] = useState(editing ? formatMoneyInput(satangToInput(editing.currentAmount)) : '')
   const [deadline, setDeadline] = useState(editing?.deadline || '')
   const [error, setError] = useState('')
 
@@ -58,19 +59,11 @@ export default function GoalModal({ open, editing, onClose }) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="mb-1 block text-sm font-medium">{strings.savings.target}</label>
-            <input
-              type="number" inputMode="decimal" step="0.01" min="0"
-              value={target} onChange={(e) => setTarget(e.target.value)}
-              placeholder="0.00" className="input-base"
-            />
+            <MoneyInput value={target} onChange={setTarget} placeholder="0.00" className="input-base" />
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium">{strings.savings.current}</label>
-            <input
-              type="number" inputMode="decimal" step="0.01" min="0"
-              value={current} onChange={(e) => setCurrent(e.target.value)}
-              placeholder="0.00" className="input-base"
-            />
+            <MoneyInput value={current} onChange={setCurrent} placeholder="0.00" className="input-base" />
           </div>
         </div>
         <div>

@@ -5,6 +5,7 @@ import { strings } from '../constants/strings'
 import { parseMoney, satangToInput } from '../utils/money'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
+import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
 
 const CURRENCIES = ['THB', 'USD']
 
@@ -17,7 +18,7 @@ export default function HoldingModal({ open, portfolioId, editing, onClose }) {
 
   const [symbol, setSymbol] = useState(editing?.symbol || '')
   const [shares, setShares] = useState(editing ? String(editing.shares) : '')
-  const [avgCost, setAvgCost] = useState(editing ? satangToInput(editing.avgCost) : '')
+  const [avgCost, setAvgCost] = useState(editing ? formatMoneyInput(satangToInput(editing.avgCost)) : '')
   const [currency, setCurrency] = useState(editing?.currency || 'THB')
   const [error, setError] = useState('')
 
@@ -97,13 +98,9 @@ export default function HoldingModal({ open, portfolioId, editing, onClose }) {
 
         <div>
           <label className="mb-1 block text-sm font-medium">{strings.stock.avgCost}</label>
-          <input
-            type="number"
-            inputMode="decimal"
-            step="0.01"
-            min="0"
+          <MoneyInput
             value={avgCost}
-            onChange={(e) => setAvgCost(e.target.value)}
+            onChange={setAvgCost}
             placeholder="0.00"
             className="input-base"
           />

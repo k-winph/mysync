@@ -5,6 +5,7 @@ import { parseMoney, satangToInput } from '../utils/money'
 import { todayISO } from '../utils/date'
 import { Plus } from 'lucide-react'
 import Button from './ui/Button'
+import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
 import CategoryIcon from './CategoryIcon'
 
 // Form for adding/editing a transaction. Controlled entirely by local state;
@@ -15,7 +16,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
   const addTag = useStore((s) => s.addTag)
 
   const [type, setType] = useState(initial?.type || 'expense')
-  const [amount, setAmount] = useState(initial ? satangToInput(initial.amount) : '')
+  const [amount, setAmount] = useState(initial ? formatMoneyInput(satangToInput(initial.amount)) : '')
   const [categoryId, setCategoryId] = useState(initial?.categoryId || '')
   const [selectedTags, setSelectedTags] = useState(initial?.tags || [])
   const [addingTag, setAddingTag] = useState(false)
@@ -95,13 +96,9 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
       {/* Amount */}
       <div>
         <label className="mb-1 block text-sm font-medium">{strings.tx.amount}</label>
-        <input
-          type="number"
-          inputMode="decimal"
-          step="0.01"
-          min="0"
+        <MoneyInput
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={setAmount}
           placeholder="0.00"
           className="input-base text-lg font-semibold"
           autoFocus

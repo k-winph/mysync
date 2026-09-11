@@ -4,6 +4,7 @@ import { strings } from '../constants/strings'
 import { parseMoney, formatMoney } from '../utils/money'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
+import MoneyInput from './ui/MoneyInput'
 
 // Quick "add money" sheet for a savings goal. Adds to currentAmount (clamped
 // at 0 in the store). Corrections/withdrawals go through editing the goal.
@@ -30,13 +31,9 @@ export default function AddFundsModal({ open, goal, onClose }) {
         <p className="text-sm text-slate-500">{goal.name}</p>
         <div>
           <label className="mb-1 block text-sm font-medium">{strings.savings.addFunds}</label>
-          <input
-            type="number"
-            inputMode="decimal"
-            step="0.01"
-            min="0"
+          <MoneyInput
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={setAmount}
             placeholder="0.00"
             className="input-base"
             autoFocus

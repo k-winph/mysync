@@ -6,6 +6,7 @@ import { parseMoney, satangToInput } from '../utils/money'
 import { todayISO } from '../utils/date'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
+import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
 
 // Add / edit / delete a single debt. `editing` = debt object or null for new.
 export default function DebtModal({ open, editing, onClose }) {
@@ -14,7 +15,7 @@ export default function DebtModal({ open, editing, onClose }) {
   const deleteDebt = useStore((s) => s.deleteDebt)
 
   const [creditor, setCreditor] = useState(editing?.creditor || '')
-  const [amount, setAmount] = useState(editing ? satangToInput(editing.amount) : '')
+  const [amount, setAmount] = useState(editing ? formatMoneyInput(satangToInput(editing.amount)) : '')
   const [dueDate, setDueDate] = useState(editing?.dueDate || todayISO())
   const [note, setNote] = useState(editing?.note || '')
   const [error, setError] = useState('')
@@ -57,13 +58,9 @@ export default function DebtModal({ open, editing, onClose }) {
 
         <div>
           <label className="mb-1 block text-sm font-medium">{strings.debt.amount}</label>
-          <input
-            type="number"
-            inputMode="decimal"
-            step="0.01"
-            min="0"
+          <MoneyInput
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={setAmount}
             placeholder="0.00"
             className="input-base text-lg font-semibold"
           />
