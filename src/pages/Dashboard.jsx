@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { getMonthRange, isWithin } from '../utils/date'
+import { getMonthRange, isWithin, todayLong } from '../utils/date'
 import { totalsByCurrency, sumValue, combineToPrimary, sumField } from '../utils/portfolio'
 import { useFx } from '../hooks/useFx'
 import Card from '../components/ui/Card'
@@ -98,11 +98,18 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
+      {/* Header — app logo + today's date */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">{strings.appName}</h1>
-          <p className="text-sm text-slate-500">{month.label}</p>
+        <div className="flex items-center gap-2.5">
+          <img
+            src={`${import.meta.env.BASE_URL}icon-192.png`}
+            alt="MySync"
+            className="h-9 w-9 rounded-xl shadow-sm"
+          />
+          <div>
+            <h1 className="text-2xl font-bold leading-tight">{strings.appName}</h1>
+            <p className="text-sm text-slate-500">{todayLong()}</p>
+          </div>
         </div>
         <div className="flex items-center gap-1">
           <button

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Check, CircleAlert, CalendarClock, Repeat, CreditCard, ChevronRight } from 'lucide-react'
+import { Plus, Check, CircleAlert, CalendarClock, Repeat, CreditCard, ChevronRight, Landmark } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate, daysUntil } from '../utils/date'
@@ -8,6 +8,7 @@ import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
 import NotificationBell from '../components/NotificationBell'
+import PageHeader from '../components/PageHeader'
 
 function dueStatus(dueDate) {
   const d = daysUntil(dueDate)
@@ -162,10 +163,7 @@ export default function Debt() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{strings.debt.title}</h1>
-        <NotificationBell />
-      </div>
+      <PageHeader icon={Landmark} title={strings.debt.title} right={<NotificationBell />} />
 
       {/* Total outstanding = one-time debts + installment remaining balances */}
       <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">

@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronRight, BookOpen } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { GUIDE_META, GUIDE } from '../constants/guide'
 import Card from '../components/ui/Card'
+import PageHeader from '../components/PageHeader'
 
 // A labelled block used in the detail view.
 function Section({ label, children }) {
@@ -26,18 +27,10 @@ export default function Guide() {
   // --- Detail view ---
   if (selected) {
     const e = content[selected]
+    const DetailIcon = GUIDE_META.find((m) => m.id === selected)?.icon
     return (
       <div className="space-y-5">
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setSelected(null)}
-            className="-ml-2 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-            aria-label="Back"
-          >
-            <ChevronLeft size={22} />
-          </button>
-          <h1 className="flex-1 text-xl font-bold">{e.title}</h1>
-        </div>
+        <PageHeader icon={DetailIcon} title={e.title} onBack={() => setSelected(null)} />
 
         <Section label={g.whatFor}>
           <p className="text-sm leading-relaxed">{e.whatFor}</p>
@@ -79,19 +72,12 @@ export default function Guide() {
   // --- List view ---
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => navigate('/settings')}
-          className="-ml-2 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Back"
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold">{g.title}</h1>
-          <p className="text-sm text-slate-500">{g.subtitle}</p>
-        </div>
-      </div>
+      <PageHeader
+        icon={BookOpen}
+        title={g.title}
+        subtitle={g.subtitle}
+        onBack={() => navigate('/settings')}
+      />
 
       <Card className="divide-y divide-slate-100 dark:divide-slate-800">
         {GUIDE_META.map((m) => {

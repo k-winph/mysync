@@ -707,6 +707,26 @@ recurring+installment โชว์ความถี่, installment โชว�
 
 ---
 
+## 25. รอบขัดเงา UX/UI (แบ่ง 6 เฟส)
+
+แนวทาง: คลีน เรียบหรู มี transition/animation เล็กๆ นุ่มๆ (อารมณ์เว็บ Fastwork) | ไอคอนใช้ lucide ทั้งหมด ห้ามอีโมจิ
+
+- **เฟส 1 — Header & โลโก้ (เสร็จแล้ว):** `components/PageHeader.jsx` (ปุ่มย้อนกลับ + ไอคอนฟังก์ชันใน badge +
+  ชื่อ + subtitle + slot ปุ่มขวา) ใช้ทุกหน้า → ได้ไอคอนหัวข้อครบทุกหน้า + สม่ำเสมอ | Dashboard ใส่โลโก้แอป
+  (`public/icon-192.png` ตัว M พื้นม่วง ผ่าน `import.meta.env.BASE_URL`) + วันที่เต็ม (`todayLong()` = "Sat 12 Sep 2026")
+  | ไอคอนแต่ละหน้า: Records=Wallet, Balance=TrendingUp, Debt=Landmark, Recurring=Repeat,
+  Installments=CreditCard, Savings=PiggyBank, Stocks/PortfolioDetail=LineChart, Tax=Calculator,
+  Split=Users, Guide=BookOpen (detail ใช้ไอคอนของฟังก์ชันนั้น), Settings=Settings
+- **เฟส 2 — Toast + กล่องยืนยันเข้าธีม:** แจ้งผล (มี Undo) + เลิกใช้ `window.confirm`
+- **เฟส 3 — Transition & animation:** modal เลื่อนขึ้น, เปลี่ยนหน้า fade, progress วิ่ง, ปุ่มมี feedback
+- **เฟส 4 — Empty state + แก้จุดเล็ก:** empty state เป็นมิตรทุกหน้า + แก้วันที่ถูกตัดในแถวหนี้ + `tabular-nums`
+- **เฟส 5 — สี + Dark mode + กราฟ:** ระบบสีสื่อความหมาย + ขัดเงาโหมดมืด + กราฟสวยขึ้น
+- **เฟส 6 — PWA + หน้าต้อนรับครั้งแรก:** icon/splash/theme-color + welcome ชี้ไปคู่มือ
+
+*(ตัดข้อ "ย่อยอดเงินก้อนใหญ่ ฿1.2M" ออกตามที่ผู้ใช้ไม่เอา)*
+
+---
+
 ## หมายเหตุการซิงก์ CLAUDE.md
 รอบก่อนๆ มีบางครั้งที่ CLAUDE.md ที่อัปเดตไม่ได้ถูก commit ขึ้น git (โดน revert กลับ)
 → เวลา push ให้ `git add -A` ทุกครั้ง เพื่อให้ CLAUDE.md ติดไปด้วย ไม่งั้น doc จะตกรุ่น

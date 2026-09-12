@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, Plus, PiggyBank, Plus as PlusIcon, CalendarClock } from 'lucide-react'
+import { Plus, PiggyBank, Plus as PlusIcon, CalendarClock } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { daysUntil } from '../utils/date'
@@ -8,6 +8,7 @@ import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import GoalModal from '../components/GoalModal'
 import AddFundsModal from '../components/AddFundsModal'
+import PageHeader from '../components/PageHeader'
 
 // Progress bar with a color that turns green once the goal is reached.
 function ProgressBar({ pct, done }) {
@@ -88,17 +89,7 @@ export default function Savings() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => navigate('/')}
-          className="-ml-2 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Back"
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <h1 className="flex-1 text-2xl font-bold">{strings.savings.title}</h1>
-      </div>
+      <PageHeader icon={PiggyBank} title={strings.savings.title} onBack={() => navigate('/')} />
 
       {goals.length === 0 ? (
         <Card className="flex flex-col items-center gap-3 py-10 text-center">

@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, Plus, X, Trash2, Users } from 'lucide-react'
+import { Plus, X, Trash2, Users } from 'lucide-react'
 import { strings } from '../constants/strings'
 import { parseMoney, formatMoney } from '../utils/money'
 import { uuid } from '../utils/id'
 import { useStore } from '../store/useStore'
 import Card from '../components/ui/Card'
 import MoneyInput from '../components/ui/MoneyInput'
+import PageHeader from '../components/PageHeader'
 
 // Ephemeral bill-splitter. No persistence, no transactions — pure calculator.
 // Each item's price splits equally among the people ticked for that item.
@@ -85,21 +86,18 @@ export default function SplitBill() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => navigate('/')}
-          className="-ml-2 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Back"
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <h1 className="flex-1 text-2xl font-bold">{strings.split.title}</h1>
-        {(people.length > 0 || items.length > 0) && (
-          <button onClick={clearAll} className="text-sm font-medium text-slate-500 hover:text-red-600">
-            {strings.split.clear}
-          </button>
-        )}
-      </div>
+      <PageHeader
+        icon={Users}
+        title={strings.split.title}
+        onBack={() => navigate('/')}
+        right={
+          (people.length > 0 || items.length > 0) && (
+            <button onClick={clearAll} className="text-sm font-medium text-slate-500 hover:text-red-600">
+              {strings.split.clear}
+            </button>
+          )
+        }
+      />
 
       {/* People */}
       <div>

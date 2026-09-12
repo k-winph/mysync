@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { CURRENCIES } from '../utils/money'
@@ -10,6 +10,7 @@ import { PROVIDERS } from '../services/stockApi'
 import { requestNotificationPermission } from '../utils/notify'
 import { biometricAvailable, registerBiometric } from '../utils/webauthn'
 import Card from '../components/ui/Card'
+import PageHeader from '../components/PageHeader'
 import CategoryManager from '../components/CategoryManager'
 import TagManager from '../components/TagManager'
 import PinSetupModal from '../components/PinSetupModal'
@@ -140,7 +141,7 @@ export default function Settings() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-bold">{strings.settings.title}</h1>
+      <PageHeader icon={SettingsIcon} title={strings.settings.title} />
 
       {/* Appearance */}
       <div>

@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, Plus, Repeat, CalendarClock, CircleAlert, Check } from 'lucide-react'
+import { Plus, Repeat, CalendarClock, CircleAlert, Check } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate, daysUntil } from '../utils/date'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
+import PageHeader from '../components/PageHeader'
 
 function RecurringCard({ item, onEdit, onPay }) {
   const days = daysUntil(item.dueDate)
@@ -71,16 +72,7 @@ export default function Recurring() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => navigate('/debt')}
-          className="-ml-2 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Back"
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <h1 className="flex-1 text-2xl font-bold">{strings.debt.recurringTitle}</h1>
-      </div>
+      <PageHeader icon={Repeat} title={strings.debt.recurringTitle} onBack={() => navigate('/debt')} />
 
       {items.length === 0 ? (
         <Card className="flex flex-col items-center gap-3 py-10 text-center">

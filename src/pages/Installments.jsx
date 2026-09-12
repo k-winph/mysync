@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, Plus, CreditCard, CalendarClock, CircleAlert, Check } from 'lucide-react'
+import { Plus, CreditCard, CalendarClock, CircleAlert, Check } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate, daysUntil } from '../utils/date'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
+import PageHeader from '../components/PageHeader'
 
 const remainingOf = (d) => d.amount * Math.max(0, (d.totalInstallments || 0) - (d.paidInstallments || 0))
 
@@ -95,16 +96,7 @@ export default function Installments() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => navigate('/debt')}
-          className="-ml-2 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Back"
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <h1 className="flex-1 text-2xl font-bold">{strings.debt.installmentTitle}</h1>
-      </div>
+      <PageHeader icon={CreditCard} title={strings.debt.installmentTitle} onBack={() => navigate('/debt')} />
 
       {active.length === 0 && done.length === 0 ? (
         <Card className="flex flex-col items-center gap-3 py-10 text-center">

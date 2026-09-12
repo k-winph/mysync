@@ -19,6 +19,11 @@ export function formatDateShort(iso) {
   return dayjs(iso).format('D MMM')
 }
 
+/** Today as a full label for the dashboard, e.g. "Fri 12 Sep 2026". */
+export function todayLong() {
+  return dayjs().format('ddd D MMM YYYY')
+}
+
 /**
  * Return the inclusive start/end ISO dates for the month containing `iso`
  * (defaults to current month). Useful for filtering "this month".

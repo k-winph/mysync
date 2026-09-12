@@ -4,12 +4,13 @@ import dayjs from 'dayjs'
 import {
   BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatMoney } from '../utils/money'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
+import PageHeader from '../components/PageHeader'
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => dayjs().month(i).format('MMM'))
 const INCOME_COLOR = '#22c55e'
@@ -69,17 +70,7 @@ export default function Balance() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => navigate('/')}
-          className="-ml-2 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Back"
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <h1 className="flex-1 text-2xl font-bold">{strings.balance.title}</h1>
-      </div>
+      <PageHeader icon={TrendingUp} title={strings.balance.title} onBack={() => navigate('/')} />
 
       {/* Year selector */}
       <div className="flex items-center justify-center gap-4">

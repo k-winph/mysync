@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Plus, RefreshCw, Pencil, KeyRound, ChevronRight } from 'lucide-react'
+import { Plus, RefreshCw, Pencil, KeyRound, ChevronRight, LineChart } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { holdingMetrics, totalsByCurrency, combineToPrimary, singleToPrimary, sumField } from '../utils/portfolio'
@@ -13,6 +13,7 @@ import DualMoney from '../components/DualMoney'
 import FxChange from '../components/FxChange'
 import PortfolioModal from '../components/PortfolioModal'
 import HoldingModal from '../components/HoldingModal'
+import PageHeader from '../components/PageHeader'
 
 // Value & gain convert to the primary currency (native shown smaller); the
 // per-share price stays in the stock's own currency.
@@ -148,32 +149,30 @@ export default function PortfolioDetail() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => navigate('/stocks')}
-          className="-ml-2 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Back"
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <h1 className="flex-1 truncate text-2xl font-bold">{portfolio.name}</h1>
-        <button
-          onClick={() => setEditPf(true)}
-          className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label={strings.stock.editPortfolio}
-        >
-          <Pencil size={18} />
-        </button>
-        <button
-          onClick={refresh}
-          disabled={loading || !hasKey}
-          className="rounded-full p-2 text-slate-500 hover:bg-slate-100 disabled:opacity-40 dark:hover:bg-slate-800"
-          aria-label={strings.stock.refresh}
-        >
-          <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
-        </button>
-      </div>
+      <PageHeader
+        icon={LineChart}
+        title={portfolio.name}
+        onBack={() => navigate('/stocks')}
+        right={
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setEditPf(true)}
+              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              aria-label={strings.stock.editPortfolio}
+            >
+              <Pencil size={18} />
+            </button>
+            <button
+              onClick={refresh}
+              disabled={loading || !hasKey}
+              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 disabled:opacity-40 dark:hover:bg-slate-800"
+              aria-label={strings.stock.refresh}
+            >
+              <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+            </button>
+          </div>
+        }
+      />
 
       {!hasKey && (
         <button onClick={() => navigate('/settings')} className="block w-full text-left">

@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, SlidersHorizontal, Search, Tag, X, Filter } from 'lucide-react'
+import { Plus, SlidersHorizontal, Search, Tag, X, Filter, Wallet } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate, isWithin } from '../utils/date'
@@ -9,6 +9,7 @@ import TransactionItem from '../components/TransactionItem'
 import TransactionModal from '../components/TransactionModal'
 import CategoryManager from '../components/CategoryManager'
 import TagSummary from '../components/TagSummary'
+import PageHeader from '../components/PageHeader'
 
 const EMPTY_FILTERS = { q: '', type: 'all', categoryId: 'all', from: '', to: '' }
 
@@ -97,25 +98,28 @@ export default function Transactions() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{strings.nav.transactions}</h1>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setTagOpen(true)}
-            className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-            aria-label={strings.tag.title}
-          >
-            <Tag size={20} />
-          </button>
-          <button
-            onClick={() => setCatOpen(true)}
-            className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-            aria-label={strings.category.manage}
-          >
-            <SlidersHorizontal size={20} />
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        icon={Wallet}
+        title={strings.nav.transactions}
+        right={
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setTagOpen(true)}
+              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              aria-label={strings.tag.title}
+            >
+              <Tag size={20} />
+            </button>
+            <button
+              onClick={() => setCatOpen(true)}
+              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              aria-label={strings.category.manage}
+            >
+              <SlidersHorizontal size={20} />
+            </button>
+          </div>
+        }
+      />
 
       {/* Search bar + filter toggle */}
       <div className="flex gap-2">

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, Plus, RefreshCw, Eye, EyeOff, ChevronRight, KeyRound } from 'lucide-react'
+import { Plus, RefreshCw, Eye, EyeOff, ChevronRight, KeyRound, LineChart } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { totalsByCurrency, combineToPrimary, sumField } from '../utils/portfolio'
@@ -11,6 +11,7 @@ import MoneyText from '../components/MoneyText'
 import DualMoney from '../components/DualMoney'
 import FxChange from '../components/FxChange'
 import PortfolioModal from '../components/PortfolioModal'
+import PageHeader from '../components/PageHeader'
 
 export default function Stocks() {
   const navigate = useNavigate()
@@ -42,32 +43,30 @@ export default function Stocks() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => navigate('/')}
-          className="-ml-2 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Back"
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <h1 className="flex-1 text-2xl font-bold">{strings.stock.title}</h1>
-        <button
-          onClick={() => updateSettings({ hideBalances: !settings.hideBalances })}
-          className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label={strings.settings.hideBalances}
-        >
-          {settings.hideBalances ? <EyeOff size={20} /> : <Eye size={20} />}
-        </button>
-        <button
-          onClick={refresh}
-          disabled={loading || !hasKey}
-          className="rounded-full p-2 text-slate-500 hover:bg-slate-100 disabled:opacity-40 dark:hover:bg-slate-800"
-          aria-label={strings.stock.refresh}
-        >
-          <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
-        </button>
-      </div>
+      <PageHeader
+        icon={LineChart}
+        title={strings.stock.title}
+        onBack={() => navigate('/')}
+        right={
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => updateSettings({ hideBalances: !settings.hideBalances })}
+              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              aria-label={strings.settings.hideBalances}
+            >
+              {settings.hideBalances ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+            <button
+              onClick={refresh}
+              disabled={loading || !hasKey}
+              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 disabled:opacity-40 dark:hover:bg-slate-800"
+              aria-label={strings.stock.refresh}
+            >
+              <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+            </button>
+          </div>
+        }
+      />
 
       {/* No API key banner */}
       {!hasKey && (

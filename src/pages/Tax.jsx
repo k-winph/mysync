@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
-import { Info } from 'lucide-react'
+import { Info, Calculator } from 'lucide-react'
 import { strings } from '../constants/strings'
 import { calcTax } from '../utils/tax'
 import { TAX_BRACKETS } from '../constants/taxBrackets'
 import { useStore } from '../store/useStore'
 import Card from '../components/ui/Card'
 import Modal from '../components/ui/Modal'
+import PageHeader from '../components/PageHeader'
 
 // Format a whole-unit number for display (tax figures are whole, not minor).
 function baht(n, currency = 'THB') {
@@ -61,19 +62,20 @@ export default function Tax() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">{strings.tax.title}</h1>
-          <p className="text-sm text-slate-500">{strings.tax.subtitle}</p>
-        </div>
-        <button
-          onClick={() => setInfoOpen(true)}
-          className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label={strings.tax.infoAria}
-        >
-          <Info size={22} />
-        </button>
-      </div>
+      <PageHeader
+        icon={Calculator}
+        title={strings.tax.title}
+        subtitle={strings.tax.subtitle}
+        right={
+          <button
+            onClick={() => setInfoOpen(true)}
+            className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+            aria-label={strings.tax.infoAria}
+          >
+            <Info size={22} />
+          </button>
+        }
+      />
 
       {/* Inputs */}
       <Card className="space-y-3">
