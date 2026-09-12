@@ -723,7 +723,10 @@ recurring+installment โชว์ความถี่, installment โชว�
   แทน `window.confirm` ทั้งหมด (8 จุด: ลบ transaction/debt/goal/holding/portfolio/tag/category + ล้าง split)
   | toast ที่ต่อแล้ว: บันทึก/ลบ/จ่ายหนี้(+Undo)/จ่าย recurring+installment/เพิ่มเงินออม/export/import
   | keyframes `toast-in`/`dialog-in`/`fade-in` ใน index.css (เคารพ prefers-reduced-motion) | strings block `toast`
-- **เฟส 3 — Transition & animation:** modal เลื่อนขึ้น, เปลี่ยนหน้า fade, progress วิ่ง, ปุ่มมี feedback
+- **เฟส 3 — Transition & animation (เสร็จแล้ว):** modal เลื่อนขึ้น (`sheet-in` ใน Modal.jsx) + backdrop `fade-in`,
+  เปลี่ยนหน้า fade (`page-in` ใน Layout ผ่าน key={pathname}), progress bar วิ่ง (`transition-all duration-500`
+  ที่ Installments + Dashboard savings), ปุ่มกดยุบ (`active:scale-[0.97]` ใน Button) | keyframes ทั้งหมดใน
+  index.css เคารพ `prefers-reduced-motion` | *หมายเหตุ:* ไอคอนหัวข้อใน PageHeader ขยายเป็น h-12 เท่าโลโก้
 - **เฟส 4 — Empty state + แก้จุดเล็ก:** empty state เป็นมิตรทุกหน้า + แก้วันที่ถูกตัดในแถวหนี้ + `tabular-nums`
 - **เฟส 5 — สี + Dark mode + กราฟ:** ระบบสีสื่อความหมาย + ขัดเงาโหมดมืด + กราฟสวยขึ้น
 - **เฟส 6 — PWA + หน้าต้อนรับครั้งแรก:** icon/splash/theme-color + welcome ชี้ไปคู่มือ

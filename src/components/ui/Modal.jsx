@@ -25,11 +25,11 @@ export default function Modal({ open, onClose, title, children }) {
       aria-modal="true"
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="fade-in absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
       <div
-        className="relative z-10 w-full max-h-[92vh] overflow-y-auto rounded-t-3xl bg-white
+        className="sheet-in relative z-10 w-full max-h-[92vh] overflow-y-auto rounded-t-3xl bg-white
           p-5 shadow-xl sm:max-w-md sm:rounded-3xl dark:bg-slate-900"
         style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}
       >

@@ -46,7 +46,7 @@ function LoanCard({ loan, onEdit, onPay }) {
             <span className="text-slate-400">{pct.toFixed(0)}%</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-            <div className="h-full rounded-full bg-brand-600" style={{ width: `${Math.min(100, pct)}%` }} />
+            <div className="h-full rounded-full bg-brand-600 transition-all duration-500" style={{ width: `${Math.min(100, pct)}%` }} />
           </div>
         </div>
 

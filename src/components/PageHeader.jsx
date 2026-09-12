@@ -17,8 +17,8 @@ export default function PageHeader({ icon: Icon, title, subtitle, onBack, right 
         </button>
       )}
       {Icon && (
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-600/15">
-          <Icon size={20} />
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-600/15">
+          <Icon size={24} />
         </span>
       )}
       <div className="min-w-0 flex-1">
