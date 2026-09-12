@@ -6,6 +6,7 @@ import { parseMoney, satangToInput } from '../utils/money'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
+import { useConfirm, useToast } from './ui/Feedback'
 
 const CURRENCIES = ['THB', 'USD']
 
@@ -15,6 +16,8 @@ export default function HoldingModal({ open, portfolioId, editing, onClose }) {
   const addHolding = useStore((s) => s.addHolding)
   const updateHolding = useStore((s) => s.updateHolding)
   const deleteHolding = useStore((s) => s.deleteHolding)
+  const confirm = useConfirm()
+  const toast = useToast()
 
   const [symbol, setSymbol] = useState(editing?.symbol || '')
   const [shares, setShares] = useState(editing ? String(editing.shares) : '')
@@ -33,12 +36,15 @@ export default function HoldingModal({ open, portfolioId, editing, onClose }) {
     const data = { symbol: sym, shares: sh, avgCost: cost, currency }
     if (editing) updateHolding(editing.id, data)
     else addHolding({ portfolioId, ...data })
+    toast(editing ? strings.toast.updated : strings.toast.saved)
     onClose()
   }
 
-  const handleDelete = () => {
-    if (editing && window.confirm(strings.stock.deleteHoldingConfirm)) {
+  const handleDelete = async () => {
+    if (!editing) return
+    if (await confirm({ message: strings.stock.deleteHoldingConfirm, danger: true, confirmLabel: strings.common.delete })) {
       deleteHolding(editing.id)
+      toast(strings.toast.deleted)
       onClose()
     }
   }

@@ -70,7 +70,7 @@ export default function Balance() {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon={TrendingUp} title={strings.balance.title} onBack={() => navigate('/')} />
+      <PageHeader icon={TrendingUp} title={strings.balance.title} subtitle={strings.pageSub.balance} onBack={() => navigate('/')} />
 
       {/* Year selector */}
       <div className="flex items-center justify-center gap-4">

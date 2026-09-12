@@ -6,12 +6,15 @@ import { parseMoney, satangToInput } from '../utils/money'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
+import { useConfirm, useToast } from './ui/Feedback'
 
 // Create / edit / delete a savings goal.
 export default function GoalModal({ open, editing, onClose }) {
   const addGoal = useStore((s) => s.addGoal)
   const updateGoal = useStore((s) => s.updateGoal)
   const deleteGoal = useStore((s) => s.deleteGoal)
+  const confirm = useConfirm()
+  const toast = useToast()
 
   const [name, setName] = useState(editing?.name || '')
   const [target, setTarget] = useState(editing ? formatMoneyInput(satangToInput(editing.targetAmount)) : '')
@@ -32,12 +35,15 @@ export default function GoalModal({ open, editing, onClose }) {
     }
     if (editing) updateGoal(editing.id, data)
     else addGoal(data)
+    toast(editing ? strings.toast.updated : strings.toast.saved)
     onClose()
   }
 
-  const handleDelete = () => {
-    if (editing && window.confirm(strings.savings.deleteConfirm)) {
+  const handleDelete = async () => {
+    if (!editing) return
+    if (await confirm({ message: strings.savings.deleteConfirm, danger: true, confirmLabel: strings.common.delete })) {
       deleteGoal(editing.id)
+      toast(strings.toast.deleted)
       onClose()
     }
   }

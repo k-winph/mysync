@@ -8,12 +8,15 @@ import { useStore } from '../store/useStore'
 import Card from '../components/ui/Card'
 import MoneyInput from '../components/ui/MoneyInput'
 import PageHeader from '../components/PageHeader'
+import { useConfirm, useToast } from '../components/ui/Feedback'
 
 // Ephemeral bill-splitter. No persistence, no transactions — pure calculator.
 // Each item's price splits equally among the people ticked for that item.
 export default function SplitBill() {
   const navigate = useNavigate()
   const primary = useStore((s) => s.settings.primaryCurrency)
+  const confirm = useConfirm()
+  const toast = useToast()
 
   const [people, setPeople] = useState([]) // [{ id, name }]
   const [items, setItems] = useState([]) // [{ id, name, price(str), members: id[] }]
@@ -56,10 +59,11 @@ export default function SplitBill() {
       )
     )
 
-  const clearAll = () => {
-    if (window.confirm(strings.split.clearConfirm)) {
+  const clearAll = async () => {
+    if (await confirm({ message: strings.split.clearConfirm, danger: true, confirmLabel: strings.split.clear })) {
       setPeople([])
       setItems([])
+      toast(strings.toast.cleared)
     }
   }
 
@@ -89,6 +93,7 @@ export default function SplitBill() {
       <PageHeader
         icon={Users}
         title={strings.split.title}
+        subtitle={strings.pageSub.split}
         onBack={() => navigate('/')}
         right={
           (people.length > 0 || items.length > 0) && (

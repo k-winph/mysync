@@ -11,6 +11,7 @@ import { requestNotificationPermission } from '../utils/notify'
 import { biometricAvailable, registerBiometric } from '../utils/webauthn'
 import Card from '../components/ui/Card'
 import PageHeader from '../components/PageHeader'
+import { useToast } from '../components/ui/Feedback'
 import CategoryManager from '../components/CategoryManager'
 import TagManager from '../components/TagManager'
 import PinSetupModal from '../components/PinSetupModal'
@@ -55,6 +56,7 @@ function ActionRow({ icon: Icon, label, onClick }) {
 
 export default function Settings() {
   const navigate = useNavigate()
+  const toast = useToast()
   const settings = useStore((s) => s.settings)
   const updateSettings = useStore((s) => s.updateSettings)
   const markBackupNow = useStore((s) => s.markBackupNow)
@@ -109,10 +111,12 @@ export default function Settings() {
   const doExportExcel = () => {
     exportExcel({ transactions, categories, tags, debts, portfolios, holdings, savingsGoals })
     markBackupNow()
+    toast(strings.toast.backup)
   }
   const doExportCSV = () => {
     exportCSV({ transactions })
     markBackupNow()
+    toast(strings.toast.backup)
   }
 
   const onPickFile = async (e) => {
@@ -134,6 +138,7 @@ export default function Settings() {
       // Make sure any tag names inside imported transactions become chips too.
       syncTagsFromTransactions()
       setImportMsg(strings.settings.importDone)
+      toast(strings.toast.imported)
     } catch {
       setImportMsg(strings.settings.importError)
     }
@@ -141,7 +146,7 @@ export default function Settings() {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon={SettingsIcon} title={strings.settings.title} />
+      <PageHeader icon={SettingsIcon} title={strings.settings.title} subtitle={strings.pageSub.settings} />
 
       {/* Appearance */}
       <div>

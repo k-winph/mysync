@@ -5,6 +5,7 @@ import { strings } from '../constants/strings'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import CategoryIcon from './CategoryIcon'
+import { useConfirm, useToast } from './ui/Feedback'
 
 // A curated set of icons/colors so the user doesn't face an overwhelming list.
 const ICON_CHOICES = [
@@ -21,6 +22,8 @@ export default function CategoryManager({ open, onClose }) {
   const categories = useStore((s) => s.categories)
   const addCategory = useStore((s) => s.addCategory)
   const deleteCategory = useStore((s) => s.deleteCategory)
+  const confirm = useConfirm()
+  const toast = useToast()
 
   const [adding, setAdding] = useState(false)
   const [name, setName] = useState('')
@@ -42,8 +45,11 @@ export default function CategoryManager({ open, onClose }) {
     resetForm()
   }
 
-  const handleDelete = (id) => {
-    if (window.confirm(strings.category.deleteConfirm)) deleteCategory(id)
+  const handleDelete = async (id) => {
+    if (await confirm({ message: strings.category.deleteConfirm, danger: true, confirmLabel: strings.common.delete })) {
+      deleteCategory(id)
+      toast(strings.toast.deleted)
+    }
   }
 
   return (

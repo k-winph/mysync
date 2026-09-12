@@ -4,11 +4,13 @@ import { Plus, Check, CircleAlert, CalendarClock, Repeat, CreditCard, ChevronRig
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate, daysUntil } from '../utils/date'
+import { formatMoney } from '../utils/money'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
 import NotificationBell from '../components/NotificationBell'
 import PageHeader from '../components/PageHeader'
+import { useToast } from '../components/ui/Feedback'
 
 function dueStatus(dueDate) {
   const d = daysUntil(dueDate)
@@ -112,11 +114,22 @@ export default function Debt() {
   const debts = useStore((s) => s.debts)
   const payDebt = useStore((s) => s.payDebt)
   const unpayDebt = useStore((s) => s.unpayDebt)
+  const primary = useStore((s) => s.settings.primaryCurrency)
+  const toast = useToast()
   const navigate = useNavigate()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [sortKey, setSortKey] = useState('dueSoon')
+
+  // Pay a one-time debt and offer an Undo in the toast.
+  const handlePay = (id) => {
+    const d = debts.find((x) => x.id === id)
+    payDebt(id)
+    toast(`${strings.toast.paid} · ${formatMoney(d?.amount || 0, primary)}`, {
+      action: { label: strings.toast.undo, onClick: () => unpayDebt(id) },
+    })
+  }
 
   const data = useMemo(() => {
     const once = debts.filter((d) => (d.kind || 'once') === 'once')
@@ -163,7 +176,7 @@ export default function Debt() {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon={Landmark} title={strings.debt.title} right={<NotificationBell />} />
+      <PageHeader icon={Landmark} title={strings.debt.title} subtitle={strings.pageSub.debt} right={<NotificationBell />} />
 
       {/* Total outstanding = one-time debts + installment remaining balances */}
       <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">
@@ -232,7 +245,7 @@ export default function Debt() {
             {data.unpaid.length > 0 ? (
               <Card className="divide-y divide-slate-100 dark:divide-slate-800">
                 {data.unpaid.map((d) => (
-                  <DebtRow key={d.id} debt={d} onEdit={openEdit} onPay={payDebt} onUnpay={unpayDebt} />
+                  <DebtRow key={d.id} debt={d} onEdit={openEdit} onPay={handlePay} onUnpay={unpayDebt} />
                 ))}
               </Card>
             ) : (
@@ -248,7 +261,7 @@ export default function Debt() {
                 </h3>
                 <Card className="divide-y divide-slate-100 dark:divide-slate-800">
                   {data.paid.map((d) => (
-                    <DebtRow key={d.id} debt={d} onEdit={openEdit} onPay={payDebt} onUnpay={unpayDebt} />
+                    <DebtRow key={d.id} debt={d} onEdit={openEdit} onPay={handlePay} onUnpay={unpayDebt} />
                   ))}
                 </Card>
               </div>

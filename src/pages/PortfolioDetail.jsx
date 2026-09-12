@@ -152,6 +152,7 @@ export default function PortfolioDetail() {
       <PageHeader
         icon={LineChart}
         title={portfolio.name}
+        subtitle={strings.stock.positions(holdings.length)}
         onBack={() => navigate('/stocks')}
         right={
           <div className="flex items-center gap-1">

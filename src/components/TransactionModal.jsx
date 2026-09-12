@@ -4,6 +4,7 @@ import Modal from './ui/Modal'
 import Button from './ui/Button'
 import TransactionForm from './TransactionForm'
 import { Trash2 } from 'lucide-react'
+import { useConfirm, useToast } from './ui/Feedback'
 
 // Shared add/edit modal so both the Transactions page and the Dashboard
 // quick-add can reuse the same form + save/delete logic.
@@ -12,16 +13,21 @@ export default function TransactionModal({ open, editing, onClose }) {
   const addTransaction = useStore((s) => s.addTransaction)
   const updateTransaction = useStore((s) => s.updateTransaction)
   const deleteTransaction = useStore((s) => s.deleteTransaction)
+  const confirm = useConfirm()
+  const toast = useToast()
 
   const handleSubmit = (data) => {
     if (editing) updateTransaction(editing.id, data)
     else addTransaction(data)
+    toast(editing ? strings.toast.updated : strings.toast.saved)
     onClose()
   }
 
-  const handleDelete = () => {
-    if (editing && window.confirm(strings.tx.deleteConfirm)) {
+  const handleDelete = async () => {
+    if (!editing) return
+    if (await confirm({ message: strings.tx.deleteConfirm, danger: true, confirmLabel: strings.common.delete })) {
       deleteTransaction(editing.id)
+      toast(strings.toast.deleted)
       onClose()
     }
   }

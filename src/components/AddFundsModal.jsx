@@ -5,12 +5,14 @@ import { parseMoney, formatMoney } from '../utils/money'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import MoneyInput from './ui/MoneyInput'
+import { useToast } from './ui/Feedback'
 
 // Quick "add money" sheet for a savings goal. Adds to currentAmount (clamped
 // at 0 in the store). Corrections/withdrawals go through editing the goal.
 export default function AddFundsModal({ open, goal, onClose }) {
   const addToGoal = useStore((s) => s.addToGoal)
   const primary = useStore((s) => s.settings.primaryCurrency)
+  const toast = useToast()
   const [amount, setAmount] = useState('')
 
   if (!goal) return null
@@ -18,7 +20,10 @@ export default function AddFundsModal({ open, goal, onClose }) {
   const submit = (e) => {
     e.preventDefault()
     const cents = parseMoney(amount)
-    if (cents > 0) addToGoal(goal.id, cents)
+    if (cents > 0) {
+      addToGoal(goal.id, cents)
+      toast(`${strings.toast.added} · ${formatMoney(cents, primary)}`)
+    }
     setAmount('')
     onClose()
   }

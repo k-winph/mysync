@@ -4,6 +4,7 @@ import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
+import { useConfirm, useToast } from './ui/Feedback'
 
 // Create and remove the managed tags that appear as selectable chips on the
 // transaction form. Names only — kept deliberately simple.
@@ -11,6 +12,8 @@ export default function TagManager({ open, onClose }) {
   const tags = useStore((s) => s.tags)
   const addTag = useStore((s) => s.addTag)
   const deleteTag = useStore((s) => s.deleteTag)
+  const confirm = useConfirm()
+  const toast = useToast()
 
   const [name, setName] = useState('')
 
@@ -19,8 +22,11 @@ export default function TagManager({ open, onClose }) {
     setName('')
   }
 
-  const handleDelete = (id) => {
-    if (window.confirm(strings.tagManage.deleteConfirm)) deleteTag(id)
+  const handleDelete = async (id) => {
+    if (await confirm({ message: strings.tagManage.deleteConfirm, danger: true, confirmLabel: strings.common.delete })) {
+      deleteTag(id)
+      toast(strings.toast.deleted)
+    }
   }
 
   return (

@@ -89,7 +89,7 @@ export default function Savings() {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon={PiggyBank} title={strings.savings.title} onBack={() => navigate('/')} />
+      <PageHeader icon={PiggyBank} title={strings.savings.title} subtitle={strings.pageSub.savings} onBack={() => navigate('/')} />
 
       {goals.length === 0 ? (
         <Card className="flex flex-col items-center gap-3 py-10 text-center">

@@ -104,7 +104,7 @@ export default function Dashboard() {
           <img
             src={`${import.meta.env.BASE_URL}icon-192.png`}
             alt="MySync"
-            className="h-9 w-9 rounded-xl shadow-sm"
+            className="h-12 w-12 rounded-2xl shadow-sm"
           />
           <div>
             <h1 className="text-2xl font-bold leading-tight">{strings.appName}</h1>

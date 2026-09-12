@@ -4,10 +4,12 @@ import { Plus, Repeat, CalendarClock, CircleAlert, Check } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate, daysUntil } from '../utils/date'
+import { formatMoney } from '../utils/money'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
 import PageHeader from '../components/PageHeader'
+import { useToast } from '../components/ui/Feedback'
 
 function RecurringCard({ item, onEdit, onPay }) {
   const days = daysUntil(item.dueDate)
@@ -50,6 +52,8 @@ export default function Recurring() {
   const navigate = useNavigate()
   const debts = useStore((s) => s.debts)
   const payRecurring = useStore((s) => s.payRecurring)
+  const primary = useStore((s) => s.settings.primaryCurrency)
+  const toast = useToast()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
@@ -60,6 +64,12 @@ export default function Recurring() {
       .sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1))
     return { items: list, total: list.reduce((s, d) => s + d.amount, 0) }
   }, [debts])
+
+  const handlePay = (id) => {
+    const it = items.find((x) => x.id === id)
+    payRecurring(id)
+    toast(`${strings.toast.paid} · ${formatMoney(it?.amount || 0, primary)}`)
+  }
 
   const openNew = () => {
     setEditing(null)
@@ -72,7 +82,7 @@ export default function Recurring() {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon={Repeat} title={strings.debt.recurringTitle} onBack={() => navigate('/debt')} />
+      <PageHeader icon={Repeat} title={strings.debt.recurringTitle} subtitle={strings.pageSub.recurring} onBack={() => navigate('/debt')} />
 
       {items.length === 0 ? (
         <Card className="flex flex-col items-center gap-3 py-10 text-center">
@@ -97,7 +107,7 @@ export default function Recurring() {
           </div>
           <div className="space-y-3">
             {items.map((it) => (
-              <RecurringCard key={it.id} item={it} onEdit={openEdit} onPay={payRecurring} />
+              <RecurringCard key={it.id} item={it} onEdit={openEdit} onPay={handlePay} />
             ))}
           </div>
         </>

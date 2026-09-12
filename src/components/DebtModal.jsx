@@ -8,6 +8,7 @@ import Modal from './ui/Modal'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
 import CategoryIcon from './CategoryIcon'
+import { useConfirm, useToast } from './ui/Feedback'
 
 const KINDS = ['once', 'recurring', 'installment']
 const FREQS = ['weekly', 'monthly', 'yearly']
@@ -21,6 +22,8 @@ export default function DebtModal({ open, editing, defaultKind = 'once', onClose
   const categories = useStore((s) => s.categories)
   const tagList = useStore((s) => s.tags)
   const addTag = useStore((s) => s.addTag)
+  const confirm = useConfirm()
+  const toast = useToast()
 
   const [kind, setKind] = useState(editing?.kind || defaultKind)
   const [creditor, setCreditor] = useState(editing?.creditor || '')
@@ -91,12 +94,15 @@ export default function DebtModal({ open, editing, defaultKind = 'once', onClose
     }
     if (editing) updateDebt(editing.id, data)
     else addDebt(data)
+    toast(editing ? strings.toast.updated : strings.toast.saved)
     onClose()
   }
 
-  const handleDelete = () => {
-    if (editing && window.confirm(strings.debt.deleteConfirm)) {
+  const handleDelete = async () => {
+    if (!editing) return
+    if (await confirm({ message: strings.debt.deleteConfirm, danger: true, confirmLabel: strings.common.delete })) {
       deleteDebt(editing.id)
+      toast(strings.toast.deleted)
       onClose()
     }
   }

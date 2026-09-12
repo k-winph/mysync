@@ -717,7 +717,12 @@ recurring+installment โชว์ความถี่, installment โชว�
   | ไอคอนแต่ละหน้า: Records=Wallet, Balance=TrendingUp, Debt=Landmark, Recurring=Repeat,
   Installments=CreditCard, Savings=PiggyBank, Stocks/PortfolioDetail=LineChart, Tax=Calculator,
   Split=Users, Guide=BookOpen (detail ใช้ไอคอนของฟังก์ชันนั้น), Settings=Settings
-- **เฟส 2 — Toast + กล่องยืนยันเข้าธีม:** แจ้งผล (มี Undo) + เลิกใช้ `window.confirm`
+- **เฟส 2 — Toast + กล่องยืนยันเข้าธีม (เสร็จแล้ว):** `components/ui/Feedback.jsx` = `FeedbackProvider`
+  (mount ใน main.jsx) + hooks `useToast()` และ `useConfirm()` | `toast(msg, {type, action:{label,onClick}})`
+  เด้งล่างจอ auto-dismiss (มี Undo ได้) | `confirm({message, danger, confirmLabel})` คืน Promise<boolean>
+  แทน `window.confirm` ทั้งหมด (8 จุด: ลบ transaction/debt/goal/holding/portfolio/tag/category + ล้าง split)
+  | toast ที่ต่อแล้ว: บันทึก/ลบ/จ่ายหนี้(+Undo)/จ่าย recurring+installment/เพิ่มเงินออม/export/import
+  | keyframes `toast-in`/`dialog-in`/`fade-in` ใน index.css (เคารพ prefers-reduced-motion) | strings block `toast`
 - **เฟส 3 — Transition & animation:** modal เลื่อนขึ้น, เปลี่ยนหน้า fade, progress วิ่ง, ปุ่มมี feedback
 - **เฟส 4 — Empty state + แก้จุดเล็ก:** empty state เป็นมิตรทุกหน้า + แก้วันที่ถูกตัดในแถวหนี้ + `tabular-nums`
 - **เฟส 5 — สี + Dark mode + กราฟ:** ระบบสีสื่อความหมาย + ขัดเงาโหมดมืด + กราฟสวยขึ้น

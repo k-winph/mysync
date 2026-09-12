@@ -46,6 +46,7 @@ export default function Stocks() {
       <PageHeader
         icon={LineChart}
         title={strings.stock.title}
+        subtitle={strings.pageSub.stocks}
         onBack={() => navigate('/')}
         right={
           <div className="flex items-center gap-1">

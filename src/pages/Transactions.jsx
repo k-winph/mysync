@@ -101,6 +101,7 @@ export default function Transactions() {
       <PageHeader
         icon={Wallet}
         title={strings.nav.transactions}
+        subtitle={strings.pageSub.records}
         right={
           <div className="flex items-center gap-1">
             <button

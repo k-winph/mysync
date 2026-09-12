@@ -202,6 +202,25 @@ const en = {
     notes: 'Good to know',
   },
 
+  pageSub: {
+    records: 'All your income & expenses',
+    balance: 'Month by month, all year',
+    debt: 'Debts and dues to pay',
+    recurring: 'Bills you pay every cycle',
+    installment: "Loans you're paying off",
+    savings: 'Your saving targets',
+    stocks: 'Your holdings and gain/loss',
+    split: 'Divide a shared bill with friends',
+    settings: 'Preferences & security',
+  },
+
+  toast: {
+    saved: 'Saved', updated: 'Updated', deleted: 'Deleted',
+    paid: 'Payment logged', undo: 'Undo',
+    backup: 'Backup saved', added: 'Money added', cleared: 'Cleared',
+    imported: 'Data imported',
+  },
+
   settings: {
     title: 'Settings', appearance: 'Appearance', darkMode: 'Dark mode', hideBalances: 'Hide balances',
     language: 'Language', currency: 'Primary currency',
@@ -440,6 +459,25 @@ const th = {
     howTo: 'วิธีใช้',
     example: 'ตัวอย่าง',
     notes: 'ข้อควรรู้',
+  },
+
+  pageSub: {
+    records: 'รายรับ-รายจ่ายทั้งหมด',
+    balance: 'ดูทั้งปีแยกรายเดือน',
+    debt: 'หนี้และรายการที่ต้องจ่าย',
+    recurring: 'ค่าใช้จ่ายที่จ่ายซ้ำเรื่อยๆ',
+    installment: 'หนี้ผ่อนที่มีวันจบ',
+    savings: 'เป้าหมายเก็บเงินของคุณ',
+    stocks: 'พอร์ตหุ้นและกำไร/ขาดทุน',
+    split: 'หารบิลกับเพื่อนหลายคน',
+    settings: 'ปรับแต่งแอปและความปลอดภัย',
+  },
+
+  toast: {
+    saved: 'บันทึกแล้ว', updated: 'อัปเดตแล้ว', deleted: 'ลบแล้ว',
+    paid: 'บันทึกการจ่ายแล้ว', undo: 'เลิกทำ',
+    backup: 'สำรองข้อมูลแล้ว', added: 'เพิ่มเงินแล้ว', cleared: 'ล้างแล้ว',
+    imported: 'นำเข้าข้อมูลแล้ว',
   },
 
   settings: {

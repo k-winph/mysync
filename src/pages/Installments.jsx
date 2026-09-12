@@ -4,10 +4,12 @@ import { Plus, CreditCard, CalendarClock, CircleAlert, Check } from 'lucide-reac
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate, daysUntil } from '../utils/date'
+import { formatMoney } from '../utils/money'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
 import PageHeader from '../components/PageHeader'
+import { useToast } from '../components/ui/Feedback'
 
 const remainingOf = (d) => d.amount * Math.max(0, (d.totalInstallments || 0) - (d.paidInstallments || 0))
 
@@ -73,6 +75,8 @@ export default function Installments() {
   const navigate = useNavigate()
   const debts = useStore((s) => s.debts)
   const payInstallment = useStore((s) => s.payInstallment)
+  const primary = useStore((s) => s.settings.primaryCurrency)
+  const toast = useToast()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
@@ -85,6 +89,12 @@ export default function Installments() {
     return { active: act, done: fin, totalRemaining: act.reduce((s, d) => s + remainingOf(d), 0) }
   }, [debts])
 
+  const handlePay = (id) => {
+    const loan = active.find((x) => x.id === id)
+    payInstallment(id)
+    toast(`${strings.toast.paid} · ${formatMoney(loan?.amount || 0, primary)}`)
+  }
+
   const openNew = () => {
     setEditing(null)
     setModalOpen(true)
@@ -96,7 +106,7 @@ export default function Installments() {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon={CreditCard} title={strings.debt.installmentTitle} onBack={() => navigate('/debt')} />
+      <PageHeader icon={CreditCard} title={strings.debt.installmentTitle} subtitle={strings.pageSub.installment} onBack={() => navigate('/debt')} />
 
       {active.length === 0 && done.length === 0 ? (
         <Card className="flex flex-col items-center gap-3 py-10 text-center">
@@ -122,7 +132,7 @@ export default function Installments() {
 
           <div className="space-y-3">
             {active.map((loan) => (
-              <LoanCard key={loan.id} loan={loan} onEdit={openEdit} onPay={payInstallment} />
+              <LoanCard key={loan.id} loan={loan} onEdit={openEdit} onPay={handlePay} />
             ))}
           </div>
 

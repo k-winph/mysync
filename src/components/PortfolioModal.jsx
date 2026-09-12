@@ -4,12 +4,15 @@ import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
+import { useConfirm, useToast } from './ui/Feedback'
 
 // Add / edit / delete a portfolio. Deleting cascades to its holdings.
 export default function PortfolioModal({ open, editing, onClose, onDeleted }) {
   const addPortfolio = useStore((s) => s.addPortfolio)
   const updatePortfolio = useStore((s) => s.updatePortfolio)
   const deletePortfolio = useStore((s) => s.deletePortfolio)
+  const confirm = useConfirm()
+  const toast = useToast()
 
   const [name, setName] = useState(editing?.name || '')
   const [note, setNote] = useState(editing?.note || '')
@@ -20,12 +23,15 @@ export default function PortfolioModal({ open, editing, onClose, onDeleted }) {
     if (!name.trim()) return setError(strings.stock.portfolioName)
     if (editing) updatePortfolio(editing.id, { name: name.trim(), note: note.trim() })
     else addPortfolio({ name: name.trim(), note: note.trim() })
+    toast(editing ? strings.toast.updated : strings.toast.saved)
     onClose()
   }
 
-  const handleDelete = () => {
-    if (editing && window.confirm(strings.stock.deletePortfolioConfirm)) {
+  const handleDelete = async () => {
+    if (!editing) return
+    if (await confirm({ message: strings.stock.deletePortfolioConfirm, danger: true, confirmLabel: strings.common.delete })) {
       deletePortfolio(editing.id)
+      toast(strings.toast.deleted)
       onClose()
       onDeleted?.()
     }
