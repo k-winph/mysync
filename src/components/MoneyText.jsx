@@ -9,7 +9,7 @@ export default function MoneyText({ satang, currency, className = '', hidden }) 
   const shouldHide = hidden ?? settings.hideBalances
 
   if (shouldHide) {
-    return <span className={className}>••••••</span>
+    return <span className={`tabular-nums ${className}`}>••••••</span>
   }
-  return <span className={className}>{formatMoney(satang, cur)}</span>
+  return <span className={`tabular-nums ${className}`}>{formatMoney(satang, cur)}</span>
 }

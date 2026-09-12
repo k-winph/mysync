@@ -50,7 +50,7 @@ function DebtRow({ debt, onEdit, onPay, onUnpay }) {
         <div className={`truncate font-medium ${debt.isPaid ? 'text-slate-400 line-through' : ''}`}>
           {debt.creditor}
         </div>
-        <div className="truncate text-xs">
+        <div className="text-xs">
           {debt.isPaid ? (
             <span className="text-green-600">{strings.debt.paid}</span>
           ) : (
@@ -66,7 +66,7 @@ function DebtRow({ debt, onEdit, onPay, onUnpay }) {
 
       <MoneyText
         satang={debt.amount}
-        className={`shrink-0 font-semibold ${debt.isPaid ? 'text-slate-400 line-through' : ''}`}
+        className={`shrink-0 whitespace-nowrap font-semibold ${debt.isPaid ? 'text-slate-400 line-through' : ''}`}
       />
     </div>
   )

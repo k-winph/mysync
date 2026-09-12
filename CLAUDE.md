@@ -727,7 +727,11 @@ recurring+installment โชว์ความถี่, installment โชว�
   เปลี่ยนหน้า fade (`page-in` ใน Layout ผ่าน key={pathname}), progress bar วิ่ง (`transition-all duration-500`
   ที่ Installments + Dashboard savings), ปุ่มกดยุบ (`active:scale-[0.97]` ใน Button) | keyframes ทั้งหมดใน
   index.css เคารพ `prefers-reduced-motion` | *หมายเหตุ:* ไอคอนหัวข้อใน PageHeader ขยายเป็น h-12 เท่าโลโก้
-- **เฟส 4 — Empty state + แก้จุดเล็ก:** empty state เป็นมิตรทุกหน้า + แก้วันที่ถูกตัดในแถวหนี้ + `tabular-nums`
+- **เฟส 4 — Empty state + แก้จุดเล็ก (เสร็จแล้ว):** `components/ui/EmptyState.jsx` (ไอคอน+ข้อความ+action)
+  ใช้ที่ Records/Dashboard recent/Dashboard donut | แก้วันที่ถูกตัดในแถวหนี้ (เอา truncate ออก + `whitespace-nowrap`
+  ที่ยอดเงิน) | `MoneyText` ใส่ `tabular-nums` ทุกที่
+  | **แก้บั๊ก FAB เด้ง:** page transition (`page-in`) เปลี่ยนเป็น fade opacity อย่างเดียว — เดิมใช้ transform
+  ทำให้ `position:fixed` (ปุ่ม +) ยึดกับกล่อง .page-in ชั่วคราวแล้วเด้ง (transform ที่ ancestor ทำให้ fixed เพี้ยน)
 - **เฟส 5 — สี + Dark mode + กราฟ:** ระบบสีสื่อความหมาย + ขัดเงาโหมดมืด + กราฟสวยขึ้น
 - **เฟส 6 — PWA + หน้าต้อนรับครั้งแรก:** icon/splash/theme-color + welcome ชี้ไปคู่มือ
 

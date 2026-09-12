@@ -62,10 +62,12 @@
 }
 .fade-in { animation: fade-in 0.15s ease-out; }
 
-/* Subtle page-change fade (keyed by route in Layout). */
+/* Subtle page-change fade (keyed by route in Layout).
+   Opacity-only on purpose: a transform here would make fixed-position children
+   (the floating + button) anchor to this box during the animation and jump. */
 @keyframes page-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 .page-in { animation: page-in 0.20s ease-out; }
 

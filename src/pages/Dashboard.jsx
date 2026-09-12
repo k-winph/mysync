@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus,
-  ChevronRight, LineChart, PiggyBank, Users,
+  ChevronRight, LineChart, PiggyBank, Users, Inbox, PieChart,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -17,6 +17,7 @@ import TransactionItem from '../components/TransactionItem'
 import ExpenseDonut from '../components/ExpenseDonut'
 import TransactionModal from '../components/TransactionModal'
 import NotificationBell from '../components/NotificationBell'
+import EmptyState from '../components/ui/EmptyState'
 
 // Sum income/expense/balance for a set of transactions.
 function totals(txs) {
@@ -167,9 +168,7 @@ export default function Dashboard() {
         </h2>
         <Card>
           {donutData.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-500">
-              {strings.dashboard.noExpenseData}
-            </p>
+            <EmptyState icon={PieChart} message={strings.dashboard.noExpenseData} />
           ) : (
             <ExpenseDonut data={donutData} currency={settings.primaryCurrency} />
           )}
@@ -182,7 +181,9 @@ export default function Dashboard() {
           {strings.dashboard.recent}
         </h2>
         {recent.length === 0 ? (
-          <Card className="text-center text-sm text-slate-500">{strings.dashboard.empty}</Card>
+          <Card>
+            <EmptyState icon={Inbox} message={strings.dashboard.empty} />
+          </Card>
         ) : (
           <Card className="space-y-0.5">
             {recent.map((tx) => (
