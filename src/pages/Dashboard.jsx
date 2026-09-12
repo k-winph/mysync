@@ -116,27 +116,31 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Balance + income/expense in one card — tap to open the yearly breakdown */}
+      {/* Balance + income/expense in one solid card — tap to open the yearly breakdown.
+          Whole card is one gradient; sections are split by faint white dividers. */}
       <button onClick={() => navigate('/balance')} className="block w-full text-left">
-        <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800">
-          {/* Top: balance */}
-          <div className="bg-gradient-to-br from-brand-600 to-brand-700 p-4 text-white">
-            <div className="flex items-center justify-between">
-              <p className="text-sm opacity-80">{strings.dashboard.balance}</p>
-              <ChevronRight size={18} className="opacity-80" />
-            </div>
-            <MoneyText satang={cur.balance} className="text-3xl font-bold" />
+        <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 p-4 text-white shadow-sm">
+          {/* Balance */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm opacity-80">{strings.dashboard.balance}</p>
+            <ChevronRight size={18} className="opacity-80" />
           </div>
-          {/* Bottom: income | expense, split by a divider */}
-          <div className="grid grid-cols-2 divide-x divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">
-            <div className="flex items-center gap-1 p-3">
-              <ArrowUpRight size={16} className="shrink-0 text-green-600" />
-              <span className="text-xs font-medium text-green-600">{strings.dashboard.income}</span>
+          <MoneyText satang={cur.balance} className="text-3xl font-bold" />
+
+          {/* Horizontal divider — inset from the card edges */}
+          <div className="my-3 border-t border-white/20" />
+
+          {/* Income | Expense — split by a short floating vertical line */}
+          <div className="flex items-stretch">
+            <div className="flex flex-1 items-center gap-1">
+              <ArrowUpRight size={16} className="shrink-0 text-emerald-300" />
+              <span className="text-xs font-medium text-emerald-300">{strings.dashboard.income}</span>
               <MoneyText satang={cur.income} className="ml-auto text-sm font-bold" />
             </div>
-            <div className="flex items-center gap-1 p-3">
-              <ArrowDownRight size={16} className="shrink-0 text-red-600" />
-              <span className="text-xs font-medium text-red-600">{strings.dashboard.expense}</span>
+            <div className="mx-3 my-0.5 w-px bg-white/20" />
+            <div className="flex flex-1 items-center gap-1">
+              <ArrowDownRight size={16} className="shrink-0 text-rose-300" />
+              <span className="text-xs font-medium text-rose-300">{strings.dashboard.expense}</span>
               <MoneyText satang={cur.expense} className="ml-auto text-sm font-bold" />
             </div>
           </div>
