@@ -685,6 +685,28 @@ recurring+installment โชว์ความถี่, installment โชว�
 
 ---
 
+## 23. ปุ่มกระดิ่งแจ้งเตือน (Notification bell, เสร็จแล้ว)
+
+- `components/NotificationBell.jsx` — ปุ่มกระดิ่ง + badge นับจำนวน + dropdown panel (สไตล์ Facebook)
+  วางมุมขวาบนของ **Dashboard** (ซ้ายของกระดิ่งคือปุ่มดวงตา) และ **หน้า Debt**
+- รวมการเตือนไว้ที่เดียว (คำนวณสดจากข้อมูล ไม่เก็บ read/unread): หนี้/งวดครบกำหนดภายใน 14 วันหรือเกินกำหนด
+  (ทั้ง 3 ประเภท) + เตือน backup ค้าง | badge = จำนวน active | แต่ละแถวกดไปหน้าที่เกี่ยว | เกินกำหนด = สีแดง
+- ลบ banner backup + การ์ดหนี้ใกล้ครบกลางหน้า Dashboard ออก มารวมในกระดิ่งแทน
+- i18n: block `notifCenter` (en+th)
+
+## 24. คู่มือการใช้งาน (User guide, เสร็จแล้ว)
+
+- ปุ่ม "คู่มือการใช้งาน" ในหน้า Settings (หมวด Help) → route `/guide`
+- `pages/Guide.jsx` — 2 มุมมองในหน้าเดียว (state `selected`): รายการฟังก์ชันทั้งหมด → แตะเข้าดูรายละเอียด
+  (ปุ่มย้อนกลับกลับไปรายการ) แต่ละหัวข้อมี: ใช้ทำอะไร / อยู่ที่ไหน / วิธีใช้ (numbered) / ตัวอย่าง / ข้อควรรู้
+- `constants/guide.js` — เนื้อหาแยก en+th: `GUIDE_META` (id+ไอคอน ตามลำดับ) + `GUIDE[lang][id]`
+  ครอบคลุม 13 ฟังก์ชัน (dashboard, records, balance, categories, tags, debt, savings, stocks, tax,
+  split, notifications, settings, backup) | อ่านภาษาจาก `settings.language`
+- i18n label: block `guide` (whatFor/location/howTo/example/notes) ใน strings.js
+- **เพิ่มฟังก์ชันใหม่ในอนาคต:** เพิ่ม entry ใน GUIDE_META + ข้อความใน GUIDE.en/GUIDE.th (คีย์เดียวกัน)
+
+---
+
 ## หมายเหตุการซิงก์ CLAUDE.md
 รอบก่อนๆ มีบางครั้งที่ CLAUDE.md ที่อัปเดตไม่ได้ถูก commit ขึ้น git (โดน revert กลับ)
 → เวลา push ให้ `git add -A` ทุกครั้ง เพื่อให้ CLAUDE.md ติดไปด้วย ไม่งั้น doc จะตกรุ่น

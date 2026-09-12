@@ -17,6 +17,7 @@ import Stocks from './pages/Stocks'
 import PortfolioDetail from './pages/PortfolioDetail'
 import Savings from './pages/Savings'
 import SplitBill from './pages/SplitBill'
+import Guide from './pages/Guide'
 import Settings from './pages/Settings'
 
 export default function App() {
@@ -83,6 +84,7 @@ export default function App() {
         <Route path="stocks/:portfolioId" element={<PortfolioDetail />} />
         <Route path="savings" element={<Savings />} />
         <Route path="split" element={<SplitBill />} />
+        <Route path="guide" element={<Guide />} />
         <Route path="settings" element={<Settings />} />
       </Route>
     </Routes>

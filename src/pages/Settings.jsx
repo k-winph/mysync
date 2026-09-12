@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { CURRENCIES } from '../utils/money'
@@ -52,6 +53,7 @@ function ActionRow({ icon: Icon, label, onClick }) {
 }
 
 export default function Settings() {
+  const navigate = useNavigate()
   const settings = useStore((s) => s.settings)
   const updateSettings = useStore((s) => s.updateSettings)
   const markBackupNow = useStore((s) => s.markBackupNow)
@@ -324,6 +326,13 @@ export default function Settings() {
           className="hidden"
           onChange={onPickFile}
         />
+      </div>
+
+      {/* Help */}
+      <div>
+        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+          <ActionRow icon={BookOpen} label={strings.guide.title} onClick={() => navigate('/guide')} />
+        </Card>
       </div>
 
       {/* About */}

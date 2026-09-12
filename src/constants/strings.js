@@ -192,6 +192,16 @@ const en = {
     aria: 'Notifications',
   },
 
+  guide: {
+    title: 'User guide',
+    subtitle: 'How every feature works',
+    whatFor: 'What it does',
+    location: 'Where to find it',
+    howTo: 'How to use it',
+    example: 'Example',
+    notes: 'Good to know',
+  },
+
   settings: {
     title: 'Settings', appearance: 'Appearance', darkMode: 'Dark mode', hideBalances: 'Hide balances',
     language: 'Language', currency: 'Primary currency',
@@ -420,6 +430,16 @@ const th = {
     title: 'การแจ้งเตือน',
     empty: 'ไม่มีการแจ้งเตือน',
     aria: 'การแจ้งเตือน',
+  },
+
+  guide: {
+    title: 'คู่มือการใช้งาน',
+    subtitle: 'อธิบายวิธีใช้ทุกฟังก์ชัน',
+    whatFor: 'ใช้ทำอะไร',
+    location: 'อยู่ที่ไหน',
+    howTo: 'วิธีใช้',
+    example: 'ตัวอย่าง',
+    notes: 'ข้อควรรู้',
   },
 
   settings: {
