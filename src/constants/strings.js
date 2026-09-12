@@ -5,7 +5,7 @@
 const en = {
   appName: 'MySync',
 
-  nav: { dashboard: 'Dashboard', transactions: 'Records', debt: 'Debt', tax: 'Tax', settings: 'Settings' },
+  nav: { dashboard: 'Home', transactions: 'Records', debt: 'Debt', tax: 'Tax', settings: 'Settings' },
 
   common: {
     add: 'Add', edit: 'Edit', delete: 'Delete', save: 'Save', cancel: 'Cancel',
