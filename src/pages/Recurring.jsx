@@ -89,10 +89,19 @@ export default function Recurring() {
         </Card>
       ) : (
         <>
-          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 p-4 text-white">
+          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 p-4 text-white">
             <p className="text-sm opacity-80">{strings.debt.recurringTotal}</p>
             <MoneyText satang={total} className="text-3xl font-bold" />
-            <p className="mt-1 text-xs opacity-80">{strings.debt.countItems(items.length)}</p>
+            {items[0] && (
+              <div className="mt-2 flex items-center justify-between border-t border-white/20 pt-2 text-sm">
+                <span className="flex items-center gap-1 text-white/80">
+                  <CalendarClock size={13} /> {strings.debt.nextPayment}: {items[0].creditor}
+                </span>
+                <span className={daysUntil(items[0].dueDate) < 0 ? 'font-semibold text-rose-200' : 'font-medium text-white/90'}>
+                  <MoneyText satang={items[0].amount} /> · {formatDate(items[0].dueDate)}
+                </span>
+              </div>
+            )}
           </div>
           <div className="space-y-3">
             {items.map((it) => (
