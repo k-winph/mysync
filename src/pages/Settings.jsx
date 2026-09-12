@@ -1,10 +1,11 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Download, ShieldAlert, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { CURRENCIES } from '../utils/money'
 import { formatDate } from '../utils/date'
+import { usePwaInstall } from '../hooks/usePwaInstall'
 import { exportExcel, exportCSV, importFile } from '../services/exportImport'
 import { PROVIDERS } from '../services/stockApi'
 import { requestNotificationPermission } from '../utils/notify'
@@ -80,6 +81,12 @@ export default function Settings() {
   const [bioMsg, setBioMsg] = useState('')
   const [showKey, setShowKey] = useState(false)
 
+  const { canInstall, install } = usePwaInstall()
+
+  // Backup is "stale" if it was never done or is older than 30 days.
+  const backupStale = !settings.lastBackupAt ||
+    (Date.now() - new Date(settings.lastBackupAt).getTime()) / 86400000 > 30
+
   useEffect(() => {
     biometricAvailable().then(setBioAvailable)
   }, [])
@@ -148,6 +155,19 @@ export default function Settings() {
     <div className="space-y-5">
       <PageHeader icon={SettingsIcon} title={strings.settings.title} subtitle={strings.pageSub.settings} />
 
+      {/* Install app — only shown when the browser says it's installable */}
+      {canInstall && (
+        <button onClick={install} className="block w-full text-left">
+          <Card className="flex items-center gap-3 bg-gradient-to-br from-brand-600 to-brand-700 text-white">
+            <Download size={22} className="shrink-0 opacity-90" />
+            <div className="flex-1">
+              <div className="font-semibold">{strings.settings.installApp}</div>
+              <div className="text-sm text-white/80">{strings.settings.installHint}</div>
+            </div>
+          </Card>
+        </button>
+      )}
+
       {/* Appearance */}
       <div>
         <h2 className="mb-2 text-sm font-semibold text-slate-500">
@@ -165,6 +185,12 @@ export default function Settings() {
             label={strings.settings.hideBalances}
             checked={settings.hideBalances}
             onChange={(v) => updateSettings({ hideBalances: v })}
+          />
+          <ToggleRow
+            icon={Vibrate}
+            label={strings.settings.haptics}
+            checked={settings.haptics !== false}
+            onChange={(v) => updateSettings({ haptics: v })}
           />
 
           {/* Language */}
@@ -306,6 +332,23 @@ export default function Settings() {
       {/* Data */}
       <div>
         <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.settings.data}</h2>
+        {backupStale && (
+          <div className="mb-2 flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-3
+            text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+            <ShieldAlert size={20} className="mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold">{strings.reminder.backupTitle}</p>
+              <p className="mt-0.5 text-xs opacity-90">{strings.reminder.backupBody}</p>
+              <button
+                onClick={doExportExcel}
+                className="mt-2 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white
+                  transition hover:bg-amber-600 active:scale-95"
+              >
+                {strings.reminder.backupAction}
+              </button>
+            </div>
+          </div>
+        )}
         <Card className="divide-y divide-slate-100 dark:divide-slate-800">
           <ActionRow
             icon={FileSpreadsheet}

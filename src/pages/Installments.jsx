@@ -10,6 +10,7 @@ import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
 import PageHeader from '../components/PageHeader'
 import { useToast } from '../components/ui/Feedback'
+import { haptic } from '../utils/haptics'
 
 const remainingOf = (d) => d.amount * Math.max(0, (d.totalInstallments || 0) - (d.paidInstallments || 0))
 
@@ -91,6 +92,7 @@ export default function Installments() {
 
   const handlePay = (id) => {
     const loan = active.find((x) => x.id === id)
+    haptic()
     payInstallment(id)
     toast(`${strings.toast.paid} · ${formatMoney(loan?.amount || 0, primary)}`)
   }

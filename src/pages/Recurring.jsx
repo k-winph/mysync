@@ -10,6 +10,7 @@ import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
 import PageHeader from '../components/PageHeader'
 import { useToast } from '../components/ui/Feedback'
+import { haptic } from '../utils/haptics'
 
 function RecurringCard({ item, onEdit, onPay }) {
   const days = daysUntil(item.dueDate)
@@ -67,6 +68,7 @@ export default function Recurring() {
 
   const handlePay = (id) => {
     const it = items.find((x) => x.id === id)
+    haptic()
     payRecurring(id)
     toast(`${strings.toast.paid} · ${formatMoney(it?.amount || 0, primary)}`)
   }

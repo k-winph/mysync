@@ -51,6 +51,7 @@ const DEFAULT_SETTINGS = {
   biometricEnabled: false, // unlock with fingerprint/Face (WebAuthn), needs PIN as fallback
   biometricCredId: null, // stored WebAuthn credential id (base64url)
   onboarded: false, // has the first-run welcome been dismissed?
+  haptics: true, // light vibration on important taps (save/pay/confirm/delete)
 }
 
 export const useStore = create(

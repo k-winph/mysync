@@ -11,6 +11,7 @@ import DebtModal from '../components/DebtModal'
 import NotificationBell from '../components/NotificationBell'
 import PageHeader from '../components/PageHeader'
 import { useToast } from '../components/ui/Feedback'
+import { haptic } from '../utils/haptics'
 
 function dueStatus(dueDate) {
   const d = daysUntil(dueDate)
@@ -125,6 +126,7 @@ export default function Debt() {
   // Pay a one-time debt and offer an Undo in the toast.
   const handlePay = (id) => {
     const d = debts.find((x) => x.id === id)
+    haptic()
     payDebt(id)
     toast(`${strings.toast.paid} · ${formatMoney(d?.amount || 0, primary)}`, {
       action: { label: strings.toast.undo, onClick: () => unpayDebt(id) },

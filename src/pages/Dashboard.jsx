@@ -7,6 +7,7 @@ import {
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { getMonthRange, isWithin, todayLong } from '../utils/date'
+import { haptic } from '../utils/haptics'
 import { totalsByCurrency, sumValue, combineToPrimary, sumField } from '../utils/portfolio'
 import { useFx } from '../hooks/useFx'
 import Card from '../components/ui/Card'
@@ -212,6 +213,7 @@ export default function Dashboard() {
       {/* Floating add (frosted/translucent so content shows through) */}
       <button
         onClick={() => {
+          haptic()
           setEditing(null)
           setAddOpen(true)
         }}

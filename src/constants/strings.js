@@ -24,6 +24,7 @@ const en = {
     topCategories: 'Top spending', spendingByCategory: 'Spending by category',
     quickAdd: 'Quick add', trackStocks: 'Track your stocks →',
     vsLastMonth: 'vs last month', noChange: 'no change', noExpenseData: 'No spending this month yet.',
+    spentThisMonth: 'Spent this month',
   },
 
   tx: {
@@ -230,6 +231,8 @@ const en = {
 
   settings: {
     title: 'Settings', appearance: 'Appearance', darkMode: 'Dark mode', hideBalances: 'Hide balances',
+    haptics: 'Vibration feedback',
+    installApp: 'Install app', installHint: 'Add MySync to your home screen for a full-screen, app-like experience.',
     language: 'Language', currency: 'Primary currency',
     currencyNote: 'Changing currency only changes the symbol/format — it does not convert existing amounts.',
     data: 'Data', exportExcel: 'Export to Excel', exportCsv: 'Export to CSV', importFile: 'Import from file',
@@ -290,6 +293,7 @@ const th = {
     topCategories: 'หมวดที่ใช้จ่ายมาก', spendingByCategory: 'รายจ่ายตามหมวด',
     quickAdd: 'เพิ่มด่วน', trackStocks: 'ติดตามหุ้นของคุณ →',
     vsLastMonth: 'เทียบเดือนก่อน', noChange: 'ไม่เปลี่ยนแปลง', noExpenseData: 'เดือนนี้ยังไม่มีรายจ่าย',
+    spentThisMonth: 'รายจ่ายเดือนนี้',
   },
 
   tx: {
@@ -496,6 +500,8 @@ const th = {
 
   settings: {
     title: 'ตั้งค่า', appearance: 'การแสดงผล', darkMode: 'โหมดมืด', hideBalances: 'ซ่อนยอดเงิน',
+    haptics: 'สั่นเมื่อกดปุ่ม',
+    installApp: 'ติดตั้งแอป', installHint: 'เพิ่ม MySync ลงหน้าจอโฮม ใช้งานแบบเต็มจอเหมือนแอปจริง',
     language: 'ภาษา', currency: 'สกุลเงินหลัก',
     currencyNote: 'เปลี่ยนสกุลเงินจะเปลี่ยนแค่สัญลักษณ์/รูปแบบ ไม่แปลงตัวเลขข้อมูลเดิม',
     data: 'ข้อมูล', exportExcel: 'ส่งออกเป็น Excel', exportCsv: 'ส่งออกเป็น CSV', importFile: 'นำเข้าจากไฟล์',
