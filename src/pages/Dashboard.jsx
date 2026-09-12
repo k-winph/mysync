@@ -2,11 +2,11 @@ import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus,
-  CircleAlert, CalendarClock, ChevronRight, LineChart, Save, X, PiggyBank, Users,
+  ChevronRight, LineChart, PiggyBank, Users,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { getMonthRange, isWithin, daysUntil, formatDate } from '../utils/date'
+import { getMonthRange, isWithin } from '../utils/date'
 import { totalsByCurrency, sumValue, combineToPrimary, sumField } from '../utils/portfolio'
 import { useFx } from '../hooks/useFx'
 import Card from '../components/ui/Card'
@@ -16,6 +16,7 @@ import FxChange from '../components/FxChange'
 import TransactionItem from '../components/TransactionItem'
 import ExpenseDonut from '../components/ExpenseDonut'
 import TransactionModal from '../components/TransactionModal'
+import NotificationBell from '../components/NotificationBell'
 
 // Sum income/expense/balance for a set of transactions.
 function totals(txs) {
@@ -31,7 +32,6 @@ function totals(txs) {
 export default function Dashboard() {
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
-  const debts = useStore((s) => s.debts)
   const holdings = useStore((s) => s.holdings)
   const portfolios = useStore((s) => s.portfolios)
   const savingsGoals = useStore((s) => s.savingsGoals)
@@ -41,12 +41,7 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [addOpen, setAddOpen] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [backupDismissed, setBackupDismissed] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
-
-  // Backup reminder: stale if there's data and no backup in the last 14 days.
-  const daysSinceBackup = settings.lastBackupAt ? -daysUntil(settings.lastBackupAt) : Infinity
-  const showBackupReminder = !backupDismissed && transactions.length > 0 && daysSinceBackup >= 14
 
   // PWA quick-add shortcut lands on /?quickadd=1 — open the add form once.
   useEffect(() => {
@@ -101,14 +96,6 @@ export default function Dashboard() {
     [transactions]
   )
 
-  // Unpaid debts that are overdue or due within 14 days — surfaced as a warning.
-  const upcomingDebts = useMemo(() => {
-    return debts
-      .filter((d) => !d.isPaid && daysUntil(d.dueDate) <= 14)
-      .sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1))
-  }, [debts])
-
-
   return (
     <div className="space-y-5">
       {/* Header */}
@@ -117,13 +104,16 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold">{strings.appName}</h1>
           <p className="text-sm text-slate-500">{month.label}</p>
         </div>
-        <button
-          onClick={() => updateSettings({ hideBalances: !settings.hideBalances })}
-          className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label={strings.settings.hideBalances}
-        >
-          {settings.hideBalances ? <EyeOff size={22} /> : <Eye size={22} />}
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => updateSettings({ hideBalances: !settings.hideBalances })}
+            className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+            aria-label={strings.settings.hideBalances}
+          >
+            {settings.hideBalances ? <EyeOff size={22} /> : <Eye size={22} />}
+          </button>
+          <NotificationBell />
+        </div>
       </div>
 
       {/* Balance + income/expense in one card — tap to open the yearly breakdown */}
@@ -153,63 +143,11 @@ export default function Dashboard() {
         </div>
       </button>
 
-      {/* Backup reminder */}
-      {showBackupReminder && (
-        <Card className="flex items-center gap-2 border-amber-300 bg-amber-50 text-sm
-          text-amber-800 dark:border-amber-900/40 dark:bg-amber-900/15 dark:text-amber-300">
-          <Save size={18} className="shrink-0" />
-          <button onClick={() => navigate('/settings')} className="min-w-0 flex-1 text-left">
-            <span className="font-semibold">{strings.reminder.backupTitle}</span>
-            <span className="ml-1 opacity-80">{strings.reminder.backupBody}</span>
-          </button>
-          <button
-            onClick={() => setBackupDismissed(true)}
-            className="shrink-0 rounded-full p-1 hover:bg-amber-100 dark:hover:bg-amber-900/30"
-            aria-label={strings.common.close}
-          >
-            <X size={16} />
-          </button>
-        </Card>
-      )}
-
       {/* Investments (Dime-style: value + today's change + portfolio shares) */}
       <InvestmentsCard portfolios={portfolios} holdings={holdings} onOpen={() => navigate('/stocks')} />
 
       {/* Savings goals */}
       <SavingsCard goals={savingsGoals} onOpen={() => navigate('/savings')} />
-
-      {/* Upcoming / overdue debts */}
-      {upcomingDebts.length > 0 && (
-        <button onClick={() => navigate('/debt')} className="block w-full text-left">
-          <Card className="border-amber-300 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-900/15">
-            <div className="mb-2 flex items-center gap-1.5 text-amber-700 dark:text-amber-400">
-              <CalendarClock size={16} />
-              <span className="text-sm font-semibold">{strings.debt.upcoming}</span>
-              <ChevronRight size={16} className="ml-auto" />
-            </div>
-            <div className="space-y-1.5">
-              {upcomingDebts.slice(0, 3).map((d) => {
-                const days = daysUntil(d.dueDate)
-                const overdue = days < 0
-                return (
-                  <div key={d.id} className="flex items-center gap-2 text-sm">
-                    {overdue ? (
-                      <CircleAlert size={13} className="shrink-0 text-red-600" />
-                    ) : (
-                      <CalendarClock size={13} className="shrink-0 text-amber-600" />
-                    )}
-                    <span className="flex-1 truncate">{d.creditor}</span>
-                    <span className={`text-xs ${overdue ? 'text-red-600' : 'text-amber-600'}`}>
-                      {overdue ? strings.debt.overdue : strings.debt.dueInDays(days)}
-                    </span>
-                    <MoneyText satang={d.amount} className="w-24 text-right font-semibold" />
-                  </div>
-                )
-              })}
-            </div>
-          </Card>
-        </button>
-      )}
 
       {/* Spending by category (donut) */}
       <div>

@@ -7,6 +7,7 @@ import { formatDate, daysUntil } from '../utils/date'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
+import NotificationBell from '../components/NotificationBell'
 
 function dueStatus(dueDate) {
   const d = daysUntil(dueDate)
@@ -161,7 +162,10 @@ export default function Debt() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-bold">{strings.debt.title}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{strings.debt.title}</h1>
+        <NotificationBell />
+      </div>
 
       {/* Total outstanding = one-time debts + installment remaining balances */}
       <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">

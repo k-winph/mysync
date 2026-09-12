@@ -186,6 +186,12 @@ const en = {
     clearConfirm: 'Clear everything?',
   },
 
+  notifCenter: {
+    title: 'Notifications',
+    empty: "You're all caught up.",
+    aria: 'Notifications',
+  },
+
   settings: {
     title: 'Settings', appearance: 'Appearance', darkMode: 'Dark mode', hideBalances: 'Hide balances',
     language: 'Language', currency: 'Primary currency',
@@ -408,6 +414,12 @@ const th = {
     unassigned: 'บางรายการยังไม่ได้เลือกคน',
     clear: 'ล้างทั้งหมด',
     clearConfirm: 'ล้างทั้งหมด?',
+  },
+
+  notifCenter: {
+    title: 'การแจ้งเตือน',
+    empty: 'ไม่มีการแจ้งเตือน',
+    aria: 'การแจ้งเตือน',
   },
 
   settings: {
