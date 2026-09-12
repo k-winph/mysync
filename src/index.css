@@ -13,6 +13,21 @@
     /* Respect iOS safe areas when installed as PWA */
     padding-bottom: env(safe-area-inset-bottom);
   }
+  /* Ambient brand glow: a soft indigo tint rising from the bottom of the
+     screen, fading to the base background near the top. Pinned to the viewport
+     (position: fixed) so it stays put while content scrolls, and kept very
+     subtle so the many purple UI elements still stand out. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(to top, #c3bdf6 0%, #dcd8fb 22%, #f8fafc 60%);
+  }
+  .dark body::before {
+    background: linear-gradient(to top, #2c2668 0%, #12132f 40%, #020617 70%);
+  }
   /* Remove number input spinners for a cleaner money field */
   input[type='number']::-webkit-outer-spin-button,
   input[type='number']::-webkit-inner-spin-button {
