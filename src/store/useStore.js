@@ -50,6 +50,7 @@ const DEFAULT_SETTINGS = {
   lastDebtNotifyAt: null, // YYYY-MM-DD of the last debt notification (once per day)
   biometricEnabled: false, // unlock with fingerprint/Face (WebAuthn), needs PIN as fallback
   biometricCredId: null, // stored WebAuthn credential id (base64url)
+  onboarded: false, // has the first-run welcome been dismissed?
 }
 
 export const useStore = create(

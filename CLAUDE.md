@@ -732,8 +732,14 @@ recurring+installment โชว์ความถี่, installment โชว�
   ที่ยอดเงิน) | `MoneyText` ใส่ `tabular-nums` ทุกที่
   | **แก้บั๊ก FAB เด้ง:** page transition (`page-in`) เปลี่ยนเป็น fade opacity อย่างเดียว — เดิมใช้ transform
   ทำให้ `position:fixed` (ปุ่ม +) ยึดกับกล่อง .page-in ชั่วคราวแล้วเด้ง (transform ที่ ancestor ทำให้ fixed เพี้ยน)
-- **เฟส 5 — สี + Dark mode + กราฟ:** ระบบสีสื่อความหมาย + ขัดเงาโหมดมืด + กราฟสวยขึ้น
-- **เฟส 6 — PWA + หน้าต้อนรับครั้งแรก:** icon/splash/theme-color + welcome ชี้ไปคู่มือ
+- **เฟส 5 — สี + Dark mode + กราฟ (เสร็จแล้ว):** ระบบสีสื่อความหมายทำครบตั้งแต่เฟสก่อนๆ (แดง=หนี้,
+  teal=recurring, violet=installment, เขียว/แดง=รับ/จ่าย) | dark mode ตรวจแล้วสะอาด contrast ดี ไม่ต้องแก้เพิ่ม |
+  กราฟ: donut มี center total + legend อยู่แล้ว, localize คำว่า "Total" (strings.common.total)
+- **เฟส 6 — PWA + หน้าต้อนรับ (เสร็จแล้ว):** manifest/theme-color/icons/shortcuts ครบอยู่แล้วใน vite.config.js
+  (ไม่ต้องแก้) | หน้าต้อนรับครั้งแรก `components/Welcome.jsx` (โลโก้+ข้อความ+ปุ่ม เริ่มใช้งาน/ดูคู่มือ) แสดงครั้งเดียว
+  เก็บสถานะ `settings.onboarded` | render ใน App หลังผ่าน PIN gate | strings block `welcome`
+
+**สรุป: รอบขัดเงา UX/UI ครบทั้ง 6 เฟสแล้ว 🎉**
 
 *(ตัดข้อ "ย่อยอดเงินก้อนใหญ่ ฿1.2M" ออกตามที่ผู้ใช้ไม่เอา)*
 

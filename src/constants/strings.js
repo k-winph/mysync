@@ -9,7 +9,7 @@ const en = {
 
   common: {
     add: 'Add', edit: 'Edit', delete: 'Delete', save: 'Save', cancel: 'Cancel',
-    confirm: 'Confirm', close: 'Close', optional: 'optional', all: 'All', none: 'None', today: 'Today',
+    confirm: 'Confirm', close: 'Close', optional: 'optional', all: 'All', none: 'None', today: 'Today', total: 'Total',
   },
 
   balance: {
@@ -221,6 +221,13 @@ const en = {
     imported: 'Data imported',
   },
 
+  welcome: {
+    title: 'Welcome to MySync',
+    body: 'Your private finance tracker — everything stays on your device. Track spending, debts, savings and investments, all in one place.',
+    start: 'Get started',
+    openGuide: 'View the guide',
+  },
+
   settings: {
     title: 'Settings', appearance: 'Appearance', darkMode: 'Dark mode', hideBalances: 'Hide balances',
     language: 'Language', currency: 'Primary currency',
@@ -268,7 +275,7 @@ const th = {
 
   common: {
     add: 'เพิ่ม', edit: 'แก้ไข', delete: 'ลบ', save: 'บันทึก', cancel: 'ยกเลิก',
-    confirm: 'ยืนยัน', close: 'ปิด', optional: 'ไม่บังคับ', all: 'ทั้งหมด', none: 'ไม่มี', today: 'วันนี้',
+    confirm: 'ยืนยัน', close: 'ปิด', optional: 'ไม่บังคับ', all: 'ทั้งหมด', none: 'ไม่มี', today: 'วันนี้', total: 'รวม',
   },
 
   balance: {
@@ -478,6 +485,13 @@ const th = {
     paid: 'บันทึกการจ่ายแล้ว', undo: 'เลิกทำ',
     backup: 'สำรองข้อมูลแล้ว', added: 'เพิ่มเงินแล้ว', cleared: 'ล้างแล้ว',
     imported: 'นำเข้าข้อมูลแล้ว',
+  },
+
+  welcome: {
+    title: 'ยินดีต้อนรับสู่ MySync',
+    body: 'แอปจัดการเงินส่วนตัว ข้อมูลทั้งหมดเก็บในเครื่องคุณเท่านั้น ติดตามรายรับรายจ่าย หนี้สิน เงินออม และการลงทุน ครบในที่เดียว',
+    start: 'เริ่มใช้งาน',
+    openGuide: 'ดูคู่มือ',
   },
 
   settings: {

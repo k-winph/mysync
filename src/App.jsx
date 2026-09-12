@@ -19,6 +19,7 @@ import Savings from './pages/Savings'
 import SplitBill from './pages/SplitBill'
 import Guide from './pages/Guide'
 import Settings from './pages/Settings'
+import Welcome from './components/Welcome'
 
 export default function App() {
   const theme = useStore((s) => s.settings.theme)
@@ -71,9 +72,10 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route index element={<Dashboard />} />
+    <>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Dashboard />} />
         <Route path="balance" element={<Balance />} />
         <Route path="transactions" element={<Transactions />} />
         <Route path="debt" element={<Debt />} />
@@ -87,6 +89,8 @@ export default function App() {
         <Route path="guide" element={<Guide />} />
         <Route path="settings" element={<Settings />} />
       </Route>
-    </Routes>
+      </Routes>
+      <Welcome />
+    </>
   )
 }

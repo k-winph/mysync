@@ -1,5 +1,6 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { formatMoney } from '../utils/money'
+import { strings } from '../constants/strings'
 import MoneyText from './MoneyText'
 import CategoryIcon from './CategoryIcon'
 
@@ -43,7 +44,7 @@ export default function ExpenseDonut({ data, currency }) {
         </ResponsiveContainer>
         {/* Center total overlay */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xs text-slate-500">Total</span>
+          <span className="text-xs text-slate-500">{strings.common.total}</span>
           <MoneyText satang={total} currency={currency} className="text-lg font-bold" />
         </div>
       </div>
