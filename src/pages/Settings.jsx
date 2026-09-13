@@ -132,12 +132,24 @@ export default function Settings() {
   // Only count it as a backup if the share actually goes through — a user who
   // dismisses the sheet (AbortError) gets no toast and no backup timestamp.
   const doShareBackup = async () => {
+    const data = { transactions, categories, tags, debts, portfolios, holdings, savingsGoals }
     try {
-      await shareBackup({ transactions, categories, tags, debts, portfolios, holdings, savingsGoals })
+      await shareBackup(data)
       markBackupNow()
       toast(strings.toast.backup)
     } catch (e) {
-      if (e?.name !== 'AbortError') toast(strings.settings.shareFailed)
+      // User dismissed the share sheet — do nothing.
+      const cancelled = e?.name === 'AbortError' || /abort|cancel/i.test(e?.message || '')
+      if (cancelled) return
+      // Share failed for another reason (some Android/PWA builds reject file
+      // shares) — fall back to a plain download so a backup still happens.
+      try {
+        exportExcel(data)
+        markBackupNow()
+        toast(strings.toast.backup)
+      } catch {
+        toast(strings.settings.shareFailed)
+      }
     }
   }
 
