@@ -266,7 +266,9 @@ export async function shareBackup(data) {
     exportExcel(data)
     return 'downloaded'
   }
-  await navigator.share({ files: [file], title: 'MySync backup' })
+  // Files only — some Android share targets reject the call when a title/text is
+  // included alongside files.
+  await navigator.share({ files: [file] })
   return 'shared'
 }
 

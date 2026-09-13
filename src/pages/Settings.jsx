@@ -134,9 +134,11 @@ export default function Settings() {
   const doShareBackup = async () => {
     const data = { transactions, categories, tags, debts, portfolios, holdings, savingsGoals }
     try {
-      await shareBackup(data)
+      const how = await shareBackup(data)
       markBackupNow()
-      toast(strings.toast.backup)
+      // 'shared' opened the share sheet; 'downloaded' means the device couldn't
+      // share the .xlsx, so it was saved to Downloads instead — say which.
+      toast(how === 'downloaded' ? strings.settings.savedToDownloads : strings.toast.backup)
     } catch (e) {
       // User dismissed the share sheet — do nothing.
       const cancelled = e?.name === 'AbortError' || /abort|cancel/i.test(e?.message || '')
@@ -146,7 +148,7 @@ export default function Settings() {
       try {
         exportExcel(data)
         markBackupNow()
-        toast(strings.toast.backup)
+        toast(strings.settings.savedToDownloads)
       } catch {
         toast(strings.settings.shareFailed)
       }
