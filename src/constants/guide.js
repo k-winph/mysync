@@ -198,7 +198,7 @@ const th = {
     whatFor: 'สำรองข้อมูลไว้กันหาย หรือย้ายไปเครื่องอื่น',
     location: 'Settings > หมวด Data',
     steps: [
-      'สำรองขึ้นคลาวด์ (ถ้าเครื่องรองรับ): กดแล้วระบบสร้างไฟล์สำรองและเปิดหน้าต่างแชร์ เลือกเซฟไป Google Drive, ไฟล์, อีเมล หรือแอปไหนก็ได้ — สะดวกสุดบนมือถือ',
+      'สำรองขึ้นคลาวด์: สร้างไฟล์สำรอง .json (ครบทุกอย่าง) แล้วเปิดหน้าต่างแชร์ให้เลือกเซฟไป Google Drive, ไฟล์, อีเมล หรือแอปไหนก็ได้ — ถ้าเครื่องแชร์ไม่ได้ ระบบจะดาวน์โหลดไฟล์ลงเครื่องแทน (เอาไปอัปขึ้นคลาวด์เองได้)',
       'Export to Excel: ได้ไฟล์ครบทุกอย่าง (รายการ, หมวด, แท็ก, หนี้, หุ้น, เป้าออม) เซฟลงเครื่อง — แนะนำใช้อันนี้',
       'Export to CSV: ได้เฉพาะรายการรับ-จ่าย',
       'Import from file: เลือกไฟล์ที่เคย export ไว้เพื่อกู้ข้อมูลกลับ',
@@ -386,7 +386,7 @@ Result: A ฿500 · B ฿500 · C ฿300 · total ฿1,300`,
     whatFor: 'Back up your data or move it to another device.',
     location: 'Settings > Data section.',
     steps: [
-      'Back up to cloud (if supported): builds the backup file and opens the share sheet — save it to Google Drive, Files, email, or any app. Easiest on mobile.',
+      'Back up to cloud: builds a complete .json backup and opens the share sheet — save it to Google Drive, Files, email, or any app. If the device can’t share, it downloads the file instead (upload it to the cloud yourself). Easiest on mobile.',
       'Export to Excel: a full file (transactions, categories, tags, debts, stocks, goals) saved to your device — recommended.',
       'Export to CSV: transactions only.',
       'Import from file: pick a file you exported before to restore.',

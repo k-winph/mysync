@@ -249,21 +249,50 @@ export function canShareFiles() {
   }
 }
 
+// --- JSON backup (complete + shareable) -------------------------------------
+// A single JSON file holds every collection verbatim (money stays integer
+// satang). Being plain text, it shares to Drive/Files where .xlsx often can't,
+// and it round-trips exactly on import.
+
+function buildBackupJSON({
+  transactions = [],
+  categories = [],
+  tags = [],
+  debts = [],
+  portfolios = [],
+  holdings = [],
+  savingsGoals = [],
+}) {
+  return JSON.stringify({
+    app: 'MySync',
+    type: 'mysync-backup',
+    schema: 1,
+    exportedAt: new Date().toISOString(),
+    data: { transactions, categories, tags, debts, portfolios, holdings, savingsGoals },
+  })
+}
+
+function backupJSONFile(data) {
+  return new File([buildBackupJSON(data)], `mysync-backup-${stamp()}.json`, {
+    type: 'application/json',
+  })
+}
+
+export function downloadBackupJSON(data) {
+  download(new Blob([buildBackupJSON(data)], { type: 'application/json' }), `mysync-backup-${stamp()}.json`)
+}
+
 /**
- * Build the backup file and hand it to the OS share sheet, so the user can save
- * it to Google Drive, Files, email, etc. Resolves 'shared' on success, or
- * 'downloaded' if the device can't share files (we fall back to a download).
+ * Build the complete JSON backup and hand it to the OS share sheet, so the user
+ * can save it to Google Drive, Files, email, etc. Resolves 'shared' on success,
+ * or 'downloaded' if the device can't share files (we fall back to a download).
  * Rejects with an AbortError if the user dismisses the share sheet — callers
  * should treat that as "no backup made" and stay silent.
  */
 export async function shareBackup(data) {
-  const wb = buildBackupWorkbook(data)
-  const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' })
-  const file = new File([buf], `mysync-backup-${stamp()}.xlsx`, {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  })
+  const file = backupJSONFile(data)
   if (!(navigator.canShare && navigator.canShare({ files: [file] }))) {
-    exportExcel(data)
+    downloadBackupJSON(data)
     return 'downloaded'
   }
   // Files only — some Android share targets reject the call when a title/text is
@@ -283,9 +312,39 @@ export function exportCSV({ transactions }) {
 // CSV imports only bring transactions (categories stay as-is).
 export function importFile(file) {
   const name = file.name.toLowerCase()
+  if (name.endsWith('.json')) return importJSON(file)
   if (name.endsWith('.csv')) return importCSV(file)
   if (name.endsWith('.xlsx') || name.endsWith('.xls')) return importExcel(file)
   return Promise.reject(new Error('Unsupported file type'))
+}
+
+// Restore a complete JSON backup. Arrays are used as-is (already in store shape);
+// a missing collection stays null so the caller keeps the current one.
+function importJSON(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target.result)
+        const d = parsed && parsed.data ? parsed.data : parsed
+        if (!d || typeof d !== 'object') throw new Error('Bad file')
+        const arr = (v) => (Array.isArray(v) ? v : null)
+        resolve({
+          transactions: arr(d.transactions) || [],
+          categories: arr(d.categories),
+          tags: arr(d.tags),
+          debts: arr(d.debts),
+          portfolios: arr(d.portfolios),
+          holdings: arr(d.holdings),
+          savingsGoals: arr(d.savingsGoals),
+        })
+      } catch (err) {
+        reject(err)
+      }
+    }
+    reader.onerror = reject
+    reader.readAsText(file)
+  })
 }
 
 function importExcel(file) {

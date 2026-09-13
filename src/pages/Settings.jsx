@@ -6,7 +6,7 @@ import { strings } from '../constants/strings'
 import { CURRENCIES } from '../utils/money'
 import { formatDate } from '../utils/date'
 import { usePwaInstall } from '../hooks/usePwaInstall'
-import { exportExcel, exportCSV, importFile, shareBackup, canShareFiles } from '../services/exportImport'
+import { exportExcel, exportCSV, importFile, shareBackup, canShareFiles, downloadBackupJSON } from '../services/exportImport'
 import { PROVIDERS } from '../services/stockApi'
 import { requestNotificationPermission } from '../utils/notify'
 import { biometricAvailable, registerBiometric } from '../utils/webauthn'
@@ -144,9 +144,9 @@ export default function Settings() {
       const cancelled = e?.name === 'AbortError' || /abort|cancel/i.test(e?.message || '')
       if (cancelled) return
       // Share failed for another reason (some Android/PWA builds reject file
-      // shares) — fall back to a plain download so a backup still happens.
+      // shares) — fall back to downloading the same complete JSON backup.
       try {
-        exportExcel(data)
+        downloadBackupJSON(data)
         markBackupNow()
         toast(strings.settings.savedToDownloads)
       } catch {
@@ -407,7 +407,7 @@ export default function Settings() {
         <input
           ref={fileRef}
           type="file"
-          accept=".xlsx,.xls,.csv"
+          accept=".xlsx,.xls,.csv,.json"
           className="hidden"
           onChange={onPickFile}
         />
