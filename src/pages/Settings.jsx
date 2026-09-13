@@ -1,12 +1,12 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Download, ShieldAlert, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Download, ShieldAlert, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { CURRENCIES } from '../utils/money'
 import { formatDate } from '../utils/date'
 import { usePwaInstall } from '../hooks/usePwaInstall'
-import { exportExcel, exportCSV, importFile } from '../services/exportImport'
+import { exportExcel, exportCSV, importFile, shareBackup, canShareFiles } from '../services/exportImport'
 import { PROVIDERS } from '../services/stockApi'
 import { requestNotificationPermission } from '../utils/notify'
 import { biometricAvailable, registerBiometric } from '../utils/webauthn'
@@ -82,10 +82,12 @@ export default function Settings() {
   const [showKey, setShowKey] = useState(false)
 
   const { canInstall, install } = usePwaInstall()
+  const canShare = canShareFiles()
 
-  // Backup is "stale" if it was never done or is older than 30 days.
+  // Backup is "stale" if it was never done or is older than 14 days (matches the
+  // notification-bell backup reminder so the two never disagree).
   const backupStale = !settings.lastBackupAt ||
-    (Date.now() - new Date(settings.lastBackupAt).getTime()) / 86400000 > 30
+    (Date.now() - new Date(settings.lastBackupAt).getTime()) / 86400000 > 14
 
   useEffect(() => {
     biometricAvailable().then(setBioAvailable)
@@ -124,6 +126,19 @@ export default function Settings() {
     exportCSV({ transactions })
     markBackupNow()
     toast(strings.toast.backup)
+  }
+
+  // Build the backup file and open the OS share sheet (save to Drive/Files/etc.).
+  // Only count it as a backup if the share actually goes through — a user who
+  // dismisses the sheet (AbortError) gets no toast and no backup timestamp.
+  const doShareBackup = async () => {
+    try {
+      await shareBackup({ transactions, categories, tags, debts, portfolios, holdings, savingsGoals })
+      markBackupNow()
+      toast(strings.toast.backup)
+    } catch (e) {
+      if (e?.name !== 'AbortError') toast(strings.settings.shareFailed)
+    }
   }
 
   const onPickFile = async (e) => {
@@ -350,6 +365,13 @@ export default function Settings() {
           </div>
         )}
         <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+          {canShare && (
+            <ActionRow
+              icon={Share2}
+              label={strings.settings.shareBackup}
+              onClick={doShareBackup}
+            />
+          )}
           <ActionRow
             icon={FileSpreadsheet}
             label={strings.settings.exportExcel}

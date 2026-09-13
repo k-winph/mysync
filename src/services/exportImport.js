@@ -210,7 +210,9 @@ function rowToHolding(r) {
 
 // --- export -----------------------------------------------------------------
 
-export function exportExcel({
+// Build the full backup workbook (every collection as its own sheet). Shared by
+// the download export and the Web Share flow so both produce identical files.
+function buildBackupWorkbook({
   transactions,
   categories,
   tags = [],
@@ -227,7 +229,45 @@ export function exportExcel({
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(portfolios.map(portfolioToRow)), 'Portfolios')
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(holdings.map(holdingToRow)), 'Holdings')
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(savingsGoals.map(goalToRow)), 'SavingsGoals')
-  XLSX.writeFile(wb, `mysync-backup-${stamp()}.xlsx`)
+  return wb
+}
+
+export function exportExcel(data) {
+  XLSX.writeFile(buildBackupWorkbook(data), `mysync-backup-${stamp()}.xlsx`)
+}
+
+// True when the browser can share actual files (Web Share Level 2). Mobile
+// Chrome/Safari support this; desktop is patchy, so the UI hides the button when
+// this is false and users fall back to the plain download export.
+export function canShareFiles() {
+  try {
+    if (typeof navigator === 'undefined' || !navigator.canShare) return false
+    const probe = new File(['x'], 'probe.txt', { type: 'text/plain' })
+    return navigator.canShare({ files: [probe] })
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Build the backup file and hand it to the OS share sheet, so the user can save
+ * it to Google Drive, Files, email, etc. Resolves 'shared' on success, or
+ * 'downloaded' if the device can't share files (we fall back to a download).
+ * Rejects with an AbortError if the user dismisses the share sheet — callers
+ * should treat that as "no backup made" and stay silent.
+ */
+export async function shareBackup(data) {
+  const wb = buildBackupWorkbook(data)
+  const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' })
+  const file = new File([buf], `mysync-backup-${stamp()}.xlsx`, {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  })
+  if (!(navigator.canShare && navigator.canShare({ files: [file] }))) {
+    exportExcel(data)
+    return 'downloaded'
+  }
+  await navigator.share({ files: [file], title: 'MySync backup' })
+  return 'shared'
 }
 
 export function exportCSV({ transactions }) {
