@@ -1,10 +1,11 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, SlidersHorizontal, Search, Tag, X, Filter, Wallet } from 'lucide-react'
+import { Plus, SlidersHorizontal, Search, Tag, X, Filter, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate, isWithin } from '../utils/date'
 import Button from '../components/ui/Button'
+import MoneyText from '../components/MoneyText'
 import TransactionItem from '../components/TransactionItem'
 import TransactionModal from '../components/TransactionModal'
 import CategoryManager from '../components/CategoryManager'
@@ -57,7 +58,7 @@ export default function Transactions() {
   }, [categories])
 
   // Apply all filters, then group by date (newest first).
-  const { grouped, count } = useMemo(() => {
+  const { grouped, count, totals } = useMemo(() => {
     const q = filters.q.trim().toLowerCase()
     const matches = transactions.filter((t) => {
       if (filters.type !== 'all' && t.type !== filters.type) return false
@@ -77,6 +78,14 @@ export default function Transactions() {
       return true
     })
 
+    // Income/expense totals of the filtered set (satang), for the summary line.
+    let income = 0
+    let expense = 0
+    for (const t of matches) {
+      if (t.type === 'income') income += t.amount
+      else expense += t.amount
+    }
+
     // Newest first: by date, then by creation time within the same day.
     const sorted = [...matches].sort((a, b) =>
       a.date !== b.date
@@ -85,7 +94,7 @@ export default function Transactions() {
     )
     const groups = {}
     for (const t of sorted) (groups[t.date] ||= []).push(t)
-    return { grouped: Object.entries(groups), count: matches.length }
+    return { grouped: Object.entries(groups), count: matches.length, totals: { income, expense } }
   }, [transactions, filters, catNameById])
 
   const openNew = () => {
@@ -240,9 +249,23 @@ export default function Transactions() {
         </div>
       )}
 
-      {/* Result count when filtering */}
+      {/* Result count + income/expense totals for the filtered set (small) */}
       {hasActiveFilters && (
-        <p className="px-1 text-xs text-slate-500">{strings.filter.resultCount(count)}</p>
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1 text-xs text-slate-500">
+          <span>{strings.filter.resultCount(count)}</span>
+          {(totals.income > 0 || totals.expense > 0) && (
+            <span className="flex items-center gap-3">
+              <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-500">
+                <ArrowUpRight size={12} className="shrink-0" />
+                <MoneyText satang={totals.income} className="font-semibold tabular-nums" />
+              </span>
+              <span className="inline-flex items-center gap-0.5 text-rose-600 dark:text-rose-500">
+                <ArrowDownRight size={12} className="shrink-0" />
+                <MoneyText satang={totals.expense} className="font-semibold tabular-nums" />
+              </span>
+            </span>
+          )}
+        </div>
       )}
 
       {/* List */}
