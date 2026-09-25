@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, X, Trash2, Users } from 'lucide-react'
 import { strings } from '../constants/strings'
@@ -10,7 +10,24 @@ import MoneyInput from '../components/ui/MoneyInput'
 import PageHeader from '../components/PageHeader'
 import { useConfirm, useToast } from '../components/ui/Feedback'
 
-// Ephemeral bill-splitter. No persistence, no transactions — pure calculator.
+// The split-bill draft persists on-device under its own key (kept out of the
+// finance store and backups — it's a scratch tool, not financial records).
+const SPLIT_KEY = 'mysync-split'
+
+function loadSplit() {
+  try {
+    const d = JSON.parse(localStorage.getItem(SPLIT_KEY) || '{}')
+    return {
+      people: Array.isArray(d.people) ? d.people : [],
+      items: Array.isArray(d.items) ? d.items : [],
+    }
+  } catch {
+    return { people: [], items: [] }
+  }
+}
+
+// Bill-splitter — no transactions, but the current draft is saved locally so it
+// survives closing/reopening the app until the user clears it.
 // Each item's price splits equally among the people ticked for that item.
 export default function SplitBill() {
   const navigate = useNavigate()
@@ -18,9 +35,18 @@ export default function SplitBill() {
   const confirm = useConfirm()
   const toast = useToast()
 
-  const [people, setPeople] = useState([]) // [{ id, name }]
-  const [items, setItems] = useState([]) // [{ id, name, price(str), members: id[] }]
+  const [people, setPeople] = useState(() => loadSplit().people) // [{ id, name }]
+  const [items, setItems] = useState(() => loadSplit().items) // [{ id, name, price(str), members: id[] }]
   const [newName, setNewName] = useState('')
+
+  // Persist the draft on every change (best-effort; ignore storage failures).
+  useEffect(() => {
+    try {
+      localStorage.setItem(SPLIT_KEY, JSON.stringify({ people, items }))
+    } catch {
+      /* private mode / storage full — the calculator still works in-session */
+    }
+  }, [people, items])
 
   const addPerson = () => {
     const name = newName.trim()
