@@ -65,6 +65,13 @@ export default function Dashboard() {
 
   const cur = useMemo(() => totals(monthTx), [monthTx])
 
+  // Running balance = all income − all expenses across every month, so last
+  // month's leftover carries forward automatically (your real cumulative total).
+  const runningBalance = useMemo(
+    () => transactions.reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0),
+    [transactions]
+  )
+
   // Expenses grouped by category -> donut data. Top 6 + "Other".
   const donutData = useMemo(() => {
     const byCat = {}
@@ -134,11 +141,15 @@ export default function Dashboard() {
             <p className="text-sm opacity-80">{strings.dashboard.balance}</p>
             <ChevronRight size={18} className="opacity-80" />
           </div>
-          <MoneyText satang={cur.balance} className="text-3xl font-bold" />
+          <MoneyText satang={runningBalance} className="text-3xl font-bold" />
 
           {/* Horizontal divider — inset from the card edges */}
           <div className="my-3 border-t border-white/20" />
 
+          {/* This month's income/expense (the balance above is the running total) */}
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide opacity-70">
+            {strings.dashboard.title}
+          </p>
           {/* Income | Expense — split by a short floating vertical line */}
           <div className="flex items-stretch">
             <div className="flex flex-1 items-center gap-1">

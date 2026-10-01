@@ -28,7 +28,7 @@ const th = {
     whatFor: 'ดูภาพรวมการเงินของเดือนนี้ในที่เดียว',
     location: 'ปุ่มกลาง (ไอคอนบ้าน) ที่แถบด้านล่าง — ปุ่มวงกลมม่วงยกเด่นตรงกลาง (เปิดแอปมาก็เจอเลย)',
     steps: [
-      'การ์ด Balance บนสุด = ยอดคงเหลือเดือนนี้ (รายรับ − รายจ่าย) พร้อมยอดรับและจ่ายแยกด้านล่าง แตะเข้าไปดูรายปีได้',
+      'การ์ด Balance บนสุด = ยอดเงินคงเหลือสะสมจริง (รายรับทั้งหมด − รายจ่ายทั้งหมด ยกยอดข้ามเดือนให้เองอัตโนมัติ) ส่วนรายรับ/รายจ่ายที่อยู่ด้านล่างเป็นของเดือนนี้ แตะเข้าไปดูสรุปรายปีได้',
       'การ์ด Investments = มูลค่าพอร์ตหุ้นรวม (ถ้ามี) แตะเข้าไปหน้าหุ้น',
       'การ์ด Savings goals = ความคืบหน้าการออม แตะเข้าไปหน้าเป้าหมาย',
       'กราฟวงกลม "รายจ่ายตามหมวด" = สัดส่วนการใช้เงินเดือนนี้',
@@ -216,7 +216,7 @@ const en = {
     whatFor: "See this month's finances at a glance.",
     location: 'The center Home button (house icon) in the bottom bar — the raised purple circle (the first screen on open).',
     steps: [
-      'Balance card (top) = this month’s balance (income − expense), with income and expense below. Tap it for the yearly view.',
+      'Balance card (top) = your running balance (all income − all expenses, carried over across months automatically); the income and expense shown below are for this month. Tap it for the yearly view.',
       'Investments card = total portfolio value (if any). Tap to open the stocks page.',
       'Savings goals card = your saving progress. Tap to open goals.',
       'Spending donut = where this month’s money went, by category.',
