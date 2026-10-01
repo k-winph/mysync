@@ -6,6 +6,7 @@ import { parseMoney, satangToInput } from '../utils/money'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
+import DateInput from './ui/DateInput'
 import { useConfirm, useToast } from './ui/Feedback'
 
 // Create / edit / delete a savings goal.
@@ -77,8 +78,8 @@ export default function GoalModal({ open, editing, onClose }) {
             {strings.savings.deadline}{' '}
             <span className="font-normal text-slate-400">({strings.common.optional})</span>
           </label>
-          <input
-            type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)}
+          <DateInput
+            value={deadline} onChange={(e) => setDeadline(e.target.value)}
             className="input-base"
           />
         </div>

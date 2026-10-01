@@ -7,6 +7,7 @@ import { todayISO } from '../utils/date'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
+import DateInput from './ui/DateInput'
 import CategoryIcon from './CategoryIcon'
 import { useConfirm, useToast } from './ui/Feedback'
 
@@ -211,8 +212,7 @@ export default function DebtModal({ open, editing, defaultKind = 'once', onClose
           <label className="mb-1 block text-sm font-medium">
             {kind === 'once' ? strings.debt.dueDate : strings.debt.nextDue}
           </label>
-          <input
-            type="date"
+          <DateInput
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
             className="input-base"

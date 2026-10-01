@@ -6,6 +6,7 @@ import { strings } from '../constants/strings'
 import { formatDate, isWithin } from '../utils/date'
 import Button from '../components/ui/Button'
 import MoneyText from '../components/MoneyText'
+import DateInput from '../components/ui/DateInput'
 import TransactionItem from '../components/TransactionItem'
 import TransactionModal from '../components/TransactionModal'
 import CategoryManager from '../components/CategoryManager'
@@ -218,8 +219,7 @@ export default function Transactions() {
               <label className="mb-1 block text-xs font-semibold text-slate-500">
                 {strings.filter.from}
               </label>
-              <input
-                type="date"
+              <DateInput
                 value={filters.from}
                 onChange={(e) => setFilter({ from: e.target.value })}
                 className="input-base"
@@ -229,8 +229,7 @@ export default function Transactions() {
               <label className="mb-1 block text-xs font-semibold text-slate-500">
                 {strings.filter.to}
               </label>
-              <input
-                type="date"
+              <DateInput
                 value={filters.to}
                 onChange={(e) => setFilter({ to: e.target.value })}
                 className="input-base"

@@ -37,6 +37,17 @@
   input[type='number'] {
     -moz-appearance: textfield;
   }
+  /* Date fields: keep the whole box tappable, and make the calendar picker icon
+     visible in dark mode (color-scheme makes the native control render light). */
+  input[type='date'] {
+    cursor: pointer;
+  }
+  input[type='date']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
+  .dark input[type='date'] {
+    color-scheme: dark;
+  }
 }
 
 @layer components {

@@ -6,6 +6,7 @@ import { todayISO } from '../utils/date'
 import { Plus } from 'lucide-react'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
+import DateInput from './ui/DateInput'
 import CategoryIcon from './CategoryIcon'
 
 // Form for adding/editing a transaction. Controlled entirely by local state;
@@ -139,8 +140,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
       {/* Date */}
       <div>
         <label className="mb-1 block text-sm font-medium">{strings.tx.date}</label>
-        <input
-          type="date"
+        <DateInput
           value={date}
           onChange={(e) => setDate(e.target.value)}
           className="input-base"
