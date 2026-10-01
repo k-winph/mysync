@@ -11,6 +11,7 @@ import { formatMoney } from '../utils/money'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import PageHeader from '../components/PageHeader'
+import MonthDetailModal from '../components/MonthDetailModal'
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => dayjs().month(i).format('MMM'))
 const INCOME_COLOR = '#22c55e'
@@ -30,6 +31,7 @@ export default function Balance() {
 
   const [year, setYear] = useState(years[0])
   const yearIdx = years.indexOf(year)
+  const [detailMonth, setDetailMonth] = useState(null) // 0-based month, or null
 
   // Per-month income/expense totals (in satang) for the selected year.
   const months = useMemo(() => {
@@ -62,11 +64,7 @@ export default function Balance() {
     expense: r.expense / 100,
   }))
 
-  const goMonth = (m) => {
-    const start = dayjs(`${year}-${String(m + 1).padStart(2, '0')}-01`)
-    const end = start.endOf('month')
-    navigate(`/transactions?from=${start.format('YYYY-MM-DD')}&to=${end.format('YYYY-MM-DD')}`)
-  }
+  const goMonth = (m) => setDetailMonth(m)
 
   return (
     <div className="space-y-5">
@@ -187,6 +185,13 @@ export default function Balance() {
           </div>
         </>
       )}
+
+      <MonthDetailModal
+        open={detailMonth !== null}
+        onClose={() => setDetailMonth(null)}
+        year={year}
+        month={detailMonth}
+      />
     </div>
   )
 }

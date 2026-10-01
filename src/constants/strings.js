@@ -15,7 +15,13 @@ const en = {
   balance: {
     title: 'Income vs Expense', income: 'Income', expense: 'Expense', net: 'Net',
     totalIncome: 'Total income', totalExpense: 'Total expense',
-    noData: 'No transactions in this year.', tapMonthHint: 'Tap a month to see its transactions',
+    noData: 'No transactions in this year.', tapMonthHint: 'Tap a month to see its breakdown',
+  },
+
+  month: {
+    incomeByCat: 'Income by category', expenseByCat: 'Expense by category',
+    noIncome: 'No income', noExpense: 'No expense',
+    transactions: 'Transactions', other: 'Other', noTx: 'No transactions this month.',
   },
 
   dashboard: {
@@ -286,7 +292,13 @@ const th = {
   balance: {
     title: 'รายรับ vs รายจ่าย', income: 'รายรับ', expense: 'รายจ่าย', net: 'คงเหลือ',
     totalIncome: 'รายรับรวม', totalExpense: 'รายจ่ายรวม',
-    noData: 'ไม่มีรายการในปีนี้', tapMonthHint: 'แตะที่เดือนเพื่อดูรายการ',
+    noData: 'ไม่มีรายการในปีนี้', tapMonthHint: 'แตะที่เดือนเพื่อดูรายละเอียด',
+  },
+
+  month: {
+    incomeByCat: 'รายรับตามหมวด', expenseByCat: 'รายจ่ายตามหมวด',
+    noIncome: 'ไม่มีรายรับ', noExpense: 'ไม่มีรายจ่าย',
+    transactions: 'รายการ', other: 'อื่น ๆ', noTx: 'เดือนนี้ไม่มีรายการ',
   },
 
   dashboard: {
