@@ -22,6 +22,7 @@ const en = {
     incomeByCat: 'Income by category', expenseByCat: 'Expense by category',
     noIncome: 'No income', noExpense: 'No expense',
     transactions: 'Transactions', other: 'Other', noTx: 'No transactions this month.',
+    shareImage: 'Share as image', madeWith: 'Made with MySync',
   },
 
   dashboard: {
@@ -238,6 +239,7 @@ const en = {
   settings: {
     title: 'Settings', appearance: 'Appearance', darkMode: 'Dark mode', hideBalances: 'Hide balances',
     haptics: 'Vibration feedback',
+    accentColor: 'Accent color',
     installApp: 'Install app', installHint: 'Add MySync to your home screen for a full-screen, app-like experience.',
     language: 'Language', currency: 'Primary currency',
     currencyNote: 'Changing currency only changes the symbol/format — it does not convert existing amounts.',
@@ -299,6 +301,7 @@ const th = {
     incomeByCat: 'รายรับตามหมวด', expenseByCat: 'รายจ่ายตามหมวด',
     noIncome: 'ไม่มีรายรับ', noExpense: 'ไม่มีรายจ่าย',
     transactions: 'รายการ', other: 'อื่น ๆ', noTx: 'เดือนนี้ไม่มีรายการ',
+    shareImage: 'แชร์เป็นรูป', madeWith: 'สร้างด้วย MySync',
   },
 
   dashboard: {
@@ -515,6 +518,7 @@ const th = {
   settings: {
     title: 'ตั้งค่า', appearance: 'การแสดงผล', darkMode: 'โหมดมืด', hideBalances: 'ซ่อนยอดเงิน',
     haptics: 'สั่นเมื่อกดปุ่ม',
+    accentColor: 'สีธีม',
     installApp: 'ติดตั้งแอป', installHint: 'เพิ่ม MySync ลงหน้าจอโฮม ใช้งานแบบเต็มจอเหมือนแอปจริง',
     language: 'ภาษา', currency: 'สกุลเงินหลัก',
     currencyNote: 'เปลี่ยนสกุลเงินจะเปลี่ยนแค่สัญลักษณ์/รูปแบบ ไม่แปลงตัวเลขข้อมูลเดิม',

@@ -1,8 +1,9 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Download, ShieldAlert, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
+import { ACCENTS } from '../constants/accents'
 import { CURRENCIES } from '../utils/money'
 import { formatDate } from '../utils/date'
 import { usePwaInstall } from '../hooks/usePwaInstall'
@@ -221,6 +222,30 @@ export default function Settings() {
             checked={settings.haptics !== false}
             onChange={(v) => updateSettings({ haptics: v })}
           />
+
+          {/* Accent color */}
+          <div className="flex items-center gap-3 py-2">
+            <Palette size={20} className="shrink-0 text-slate-500" />
+            <span className="flex-1 font-medium">{strings.settings.accentColor}</span>
+            <div className="flex gap-2">
+              {ACCENTS.map((a) => {
+                const active = (settings.accent || 'indigo') === a.id
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => updateSettings({ accent: a.id })}
+                    className={`flex h-7 w-7 items-center justify-center rounded-full transition ${
+                      active ? 'ring-2 ring-offset-2 ring-slate-400 dark:ring-offset-slate-900' : ''
+                    }`}
+                    style={{ backgroundColor: a.swatch }}
+                    aria-label={a.label}
+                  >
+                    {active && <Check size={14} className="text-white" />}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
 
           {/* Language */}
           <div className="flex items-center gap-3 py-2">

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { useStore } from './store/useStore'
 import { strings, setLang } from './constants/strings'
+import { applyAccent } from './constants/accents'
 import { todayISO, daysUntil } from './utils/date'
 import { notificationPermission, showNotification } from './utils/notify'
 import Layout from './components/Layout'
@@ -25,6 +26,7 @@ export default function App() {
   const theme = useStore((s) => s.settings.theme)
   const language = useStore((s) => s.settings.language)
   const pinEnabled = useStore((s) => s.settings.pinEnabled)
+  const accent = useStore((s) => s.settings.accent)
 
   // Apply the active language before children render so `strings.x` (a live
   // Proxy) resolves to it. Subscribing to `language` re-renders the whole tree
@@ -51,6 +53,11 @@ export default function App() {
     if (theme === 'dark') root.classList.add('dark')
     else root.classList.remove('dark')
   }, [theme])
+
+  // Apply the chosen accent color's CSS variables (before paint to avoid a flash).
+  useLayoutEffect(() => {
+    applyAccent(accent)
+  }, [accent])
 
   // On app open: notify about due/overdue debts (once per day), if enabled.
   useEffect(() => {

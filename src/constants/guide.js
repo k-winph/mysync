@@ -61,7 +61,8 @@ const th = {
     location: 'แตะการ์ด Balance ที่หน้าหลัก',
     steps: [
       'ดูกราฟ/ตัวเลขรายรับ-รายจ่ายของแต่ละเดือน',
-      'แตะที่เดือนใดเดือนหนึ่งเพื่อดูรายการทั้งหมดของเดือนนั้น',
+      'แตะที่เดือนใดเดือนหนึ่ง → เปิดป็อปอัพสรุปเดือนนั้น: โดนัทรายรับ/รายจ่ายแยกหมวด + รายการทั้งหมดของเดือน',
+      'ในป็อปอัพมีปุ่ม "แชร์เป็นรูป" สร้างการ์ดสรุปเดือนเป็นรูปภาพไว้เซฟหรือแชร์ได้',
     ],
   },
   categories: {
@@ -185,6 +186,7 @@ const th = {
       'ซ่อนยอดเงิน: ปิดบังตัวเลขเงินทั้งแอป',
       'ภาษา: สลับไทย/อังกฤษ',
       'สกุลเงินหลัก: เปลี่ยนสัญลักษณ์เงินที่แสดง',
+      'สีธีม: เลือกสี accent ของแอปได้ (ม่วง/เขียว/ฟ้า/ชมพู/ส้ม ฯลฯ) เปลี่ยนสีการ์ด ปุ่ม และพื้นหลังทั้งแอป',
       'สั่นเมื่อกดปุ่ม: เปิด/ปิดการสั่นเบา ๆ ตอนกดปุ่มสำคัญ (บันทึก/จ่าย/ยืนยัน)',
       'ติดตั้งแอป: ถ้าเบราว์เซอร์รองรับจะมีปุ่มติดตั้ง MySync ลงหน้าจอโฮม ใช้แบบเต็มจอเหมือนแอปจริง',
       'ล็อกด้วย PIN: ตั้งรหัส 6 หลักล็อกแอป · เปิดปลดล็อกด้วยลายนิ้วมือ/ใบหน้าได้ (ถ้าเครื่องรองรับ)',
@@ -249,7 +251,8 @@ const en = {
     location: 'Tap the Balance card on the Dashboard.',
     steps: [
       'View each month’s income/expense figures.',
-      'Tap a month to see all of that month’s transactions.',
+      'Tap a month → a popup opens with income/expense donuts by category and that month’s full transaction list.',
+      'The popup has a "Share as image" button to save or share a summary card of the month.',
     ],
   },
   categories: {
@@ -373,6 +376,7 @@ Result: A ฿500 · B ฿500 · C ฿300 · total ฿1,300`,
       'Hide balances: mask all money figures across the app.',
       'Language: switch Thai/English.',
       'Primary currency: change the money symbol shown.',
+      'Accent color: pick the app’s theme color (indigo/violet/sky/emerald/rose/amber) — it recolors cards, buttons and the background.',
       'Vibration feedback: toggle the light buzz on important taps (save/pay/confirm).',
       'Install app: if your browser supports it, a button appears to add MySync to your home screen for a full-screen, app-like experience.',
       'App lock (PIN): set a 6-digit lock · optionally unlock with fingerprint/face (if supported).',

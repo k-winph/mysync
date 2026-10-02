@@ -1,13 +1,26 @@
 import { useMemo } from 'react'
 import dayjs from 'dayjs'
+import { Share2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate } from '../utils/date'
+import { buildMonthImage } from '../utils/monthImage'
 import Modal from './ui/Modal'
 import MoneyText from './MoneyText'
 import TransactionItem from './TransactionItem'
 
 const OTHER_COLOR = '#94a3b8'
+
+function downloadBlob(blob, name) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
 
 // Group one type's transactions by category -> rows sorted desc. Keeps the top 5
 // and rolls the rest into a single "Other" slice, so the donut and its legend
@@ -83,6 +96,7 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
   const currency = useStore((s) => s.settings.primaryCurrency)
+  const accent = useStore((s) => s.settings.accent)
 
   const data = useMemo(() => {
     if (month === null || month === undefined) return null
@@ -115,6 +129,41 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
     ? ''
     : dayjs(`${year}-${String(month + 1).padStart(2, '0')}-01`).format('MMMM YYYY')
 
+  const shareImage = async () => {
+    if (!data) return
+    const blob = await buildMonthImage({
+      title,
+      income: data.income,
+      expense: data.expense,
+      net: data.net,
+      incomeRows: data.incomeRows,
+      expenseRows: data.expenseRows,
+      currency,
+      accent,
+      labels: {
+        income: strings.balance.income,
+        expense: strings.balance.expense,
+        net: strings.balance.net,
+        incomeByCat: strings.month.incomeByCat,
+        expenseByCat: strings.month.expenseByCat,
+        footer: strings.month.madeWith,
+      },
+    })
+    if (!blob) return
+    const name = `mysync-${year}-${String(month + 1).padStart(2, '0')}.png`
+    const file = new File([blob], name, { type: 'image/png' })
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file] })
+      } else {
+        downloadBlob(blob, name)
+      }
+    } catch (e) {
+      const cancelled = e?.name === 'AbortError' || /abort|cancel/i.test(e?.message || '')
+      if (!cancelled) downloadBlob(blob, name)
+    }
+  }
+
   if (!data) return null
 
   return (
@@ -138,6 +187,16 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
           />
         </div>
       </div>
+
+      {/* Share this month as an image */}
+      <button
+        onClick={shareImage}
+        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-brand-500
+          py-2 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 active:scale-95
+          dark:text-brand-500 dark:hover:bg-brand-600/10"
+      >
+        <Share2 size={16} /> {strings.month.shareImage}
+      </button>
 
       {/* Two donuts side by side */}
       <div className="mt-4 flex gap-3">

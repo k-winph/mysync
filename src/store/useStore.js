@@ -52,6 +52,7 @@ const DEFAULT_SETTINGS = {
   biometricCredId: null, // stored WebAuthn credential id (base64url)
   onboarded: false, // has the first-run welcome been dismissed?
   haptics: true, // light vibration on important taps (save/pay/confirm/delete)
+  accent: 'indigo', // brand accent color preset (see constants/accents.js)
 }
 
 export const useStore = create(

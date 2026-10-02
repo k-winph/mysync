@@ -4,6 +4,15 @@
 
 /* Base app styling. Mobile-first, dark-mode aware via `.dark` on <html>. */
 @layer base {
+  /* Default brand accent (Indigo). JS overrides these per the user's chosen
+     accent — see constants/accents.js. Values are space-separated RGB channels. */
+  :root {
+    --brand-50: 238 242 255;
+    --brand-100: 224 231 255;
+    --brand-500: 99 102 241;
+    --brand-600: 79 70 229;
+    --brand-700: 67 56 202;
+  }
   html {
     -webkit-tap-highlight-color: transparent;
   }
@@ -23,10 +32,20 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: linear-gradient(to top, #c3bdf6 0%, #dcd8fb 22%, #f8fafc 60%);
+    background: linear-gradient(
+      to top,
+      rgb(var(--brand-500) / 0.3) 0%,
+      rgb(var(--brand-500) / 0.1) 24%,
+      #f8fafc 60%
+    );
   }
   .dark body::before {
-    background: linear-gradient(to top, #2c2668 0%, #12132f 40%, #020617 70%);
+    background: linear-gradient(
+      to top,
+      rgb(var(--brand-500) / 0.34) 0%,
+      rgb(var(--brand-500) / 0.12) 40%,
+      #020617 72%
+    );
   }
   /* Remove number input spinners for a cleaner money field */
   input[type='number']::-webkit-outer-spin-button,
