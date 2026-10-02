@@ -25,6 +25,7 @@ to your phone's home screen like a native app.
 - [Key concepts](#key-concepts)
 - [Offline & data safety](#offline--data-safety)
 - [Deployment (GitHub Pages)](#deployment-github-pages)
+- [Versioning & releases](#versioning--releases)
 - [Make it your own (fork & customize)](#make-it-your-own-fork--customize)
 - [Known limitations](#known-limitations)
 - [Contributing](#contributing)
@@ -37,9 +38,10 @@ to your phone's home screen like a native app.
 - 🔒 **100% on-device** — every record lives in your browser's `localStorage`. Nothing is sent anywhere.
 - 📴 **Works offline** — installable PWA with a service worker; open and use it with no connection.
 - 🆓 **Free to run** — static site, deployable free on GitHub Pages.
-- 🌗 **Light / dark mode** and 🇬🇧 / 🇹🇭 **bilingual** UI.
+- 🌗 **Light / dark mode**, 🎨 **custom accent color**, and 🇬🇧 / 🇹🇭 **bilingual** UI.
 - 💸 **Integer-satang money** — amounts are stored as integers (minor units) to avoid floating-point rounding errors.
-- 📤 **Backup & restore** — export everything to Excel/CSV and import it back.
+- 🖼️ **Shareable summary cards** — turn any month into a 9:16 story image (themed, with category breakdown + portfolio).
+- 📤 **Backup & restore** — a complete JSON backup you can share to the cloud, plus Excel/CSV export and import.
 
 ---
 
@@ -48,7 +50,10 @@ to your phone's home screen like a native app.
 **Money tracking**
 - Income / expense transactions with categories, tags, notes and dates
 - Custom categories (icon + color) and a managed tag list
-- Yearly income-vs-expense breakdown, tap a month to drill in
+- A **running cumulative balance** that carries over across months automatically
+- Yearly income-vs-expense breakdown; tap a month for a popup (category donuts + that month's transactions)
+- Filtered totals — the Records list shows income/expense sums for whatever filter is active
+- **Share a month as an image** — a 9:16 card (accent + light/dark themed) with category %, savings rate, vs-last-month, and portfolio highlights (top gainer + top holding)
 - Spending-by-category donut on the dashboard
 
 **Debts** — three distinct kinds
@@ -65,13 +70,14 @@ to your phone's home screen like a native app.
 **Savings, tax & tools**
 - Savings goals with progress and "add funds"
 - Thai personal income-tax estimator (configurable brackets)
-- Split-the-bill helper
+- Split-the-bill helper — the draft persists on-device until you clear it
 - In-app user guide
 
 **App & security**
 - Installable PWA (add-to-home-screen) + light haptic feedback on key actions
+- Custom accent color (indigo / violet / sky / emerald / rose / amber), applied app-wide via CSS variables
 - App lock with a PIN, optional biometric unlock (WebAuthn)
-- Backup reminder when you haven't exported in a while
+- Backup reminder when you haven't backed up in a while
 
 ---
 
@@ -123,7 +129,7 @@ mysync/
     │   ├── Stocks.jsx           # /stocks    portfolios list
     │   ├── PortfolioDetail.jsx  # /stocks/:portfolioId
     │   ├── Savings.jsx          # /savings   goals
-    │   ├── SplitBill.jsx        # /split     bill splitter (component-only state)
+    │   ├── SplitBill.jsx        # /split     bill splitter (draft persisted to localStorage)
     │   ├── Guide.jsx            # /guide     in-app user guide
     │   └── Settings.jsx         # /settings  everything configurable
     │
@@ -138,6 +144,7 @@ mysync/
     │   ├── CategoryManager.jsx, TagManager.jsx, CategoryIcon.jsx
     │   ├── LockScreen.jsx, PinPad.jsx, PinSetupModal.jsx   # PIN / biometric
     │   ├── ExpenseDonut.jsx, MoneyText.jsx, DualMoney.jsx, FxChange.jsx
+    │   ├── MonthDetailModal.jsx # month popup (donuts + list) + share-as-image
     │   └── Welcome.jsx, NotificationBell.jsx, Layout.jsx
     │
     ├── store/
@@ -146,7 +153,7 @@ mysync/
     ├── services/           # side-effecting I/O
     │   ├── stockApi.js         # swappable stock-price provider layer (Finnhub)
     │   ├── fx.js               # currency exchange-rate fetch
-    │   └── exportImport.js     # Excel/CSV backup & restore
+    │   └── exportImport.js     # JSON cloud backup + Excel/CSV export & import
     │
     ├── hooks/
     │   ├── useFx.js            # FX rates for a set of currencies
@@ -158,6 +165,7 @@ mysync/
     │   ├── date.js             # dayjs helpers (ranges, daysUntil, addPeriod, ...)
     │   ├── tax.js              # tax computation
     │   ├── portfolio.js        # holdings math (value, gain, per-currency totals)
+    │   ├── monthImage.js       # Canvas renderer for the 9:16 share-a-month card
     │   ├── notify.js           # local notifications (service-worker aware)
     │   ├── webauthn.js, pin.js # biometric + PIN hashing
     │   ├── haptics.js          # navigator.vibrate wrapper (respects setting)
@@ -166,6 +174,7 @@ mysync/
     └── constants/
         ├── strings.js          # all UI text, English + Thai (live-switching Proxy)
         ├── categories.js       # default seed categories
+        ├── accents.js          # accent-color presets + applyAccent() (CSS vars)
         ├── taxBrackets.js      # tax brackets
         └── guide.js            # in-app guide content
 ```
@@ -262,10 +271,17 @@ Everything else is local.
   split-bill, backup — works with no connection. Investments work offline too
   (view/add/edit holdings, see the **last cached prices**); only *refreshing to
   current prices* and *FX rate updates* need the internet.
-- **Backup / restore:** because data lives only in the browser, **exporting is
-  your backup**. Settings → Data → *Export to Excel* writes a `.xlsx` with every
-  collection; *Import from file* restores it. Do this regularly, especially
-  before clearing browser data or switching devices.
+- **Backup / restore:** because data lives only in the browser, **backing up is
+  on you**. Settings → Data gives you three options:
+  - *Back up to cloud* — builds a complete `.json` backup and opens the share
+    sheet (save to Google Drive, Files, email, …). If the device can't share a
+    file, it downloads instead. Best on mobile.
+  - *Export to Excel* — a `.xlsx` with every collection (transactions,
+    categories, tags, debts, stocks, goals).
+  - *Export to CSV* — transactions only.
+  *Import from file* restores a `.json` or `.xlsx` you saved earlier. Do this
+  regularly, especially before clearing browser data or switching devices. The
+  app nudges you if it's been more than 14 days since your last backup.
 
 ---
 
@@ -288,6 +304,70 @@ Notes:
 - The service worker uses `autoUpdate`. After a redeploy, an installed PWA picks
   up the new version on its next launch (you may need to fully close and reopen
   the app once).
+
+---
+
+## Versioning & releases
+
+MySync uses [Semantic Versioning](https://semver.org/): **`MAJOR.MINOR.PATCH`**.
+
+| Bump | When | Example |
+|------|------|---------|
+| **PATCH** | Bug fixes only, no new features | `v1.0.0` → `v1.0.1` |
+| **MINOR** | New features, backward-compatible (nothing existing breaks) | `v1.0.0` → `v1.1.0` |
+| **MAJOR** | Breaking change (e.g. a data shape old backups can't restore) | `v1.x` → `v2.0.0` |
+
+> This batch of changes (share-as-image, accent themes, running balance,
+> persisted split-bill, filtered totals, JSON backup) adds features without
+> breaking anything, so it's a **MINOR** bump: `v1.0.0` → **`v1.1.0`**.
+
+### Tagging a new version
+
+First commit your work, then tag it. The easiest way is `npm version`, which
+updates `package.json`, makes a commit, **and** creates the matching git tag in
+one step. Pass the exact version so `package.json` and the tag line up:
+
+```bash
+# 1. Commit the feature work first
+git add -A
+git commit -m "feat: share images, accent themes, running balance, JSON backup"
+
+# 2. Set the version + create an annotated tag v1.1.0 (one command)
+npm version 1.1.0 -m "Release v%s"
+
+# 3. Push the commits and the tag to GitHub
+git push origin main        # or your default branch
+git push origin v1.1.0      # push just this tag (or: git push --tags)
+```
+
+Prefer to tag by hand instead of `npm version`? Do it directly:
+
+```bash
+git tag -a v1.1.0 -m "MySync v1.1.0 — share images, accent themes, JSON backup"
+git push origin v1.1.0
+```
+
+### Handy tag commands
+
+```bash
+git tag                       # list all tags
+git describe --tags           # show the current/nearest tag
+git show v1.1.0               # see what a tag points at
+git tag -d v1.1.0            # delete a tag locally (if you tagged by mistake)
+git push origin :v1.1.0      # delete that tag on GitHub too
+```
+
+### Turning a tag into a GitHub Release (optional)
+
+A tag is enough for versioning, but a **Release** gives it a changelog page and
+downloadable archives. On GitHub: **Releases → Draft a new release → choose tag
+`v1.1.0` → add notes → Publish release.** (Re-running `npm run deploy` is still
+what updates the live GitHub Pages site — tags and releases don't deploy by
+themselves.)
+
+> Note: `package.json` currently reads `0.1.0` while your git history is tagged
+> `v1.0.0`. Running `npm version 1.1.0` as above realigns them — afterwards both
+> the file and the tag say `1.1.0`.
 
 ---
 

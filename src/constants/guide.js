@@ -53,7 +53,10 @@ const th = {
       'แก้ไข/ลบ: แตะที่รายการนั้นเพื่อเปิดขึ้นมาแก้',
       'ค้นหา/กรอง: ใช้ช่องค้นหาด้านบน หรือปุ่มกรอง (ตามประเภท/หมวด/ช่วงวันที่)',
     ],
-    notes: ['รายการเรียงจากใหม่สุดไปเก่าสุดเสมอ'],
+    notes: [
+      'รายการเรียงจากใหม่สุดไปเก่าสุดเสมอ',
+      'เวลากรองอยู่ จะมีบรรทัดเล็ก ๆ สรุปยอดรวมรายรับ/รายจ่ายเฉพาะรายการที่กรองไว้',
+    ],
   },
   balance: {
     title: 'สรุปรายรับ-จ่ายรายปี (Balance)',
@@ -62,7 +65,8 @@ const th = {
     steps: [
       'ดูกราฟ/ตัวเลขรายรับ-รายจ่ายของแต่ละเดือน',
       'แตะที่เดือนใดเดือนหนึ่ง → เปิดป็อปอัพสรุปเดือนนั้น: โดนัทรายรับ/รายจ่ายแยกหมวด + รายการทั้งหมดของเดือน',
-      'ในป็อปอัพมีปุ่ม "แชร์เป็นรูป" สร้างการ์ดสรุปเดือนเป็นรูปภาพไว้เซฟหรือแชร์ได้',
+      'ในป็อปอัพมีปุ่ม "แชร์เป็นรูป" สร้างการ์ดสรุปเดือน (ขนาด 9:16 พอดีลงสตอรี่ IG สีพื้นหลังตามธีมและโหมดสว่าง/มืดที่ตั้งไว้) โชว์ยอดคงเหลือ รายรับ/รายจ่ายแยกหมวดพร้อม %, อัตราการออม, เทียบรายจ่ายกับเดือนก่อน และพอร์ตหุ้น (มูลค่ารวม กำไร/ขาดทุน หุ้นกำไรสูงสุด และหุ้นมูลค่าสูงสุด)',
+      'ตอนกดแชร์ ระบบจะเซฟรูปลงเครื่องให้ด้วยอัตโนมัติ (เผื่อหน้าต่างแชร์กดยกเลิก)',
     ],
   },
   categories: {
@@ -163,7 +167,7 @@ const th = {
 สรุป: เอ ฿500 · บี ฿500 · ซี ฿300 · รวม ฿1,300`,
     notes: [
       'ถ้ามีรายการที่ยังไม่ติ๊กใครเลย ระบบจะเตือน (ยอดนั้นยังไม่ถูกหาร)',
-      'เป็นเครื่องคิดเลขใช้แล้วทิ้ง ปิดหน้าแล้วข้อมูลหาย และไม่ถูกบันทึกเป็นรายรับ-รายจ่าย',
+      'ข้อมูลที่กรอกจะถูกเก็บไว้ในเครื่องจนกว่าจะกด "ล้างทั้งหมด" เอง (ปิดแอปแล้วเปิดใหม่ก็ยังอยู่) แต่ไม่ถูกบันทึกเป็นรายรับ-รายจ่าย',
     ],
   },
   notifications: {
@@ -243,7 +247,10 @@ const en = {
       'Edit/delete: tap an entry to open and change it.',
       'Search/filter: use the search box up top, or the filter button (by type / category / date range).',
     ],
-    notes: ['Entries are always sorted newest first.'],
+    notes: [
+      'Entries are always sorted newest first.',
+      'While a filter is active, a small line shows the total income/expense for just the filtered entries.',
+    ],
   },
   balance: {
     title: 'Yearly income vs expense (Balance)',
@@ -252,7 +259,8 @@ const en = {
     steps: [
       'View each month’s income/expense figures.',
       'Tap a month → a popup opens with income/expense donuts by category and that month’s full transaction list.',
-      'The popup has a "Share as image" button to save or share a summary card of the month.',
+      'The popup has a "Share as image" button that builds a 9:16 story-sized card (themed to your accent color and light/dark mode): balance, income/expense by category with %, savings rate, expense vs. last month, and your portfolio (total value, gain/loss, top gainer and top holding).',
+      'Sharing also saves a copy of the image to your device automatically (in case you dismiss the share sheet).',
     ],
   },
   categories: {
@@ -353,7 +361,7 @@ Beer ฿400 shared by A and B only = ฿200 each
 Result: A ฿500 · B ฿500 · C ฿300 · total ฿1,300`,
     notes: [
       'If an item has nobody ticked, you’ll get a warning (that amount isn’t split yet).',
-      'It’s a throwaway calculator — data is lost when you leave, and nothing is saved as income/expense.',
+      'Your draft stays on this device until you tap "Clear all" (it survives closing and reopening the app), but nothing is saved as income/expense.',
     ],
   },
   notifications: {
