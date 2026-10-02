@@ -5,6 +5,8 @@ import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatDate } from '../utils/date'
 import { buildMonthImage } from '../utils/monthImage'
+import { useFx } from '../hooks/useFx'
+import { totalsByCurrency, combineToPrimary, sumField } from '../utils/portfolio'
 import Modal from './ui/Modal'
 import MoneyText from './MoneyText'
 import TransactionItem from './TransactionItem'
@@ -22,10 +24,11 @@ function downloadBlob(blob, name) {
   URL.revokeObjectURL(url)
 }
 
-// Group one type's transactions by category -> rows sorted desc. Keeps the top 5
-// and rolls the rest into a single "Other" slice, so the donut and its legend
-// never get crowded.
-function breakdown(txs, categories, type) {
+// Group one type's transactions by category -> rows sorted desc. Keeps the top
+// `cap` and rolls the rest into a single "Other" slice. If a real category named
+// like "Other" is already in the top, the remainder is merged into it so the
+// label never appears twice.
+function breakdown(txs, categories, type, cap = 5) {
   const byCat = {}
   for (const t of txs) {
     if (t.type !== type) continue
@@ -37,9 +40,14 @@ function breakdown(txs, categories, type) {
       return { id, name: c?.name || 'Uncategorized', color: c?.color || OTHER_COLOR, value }
     })
     .sort((a, b) => b.value - a.value)
-  if (rows.length <= 5) return rows
-  const top = rows.slice(0, 5)
-  const otherValue = rows.slice(5).reduce((s, r) => s + r.value, 0)
+  if (rows.length <= cap) return rows
+  const top = rows.slice(0, cap)
+  const otherValue = rows.slice(cap).reduce((s, r) => s + r.value, 0)
+  const existing = top.find((r) => r.name === strings.month.other)
+  if (existing) {
+    existing.value += otherValue
+    return top
+  }
   return [...top, { id: '__other', name: strings.month.other, color: OTHER_COLOR, value: otherValue }]
 }
 
@@ -95,8 +103,22 @@ function DonutSide({ label, rows, currency, emptyText }) {
 export default function MonthDetailModal({ open, onClose, year, month }) {
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
+  const holdings = useStore((s) => s.holdings)
   const currency = useStore((s) => s.settings.primaryCurrency)
   const accent = useStore((s) => s.settings.accent)
+  const dark = useStore((s) => s.settings.theme) === 'dark'
+  const { convert } = useFx(holdings.map((h) => h.currency), currency)
+
+  // Current portfolio snapshot (value + gain) in the primary currency.
+  const stocks = useMemo(() => {
+    if (!holdings.length) return { has: false }
+    const grand = totalsByCurrency(holdings, {})
+    const value = combineToPrimary(grand, 'value', convert, currency).primaryMinor
+    const gain = combineToPrimary(grand, 'gain', convert, currency).primaryMinor
+    const cost = sumField(grand, 'cost')
+    const gainPct = cost > 0 ? (sumField(grand, 'gain') / cost) * 100 : 0
+    return { has: true, value, gain, gainPct }
+  }, [holdings, convert, currency])
 
   const data = useMemo(() => {
     if (month === null || month === undefined) return null
@@ -138,29 +160,31 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
       net: data.net,
       incomeRows: data.incomeRows,
       expenseRows: data.expenseRows,
+      stocks,
       currency,
       accent,
+      dark,
       labels: {
         income: strings.balance.income,
         expense: strings.balance.expense,
         net: strings.balance.net,
         incomeByCat: strings.month.incomeByCat,
         expenseByCat: strings.month.expenseByCat,
+        investments: strings.month.investments,
         footer: strings.month.madeWith,
       },
     })
     if (!blob) return
     const name = `mysync-${year}-${String(month + 1).padStart(2, '0')}.png`
+    // Always save a copy to the device, then also open the share sheet.
+    downloadBlob(blob, name)
     const file = new File([blob], name, { type: 'image/png' })
     try {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file] })
-      } else {
-        downloadBlob(blob, name)
       }
-    } catch (e) {
-      const cancelled = e?.name === 'AbortError' || /abort|cancel/i.test(e?.message || '')
-      if (!cancelled) downloadBlob(blob, name)
+    } catch {
+      /* share cancelled or unsupported — the file was already downloaded */
     }
   }
 

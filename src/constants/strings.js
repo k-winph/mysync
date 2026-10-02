@@ -22,7 +22,7 @@ const en = {
     incomeByCat: 'Income by category', expenseByCat: 'Expense by category',
     noIncome: 'No income', noExpense: 'No expense',
     transactions: 'Transactions', other: 'Other', noTx: 'No transactions this month.',
-    shareImage: 'Share as image', madeWith: 'Made with MySync',
+    shareImage: 'Share as image', madeWith: 'Made with MySync', investments: 'Investments',
   },
 
   dashboard: {
@@ -301,7 +301,7 @@ const th = {
     incomeByCat: 'รายรับตามหมวด', expenseByCat: 'รายจ่ายตามหมวด',
     noIncome: 'ไม่มีรายรับ', noExpense: 'ไม่มีรายจ่าย',
     transactions: 'รายการ', other: 'อื่น ๆ', noTx: 'เดือนนี้ไม่มีรายการ',
-    shareImage: 'แชร์เป็นรูป', madeWith: 'สร้างด้วย MySync',
+    shareImage: 'แชร์เป็นรูป', madeWith: 'สร้างด้วย MySync', investments: 'การลงทุน',
   },
 
   dashboard: {
