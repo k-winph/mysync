@@ -23,6 +23,7 @@ const en = {
     noIncome: 'No income', noExpense: 'No expense',
     transactions: 'Transactions', other: 'Other', noTx: 'No transactions this month.',
     shareImage: 'Share as image', madeWith: 'Made with MySync', investments: 'Investments',
+    saved: 'Saved', vsPrev: 'vs last month',
   },
 
   dashboard: {
@@ -302,6 +303,7 @@ const th = {
     noIncome: 'ไม่มีรายรับ', noExpense: 'ไม่มีรายจ่าย',
     transactions: 'รายการ', other: 'อื่น ๆ', noTx: 'เดือนนี้ไม่มีรายการ',
     shareImage: 'แชร์เป็นรูป', madeWith: 'สร้างด้วย MySync', investments: 'การลงทุน',
+    saved: 'ออม', vsPrev: 'เทียบเดือนก่อน',
   },
 
   dashboard: {

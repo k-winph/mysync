@@ -35,7 +35,7 @@ const FONT = '-apple-system, system-ui, "Segoe UI", Roboto, "Noto Sans Thai", sa
 export async function buildMonthImage(opts) {
   const {
     title, income, expense, net, incomeRows, expenseRows, stocks,
-    currency, accent, dark, labels,
+    prevExpense, savingsRate, currency, accent, dark, labels,
   } = opts
   const accentHex = (ACCENTS.find((a) => a.id === accent) || ACCENTS.find((a) => a.id === DEFAULT_ACCENT)).swatch
 
@@ -87,6 +87,23 @@ export async function buildMonthImage(opts) {
       ctx.textBaseline = 'alphabetic'
       ctx.font = `700 30px ${FONT}`
       ctx.fillText('MySync', left + 34, y + 24)
+      // Savings-rate pill (top-right) — fills the header's empty corner.
+      if (savingsRate != null) {
+        const txt = `${labels.saved} ${Math.round(savingsRate)}%`
+        ctx.font = `700 30px ${FONT}`
+        const tw = ctx.measureText(txt).width
+        const padX = 28
+        const ph = 62
+        const pw = tw + padX * 2
+        const px = M + cardW - PAD - pw
+        const py = y + 34
+        ctx.fillStyle = rgba(accentHex, dark ? 0.22 : 0.12)
+        roundRect(ctx, px, py, pw, ph, 31)
+        ctx.fill()
+        ctx.fillStyle = accentHex
+        ctx.textAlign = 'left'
+        ctx.fillText(txt, px + padX, py + 41)
+      }
     }
     y += 52
 
@@ -129,7 +146,30 @@ export async function buildMonthImage(opts) {
       chip(left, labels.income, income, green)
       chip(left + chipW + gap, labels.expense, expense, red)
     }
-    y += chipH + 44
+    y += chipH + 18
+
+    // "Expense ▼8% vs last month" line
+    if (prevExpense > 0) {
+      const delta = ((expense - prevExpense) / prevExpense) * 100
+      const down = delta <= 0
+      if (d) {
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'alphabetic'
+        ctx.font = `600 24px ${FONT}`
+        let x = left
+        ctx.fillStyle = muted
+        ctx.fillText(`${labels.expense} `, x, y + 22)
+        x += ctx.measureText(`${labels.expense} `).width
+        ctx.fillStyle = down ? green : red
+        const dt = `${down ? '▼' : '▲'}${Math.abs(delta).toFixed(0)}% `
+        ctx.fillText(dt, x, y + 22)
+        x += ctx.measureText(dt).width
+        ctx.fillStyle = muted
+        ctx.fillText(labels.vsPrev, x, y + 22)
+      }
+      y += 40
+    }
+    y += 26
 
     // Category section (bars)
     const section = (rows, heading) => {
@@ -145,12 +185,26 @@ export async function buildMonthImage(opts) {
       for (const r of rows) {
         const pct = total > 0 ? r.value / total : 0
         if (d) {
+          // color dot
+          ctx.fillStyle = r.color
+          ctx.beginPath()
+          ctx.arc(left + 9, y + 14, 9, 0, Math.PI * 2)
+          ctx.fill()
+          // name
           ctx.fillStyle = ink
           ctx.font = `600 29px ${FONT}`
           ctx.textAlign = 'left'
-          ctx.fillText(r.name, left, y + 24)
-          ctx.textAlign = 'right'
+          ctx.textBaseline = 'alphabetic'
+          ctx.fillText(r.name, left + 32, y + 24)
+          // percent after the name (muted)
+          const nameW = ctx.measureText(r.name).width
+          ctx.fillStyle = muted
+          ctx.font = `600 23px ${FONT}`
+          ctx.fillText(`${Math.round(pct * 100)}%`, left + 32 + nameW + 14, y + 23)
+          // amount
+          ctx.fillStyle = ink
           ctx.font = `700 29px ${FONT}`
+          ctx.textAlign = 'right'
           ctx.fillText(formatMoney(r.value, currency), left + innerW, y + 24)
           const barY = y + 40
           ctx.fillStyle = track

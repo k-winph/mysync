@@ -151,6 +151,15 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
     ? ''
     : dayjs(`${year}-${String(month + 1).padStart(2, '0')}-01`).format('MMMM YYYY')
 
+  // Previous month's expense total (handles the year boundary) for the trend line.
+  const prevExpense = useMemo(() => {
+    if (month === null || month === undefined) return 0
+    const prefix = dayjs(`${year}-${String(month + 1).padStart(2, '0')}-01`).subtract(1, 'month').format('YYYY-MM')
+    return transactions
+      .filter((t) => t.type === 'expense' && t.date.slice(0, 7) === prefix)
+      .reduce((s, t) => s + t.amount, 0)
+  }, [transactions, year, month])
+
   const shareImage = async () => {
     if (!data) return
     const blob = await buildMonthImage({
@@ -161,6 +170,8 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
       incomeRows: data.incomeRows,
       expenseRows: data.expenseRows,
       stocks,
+      prevExpense,
+      savingsRate: data.income > 0 && data.net > 0 ? (data.net / data.income) * 100 : null,
       currency,
       accent,
       dark,
@@ -171,6 +182,8 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
         incomeByCat: strings.month.incomeByCat,
         expenseByCat: strings.month.expenseByCat,
         investments: strings.month.investments,
+        saved: strings.month.saved,
+        vsPrev: strings.month.vsPrev,
         footer: strings.month.madeWith,
       },
     })
