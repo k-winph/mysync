@@ -96,7 +96,7 @@ export async function buildMonthImage(opts) {
         const ph = 62
         const pw = tw + padX * 2
         const px = M + cardW - PAD - pw
-        const py = y + 34
+        const py = y + 48 // sit beside the month title, vertically centered on it
         ctx.fillStyle = rgba(accentHex, dark ? 0.22 : 0.12)
         roundRect(ctx, px, py, pw, ph, 31)
         ctx.fill()
@@ -223,7 +223,8 @@ export async function buildMonthImage(opts) {
 
     // Stocks block (current portfolio snapshot)
     if (stocks && stocks.has) {
-      const blockH = 150
+      const standouts = stocks.topGain || stocks.topValue
+      const blockH = standouts ? 250 : 150
       if (d) {
         ctx.fillStyle = dark ? 'rgba(255,255,255,0.05)' : '#f6f7fb'
         roundRect(ctx, left, y, innerW, blockH, 24)
@@ -242,6 +243,37 @@ export async function buildMonthImage(opts) {
         ctx.fillStyle = up ? green : red
         ctx.font = `700 30px ${FONT}`
         ctx.fillText(gtext, left + innerW - 28, y + 100)
+
+        // Standout holdings: top gainer (left) + highest value (right).
+        if (standouts) {
+          const dy = y + 140
+          ctx.strokeStyle = dark ? 'rgba(255,255,255,0.09)' : '#e7e9f0'
+          ctx.lineWidth = 2
+          ctx.beginPath()
+          ctx.moveTo(left + 28, dy)
+          ctx.lineTo(left + innerW - 28, dy)
+          ctx.stroke()
+          const colY = dy + 22
+          const colW = (innerW - 56) / 2
+          const mini = (mx, label, valueText, valueColor) => {
+            ctx.textAlign = 'left'
+            ctx.fillStyle = muted
+            ctx.font = `600 22px ${FONT}`
+            ctx.fillText(label, mx, colY + 22)
+            ctx.fillStyle = valueColor
+            ctx.font = `700 29px ${FONT}`
+            ctx.fillText(valueText, mx, colY + 60)
+          }
+          if (stocks.topGain) {
+            const g = stocks.topGain
+            const sign = g.gainPct >= 0 ? '+' : ''
+            mini(left + 28, labels.topGainer, `${g.symbol}  ${sign}${g.gainPct.toFixed(1)}%`, g.gainPct >= 0 ? green : red)
+          }
+          if (stocks.topValue) {
+            const v = stocks.topValue
+            mini(left + 28 + colW, labels.topHolding, `${v.symbol}  ${formatMoney(v.valuePrimary, currency)}`, ink)
+          }
+        }
       }
       y += blockH + 28
     }

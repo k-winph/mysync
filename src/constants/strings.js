@@ -24,6 +24,7 @@ const en = {
     transactions: 'Transactions', other: 'Other', noTx: 'No transactions this month.',
     shareImage: 'Share as image', madeWith: 'Made with MySync', investments: 'Investments',
     saved: 'Saved', vsPrev: 'vs last month',
+    topGainer: 'Top gainer', topHolding: 'Top holding',
   },
 
   dashboard: {
@@ -304,6 +305,7 @@ const th = {
     transactions: 'รายการ', other: 'อื่น ๆ', noTx: 'เดือนนี้ไม่มีรายการ',
     shareImage: 'แชร์เป็นรูป', madeWith: 'สร้างด้วย MySync', investments: 'การลงทุน',
     saved: 'ออม', vsPrev: 'เทียบเดือนก่อน',
+    topGainer: 'กำไรสูงสุด', topHolding: 'มูลค่าสูงสุด',
   },
 
   dashboard: {

@@ -6,12 +6,16 @@ import { strings } from '../constants/strings'
 import { formatDate } from '../utils/date'
 import { buildMonthImage } from '../utils/monthImage'
 import { useFx } from '../hooks/useFx'
-import { totalsByCurrency, combineToPrimary, sumField } from '../utils/portfolio'
+import { totalsByCurrency, combineToPrimary, sumField, holdingMetrics } from '../utils/portfolio'
 import Modal from './ui/Modal'
 import MoneyText from './MoneyText'
 import TransactionItem from './TransactionItem'
 
 const OTHER_COLOR = '#94a3b8'
+const TH_MONTHS = [
+  'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+  'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม',
+]
 
 function downloadBlob(blob, name) {
   const url = URL.createObjectURL(blob)
@@ -106,6 +110,7 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
   const holdings = useStore((s) => s.holdings)
   const currency = useStore((s) => s.settings.primaryCurrency)
   const accent = useStore((s) => s.settings.accent)
+  const language = useStore((s) => s.settings.language)
   const dark = useStore((s) => s.settings.theme) === 'dark'
   const { convert } = useFx(holdings.map((h) => h.currency), currency)
 
@@ -117,7 +122,26 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
     const gain = combineToPrimary(grand, 'gain', convert, currency).primaryMinor
     const cost = sumField(grand, 'cost')
     const gainPct = cost > 0 ? (sumField(grand, 'gain') / cost) * 100 : 0
-    return { has: true, value, gain, gainPct }
+
+    // Standout holdings: the one up the most (%) and the one worth the most.
+    let topGain = null // { symbol, gainPct } — only among priced holdings
+    let topValue = null // { symbol, valuePrimary } — compared in primary currency
+    for (const h of holdings) {
+      const m = holdingMetrics(h)
+      const symbol = (h.symbol || h.name || '').toUpperCase()
+      if (!symbol) continue
+      // Value for ranking: use market value when priced, else cost. Convert to
+      // primary so holdings in different currencies compare fairly (fall back to
+      // the native amount if no FX rate yet).
+      const native = m.hasPrice ? m.value : m.cost
+      const inPrimary = convert(native, h.currency)
+      const cmp = inPrimary == null ? native : inPrimary
+      if (!topValue || cmp > topValue.valuePrimary) topValue = { symbol, valuePrimary: cmp }
+      if (m.hasPrice && m.gainPct != null && (!topGain || m.gainPct > topGain.gainPct)) {
+        topGain = { symbol, gainPct: m.gainPct }
+      }
+    }
+    return { has: true, value, gain, gainPct, topGain, topValue }
   }, [holdings, convert, currency])
 
   const data = useMemo(() => {
@@ -149,7 +173,9 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
 
   const title = month === null || month === undefined
     ? ''
-    : dayjs(`${year}-${String(month + 1).padStart(2, '0')}-01`).format('MMMM YYYY')
+    : language === 'th'
+      ? `${TH_MONTHS[month]} ${year}`
+      : dayjs(`${year}-${String(month + 1).padStart(2, '0')}-01`).format('MMMM YYYY')
 
   // Previous month's expense total (handles the year boundary) for the trend line.
   const prevExpense = useMemo(() => {
@@ -184,6 +210,8 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
         investments: strings.month.investments,
         saved: strings.month.saved,
         vsPrev: strings.month.vsPrev,
+        topGainer: strings.month.topGainer,
+        topHolding: strings.month.topHolding,
         footer: strings.month.madeWith,
       },
     })
