@@ -16,6 +16,17 @@
   html {
     -webkit-tap-highlight-color: transparent;
   }
+  /* Visible keyboard-focus ring on every interactive element — shows only for
+     keyboard/AT users (:focus-visible), never on mouse tap. :where() keeps
+     specificity at 0 so it never fights a component's own styles. */
+  :where(a, button, [role='button'], input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid rgb(var(--brand-600));
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+  :where(.dark a, .dark button, .dark [role='button'], .dark input, .dark select, .dark textarea, .dark summary, .dark [tabindex]):focus-visible {
+    outline-color: rgb(var(--brand-500));
+  }
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
     @apply dark:bg-slate-950 dark:text-slate-100;

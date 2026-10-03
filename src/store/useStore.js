@@ -3,13 +3,13 @@ import { persist } from 'zustand/middleware'
 import { uuid } from '../utils/id'
 import { DEFAULT_CATEGORIES } from '../constants/categories'
 import { todayISO, addPeriod } from '../utils/date'
+import { STORE_VERSION, migratePersisted } from './migrate'
 
 // Single source of truth for the whole app, persisted to localStorage.
 // Kept as ONE store on purpose: the app is small and cross-slice reads
 // (e.g. dashboard needs transactions + categories) are simpler this way.
 
 const STORAGE_KEY = 'mysync-store'
-const STORE_VERSION = 2
 
 const now = () => new Date().toISOString()
 
@@ -347,24 +347,8 @@ export const useStore = create(
     {
       name: STORAGE_KEY,
       version: STORE_VERSION,
-      // v1 -> v2: debts gained `kind` (once/recurring/installment). Old debts used
-      // `recurrence` ('none' | weekly | monthly | yearly); map it forward so
-      // existing subscriptions become 'recurring' and everything else 'once'.
-      migrate: (state, version) => {
-        if (state && version < 2 && Array.isArray(state.debts)) {
-          state.debts = state.debts.map((d) => {
-            const rec = d.recurrence
-            return {
-              ...d,
-              kind: d.kind || (rec && rec !== 'none' ? 'recurring' : 'once'),
-              frequency: d.frequency || (rec && rec !== 'none' ? rec : 'monthly'),
-              totalInstallments: d.totalInstallments || 0,
-              paidInstallments: d.paidInstallments || 0,
-            }
-          })
-        }
-        return state
-      },
+      // Upgrades old persisted data to the current shape (see store/migrate.js).
+      migrate: migratePersisted,
       // Only persist data, not action functions (zustand handles this, but we
       // keep it explicit for clarity and future-proofing).
       partialize: (s) => ({

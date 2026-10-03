@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, lazy, Suspense } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus,
@@ -16,7 +16,9 @@ import AnimatedMoney from '../components/AnimatedMoney'
 import DualMoney from '../components/DualMoney'
 import FxChange from '../components/FxChange'
 import TransactionItem from '../components/TransactionItem'
-import ExpenseDonut from '../components/ExpenseDonut'
+// Lazy so Recharts (its only heavy dependency) loads after the dashboard
+// paints, instead of blocking the initial bundle.
+const ExpenseDonut = lazy(() => import('../components/ExpenseDonut'))
 import TransactionModal from '../components/TransactionModal'
 import NotificationBell from '../components/NotificationBell'
 import EmptyState from '../components/ui/EmptyState'
@@ -183,7 +185,11 @@ export default function Dashboard() {
           {donutData.length === 0 ? (
             <EmptyState icon={PieChart} message={strings.dashboard.noExpenseData} />
           ) : (
-            <ExpenseDonut data={donutData} currency={settings.primaryCurrency} />
+            <Suspense fallback={<div className="flex h-[200px] items-center justify-center">
+              <div className="h-7 w-7 animate-spin rounded-full border-2 border-brand-500/30 border-t-brand-600" />
+            </div>}>
+              <ExpenseDonut data={donutData} currency={settings.primaryCurrency} />
+            </Suspense>
           )}
         </Card>
       </div>

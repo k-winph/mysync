@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState, lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { useStore } from './store/useStore'
 import { strings, setLang } from './constants/strings'
@@ -8,19 +8,34 @@ import { notificationPermission, showNotification } from './utils/notify'
 import Layout from './components/Layout'
 import LockScreen from './components/LockScreen'
 import Dashboard from './pages/Dashboard'
-import Balance from './pages/Balance'
-import Transactions from './pages/Transactions'
-import Debt from './pages/Debt'
-import Recurring from './pages/Recurring'
-import Installments from './pages/Installments'
-import Tax from './pages/Tax'
-import Stocks from './pages/Stocks'
-import PortfolioDetail from './pages/PortfolioDetail'
-import Savings from './pages/Savings'
-import SplitBill from './pages/SplitBill'
-import Guide from './pages/Guide'
-import Settings from './pages/Settings'
 import Welcome from './components/Welcome'
+
+// Dashboard is the landing screen, so it stays in the main bundle for an
+// instant first paint. Every other screen is code-split and loaded on demand —
+// this keeps heavy, rarely-first dependencies (xlsx in Settings/backup, the
+// portfolio charts, etc.) out of the initial download.
+const Balance = lazy(() => import('./pages/Balance'))
+const Transactions = lazy(() => import('./pages/Transactions'))
+const Debt = lazy(() => import('./pages/Debt'))
+const Recurring = lazy(() => import('./pages/Recurring'))
+const Installments = lazy(() => import('./pages/Installments'))
+const Tax = lazy(() => import('./pages/Tax'))
+const Stocks = lazy(() => import('./pages/Stocks'))
+const PortfolioDetail = lazy(() => import('./pages/PortfolioDetail'))
+const Savings = lazy(() => import('./pages/Savings'))
+const SplitBill = lazy(() => import('./pages/SplitBill'))
+const Guide = lazy(() => import('./pages/Guide'))
+const Settings = lazy(() => import('./pages/Settings'))
+
+// Shown briefly while a lazy route chunk loads. Quiet and theme-aware.
+function RouteFallback() {
+  return (
+    <div className="flex items-center justify-center py-24" role="status" aria-live="polite">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-500/30 border-t-brand-600" />
+      <span className="sr-only">Loading…</span>
+    </div>
+  )
+}
 
 export default function App() {
   const theme = useStore((s) => s.settings.theme)
@@ -80,23 +95,25 @@ export default function App() {
 
   return (
     <>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<Dashboard />} />
-        <Route path="balance" element={<Balance />} />
-        <Route path="transactions" element={<Transactions />} />
-        <Route path="debt" element={<Debt />} />
-        <Route path="debt/recurring" element={<Recurring />} />
-        <Route path="debt/installments" element={<Installments />} />
-        <Route path="tax" element={<Tax />} />
-        <Route path="stocks" element={<Stocks />} />
-        <Route path="stocks/:portfolioId" element={<PortfolioDetail />} />
-        <Route path="savings" element={<Savings />} />
-        <Route path="split" element={<SplitBill />} />
-        <Route path="guide" element={<Guide />} />
-        <Route path="settings" element={<Settings />} />
-      </Route>
-      </Routes>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="balance" element={<Balance />} />
+            <Route path="transactions" element={<Transactions />} />
+            <Route path="debt" element={<Debt />} />
+            <Route path="debt/recurring" element={<Recurring />} />
+            <Route path="debt/installments" element={<Installments />} />
+            <Route path="tax" element={<Tax />} />
+            <Route path="stocks" element={<Stocks />} />
+            <Route path="stocks/:portfolioId" element={<PortfolioDetail />} />
+            <Route path="savings" element={<Savings />} />
+            <Route path="split" element={<SplitBill />} />
+            <Route path="guide" element={<Guide />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+        </Routes>
+      </Suspense>
       <Welcome />
     </>
   )
