@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Info, Calculator } from 'lucide-react'
 import { strings } from '../constants/strings'
 import { calcTax } from '../utils/tax'
@@ -49,6 +50,7 @@ function Line({ label, value, strong }) {
 }
 
 export default function Tax() {
+  const navigate = useNavigate()
   const currency = useStore((s) => s.settings.primaryCurrency)
 
   const [income, setIncome] = useState('')
@@ -66,6 +68,7 @@ export default function Tax() {
         icon={Calculator}
         title={strings.tax.title}
         subtitle={strings.tax.subtitle}
+        onBack={() => navigate('/')}
         right={
           <button
             onClick={() => setInfoOpen(true)}

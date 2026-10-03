@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Plus, X, Trash2, Users, Share2 } from 'lucide-react'
 import { strings } from '../constants/strings'
 import { parseMoney, formatMoney } from '../utils/money'
@@ -66,7 +65,6 @@ function downloadBlob(blob, name) {
 // Each item's price splits equally among the people ticked for that item.
 // Service charge / VAT / tip (percent) are added on top and shared in proportion.
 export default function SplitBill() {
-  const navigate = useNavigate()
   const primary = useStore((s) => s.settings.primaryCurrency)
   const accent = useStore((s) => s.settings.accent)
   const dark = useStore((s) => s.settings.theme) === 'dark'
@@ -235,7 +233,6 @@ export default function SplitBill() {
         icon={Users}
         title={strings.split.title}
         subtitle={strings.pageSub.split}
-        onBack={() => navigate('/')}
         right={
           (people.length > 0 || items.length > 0) && (
             <button onClick={clearAll} className="text-sm font-medium text-slate-500 hover:text-red-600">
