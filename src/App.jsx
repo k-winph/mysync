@@ -9,6 +9,7 @@ import Layout from './components/Layout'
 import LockScreen from './components/LockScreen'
 import Dashboard from './pages/Dashboard'
 import Welcome from './components/Welcome'
+import PwaUpdatePrompt from './components/PwaUpdatePrompt'
 
 // Dashboard is the landing screen, so it stays in the main bundle for an
 // instant first paint. Every other screen is code-split and loaded on demand —
@@ -115,6 +116,7 @@ export default function App() {
         </Routes>
       </Suspense>
       <Welcome />
+      <PwaUpdatePrompt />
     </>
   )
 }

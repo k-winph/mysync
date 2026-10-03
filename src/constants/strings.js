@@ -246,6 +246,11 @@ const en = {
     start: 'Get started',
     openGuide: 'View the guide',
   },
+  pwa: {
+    updateReady: 'A new version is available.',
+    reload: 'Refresh',
+    dismiss: 'Later',
+  },
 
   settings: {
     title: 'Settings', appearance: 'Appearance', darkMode: 'Dark mode', hideBalances: 'Hide balances',
@@ -539,6 +544,11 @@ const th = {
     body: 'แอปจัดการเงินส่วนตัว ข้อมูลทั้งหมดเก็บในเครื่องคุณเท่านั้น ติดตามรายรับรายจ่าย หนี้สิน เงินออม และการลงทุน ครบในที่เดียว',
     start: 'เริ่มใช้งาน',
     openGuide: 'ดูคู่มือ',
+  },
+  pwa: {
+    updateReady: 'มีเวอร์ชันใหม่พร้อมใช้งาน',
+    reload: 'รีเฟรช',
+    dismiss: 'ไว้ก่อน',
   },
 
   settings: {

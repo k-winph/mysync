@@ -1,10 +1,11 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Plus, X, Trash2, Users, Share2 } from 'lucide-react'
 import { strings } from '../constants/strings'
-import { parseMoney, formatMoney } from '../utils/money'
+import { formatMoney } from '../utils/money'
 import { uuid } from '../utils/id'
 import { useStore } from '../store/useStore'
 import { avatarColor, avatarInitial } from '../utils/avatar'
+import { computeSplit } from '../utils/split'
 import { buildSplitImage } from '../utils/splitImage'
 import Card from '../components/ui/Card'
 import MoneyInput from '../components/ui/MoneyInput'
@@ -29,12 +30,6 @@ function loadSplit() {
   } catch {
     return { people: [], items: [], charges: { ...EMPTY_CHARGES } }
   }
-}
-
-// Parse a percent string like "10" / "7.5" -> number (0 if blank/invalid).
-function parsePct(text) {
-  const n = parseFloat(String(text ?? '').replace(/[^0-9.]/g, ''))
-  return Number.isFinite(n) && n > 0 ? n : 0
 }
 
 // A small colored initial-circle for a person; same color everywhere.
@@ -132,45 +127,17 @@ export default function SplitBill() {
     }
   }
 
-  // Totals in satang. Item shares split equally among an item's members; then
-  // service/VAT/tip are added on top and distributed in proportion to each
-  // person's item share (VAT stacks on subtotal + service, Thai-receipt style).
-  const calc = useMemo(() => {
-    const share = {}
-    let subtotal = 0
-    let unassigned = 0
-    for (const it of items) {
-      const price = parseMoney(it.price)
-      if (price <= 0) continue
-      subtotal += price
-      const mem = it.members.filter((m) => people.some((p) => p.id === m))
-      if (mem.length === 0) {
-        unassigned += price
-        continue
-      }
-      const each = price / mem.length
-      for (const m of mem) share[m] = (share[m] || 0) + each
-    }
-    const s = parsePct(charges.service)
-    const v = parsePct(charges.vat)
-    const t = parsePct(charges.tip)
-    const serviceAmt = Math.round(subtotal * (s / 100))
-    const vatAmt = Math.round((subtotal + serviceAmt) * (v / 100))
-    const tipAmt = Math.round(subtotal * (t / 100))
-    const grandTotal = subtotal + serviceAmt + vatAmt + tipAmt
-    const mult = subtotal > 0 ? grandTotal / subtotal : 1
-    const perPerson = {}
-    for (const id of Object.keys(share)) perPerson[id] = share[id] * mult
-
-    const chargeList = []
-    if (serviceAmt > 0) chargeList.push({ key: 'service', label: strings.split.service, amount: serviceAmt })
-    if (vatAmt > 0) chargeList.push({ key: 'vat', label: strings.split.vat, amount: vatAmt })
-    if (tipAmt > 0) chargeList.push({ key: 'tip', label: strings.split.tip, amount: tipAmt })
-
-    return { perPerson, subtotal, grandTotal, unassigned, chargeList }
-  }, [items, people, charges])
-
-  const { perPerson, subtotal, grandTotal, unassigned, chargeList } = calc
+  // Totals in satang (pure math in utils/split). Then build the localized
+  // charge breakdown for display.
+  const calc = useMemo(() => computeSplit(people, items, charges), [items, people, charges])
+  const { perPerson, subtotal, grandTotal, unassigned, serviceAmt, vatAmt, tipAmt } = calc
+  const chargeList = useMemo(() => {
+    const list = []
+    if (serviceAmt > 0) list.push({ key: 'service', label: strings.split.service, amount: serviceAmt })
+    if (vatAmt > 0) list.push({ key: 'vat', label: strings.split.vat, amount: vatAmt })
+    if (tipAmt > 0) list.push({ key: 'tip', label: strings.split.tip, amount: tipAmt })
+    return list
+  }, [serviceAmt, vatAmt, tipAmt])
   const maxShare = Math.max(1, ...people.map((p) => perPerson[p.id] || 0))
 
   const shareImage = async () => {

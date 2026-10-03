@@ -266,7 +266,7 @@ Everything else is local.
 
 ## Offline & data safety
 
-- **Offline:** as an installed PWA (service worker set to `autoUpdate`), the app
+- **Offline:** as an installed PWA (service worker registered with `prompt`), the app
   shell is cached and every core feature — transactions, debts, tax, savings,
   split-bill, backup — works with no connection. Investments work offline too
   (view/add/edit holdings, see the **last cached prices**); only *refreshing to
@@ -301,9 +301,10 @@ Notes:
 - SPA deep links are handled by `public/404.html`, which stashes the requested
   route and hands it back to `index.html` on load — so refreshing on
   `/mysync/settings` works.
-- The service worker uses `autoUpdate`. After a redeploy, an installed PWA picks
-  up the new version on its next launch (you may need to fully close and reopen
-  the app once).
+- The service worker uses `prompt`. After a redeploy, an installed PWA shows a
+  "new version available" banner (`components/PwaUpdatePrompt.jsx`); tapping
+  **Refresh** activates the new build and reloads. Dismissing keeps the current
+  version until the next launch.
 
 ---
 
@@ -426,27 +427,9 @@ variable names and comments are in English; user-facing strings go in
 
 ## License
 
-MIT License
-
-Copyright (c) 2026 k-winph
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+No license file is included yet. If you want others to reuse your code, add one
+(for a permissive choice, the [MIT License](https://choosealicense.com/licenses/mit/)
+is common). Until a license is added, all rights are reserved by the author.
 
 ---
 
