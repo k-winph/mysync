@@ -5,6 +5,8 @@ import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { daysUntil } from '../utils/date'
 import Card from '../components/ui/Card'
+import EmptyState from '../components/ui/EmptyState'
+import { PiggyArt } from '../components/illustrations'
 import MoneyText from '../components/MoneyText'
 import GoalModal from '../components/GoalModal'
 import AddFundsModal from '../components/AddFundsModal'
@@ -92,9 +94,12 @@ export default function Savings() {
       <PageHeader icon={PiggyBank} title={strings.savings.title} subtitle={strings.pageSub.savings} onBack={() => navigate('/')} />
 
       {goals.length === 0 ? (
-        <Card className="flex flex-col items-center gap-3 py-10 text-center">
-          <PiggyBank size={40} className="text-slate-300 dark:text-slate-700" />
-          <p className="text-sm text-slate-500">{strings.savings.empty}</p>
+        <Card>
+          <EmptyState
+            illustration={<PiggyArt />}
+            title={strings.savings.emptyTitle}
+            message={strings.savings.empty}
+          />
         </Card>
       ) : (
         <>

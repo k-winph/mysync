@@ -42,6 +42,7 @@ const en = {
     noTagsHint: 'No tags yet. Tap Add to create one.', note: 'Note', date: 'Date',
     addTitle: 'Add transaction', editTitle: 'Edit transaction', deleteConfirm: 'Delete this transaction?',
     empty: 'No transactions.', pickCategory: 'Select a category', noResults: 'No transactions match your filters.',
+    emptyTitle: 'Start tracking', emptyBody: 'Your income and expenses will appear here. Tap + to add your first entry.',
   },
 
   filter: {
@@ -88,10 +89,10 @@ const en = {
     countItems: (n) => `${n} item${n === 1 ? '' : 's'}`,
     // Recurring page
     recurringTitle: 'Recurring', recurringTotal: 'Recurring total',
-    recurringEmpty: 'No recurring bills yet. Tap + to add one.',
+    recurringEmptyTitle: 'No recurring bills', recurringEmpty: 'Add bills like rent or subscriptions and MySync tracks each due date. Tap + to start.',
     // Installment page
     installmentTitle: 'Installments', installmentTotalRemaining: 'Total remaining',
-    installmentEmpty: 'No installment loans yet. Tap + to add one.',
+    installmentEmptyTitle: 'No installment loans', installmentEmpty: 'Track a car or home loan with its number of payments. Tap + to add one.',
     finishedTitle: 'Paid off',
     nextPayment: 'Next payment', onceEmpty: 'No one-time debts. Tap + to add one.',
     sortLabel: 'Sort', sortExpensive: 'Most expensive', sortCheap: 'Cheapest',
@@ -137,7 +138,7 @@ const en = {
     title: 'Investments', totalValue: 'Total value', today: 'Today', allGainLoss: 'Total gain/loss',
     addPortfolio: 'Add portfolio', editPortfolio: 'Edit portfolio', portfolioName: 'Portfolio name',
     portfolioNameHint: 'e.g. Long-term', note: 'Note',
-    emptyPortfolios: 'No portfolios yet. Create one to start tracking your stocks.',
+    emptyTitle: 'No portfolios yet', emptyPortfolios: 'Create a portfolio, then add the stocks you hold to track value and gains.',
     deletePortfolioConfirm: 'Delete this portfolio and all of its holdings?',
     positions: (n) => `${n} position${n === 1 ? '' : 's'}`,
     holdings: 'Holdings', addHolding: 'Add holding', editHolding: 'Edit holding', symbol: 'Symbol',
@@ -165,7 +166,8 @@ const en = {
     target: 'Target amount',
     current: 'Saved so far',
     deadline: 'Target date',
-    empty: 'No goals yet. Tap + to set one.',
+    empty: 'Set a target, then put money aside bit by bit and watch the progress.',
+    emptyTitle: 'Save toward a goal',
     deleteConfirm: 'Delete this goal?',
     addFunds: 'Add money',
     addFundsTitle: 'Add to savings',
@@ -323,6 +325,7 @@ const th = {
     noTagsHint: 'ยังไม่มีแท็ก แตะเพิ่มเพื่อสร้าง', note: 'โน้ต', date: 'วันที่',
     addTitle: 'เพิ่มรายการ', editTitle: 'แก้ไขรายการ', deleteConfirm: 'ลบรายการนี้?',
     empty: 'ไม่มีรายการ', pickCategory: 'เลือกหมวดหมู่', noResults: 'ไม่มีรายการตรงกับตัวกรอง',
+    emptyTitle: 'เริ่มบันทึกรายการ', emptyBody: 'รายรับและรายจ่ายของคุณจะแสดงที่นี่ แตะ + เพื่อเพิ่มรายการแรก',
   },
 
   filter: {
@@ -369,10 +372,10 @@ const th = {
     countItems: (n) => `${n} รายการ`,
     // Recurring page
     recurringTitle: 'รายจ่ายประจำ', recurringTotal: 'ยอดรวมต่อรอบ',
-    recurringEmpty: 'ยังไม่มีรายจ่ายประจำ แตะ + เพื่อเพิ่ม',
+    recurringEmptyTitle: 'ยังไม่มีรายจ่ายประจำ', recurringEmpty: 'เพิ่มรายจ่ายอย่างค่าเช่าหรือค่าสมาชิก แล้วแอปจะคอยเตือนทุกรอบ แตะ + เพื่อเริ่ม',
     // Installment page
     installmentTitle: 'หนี้ผ่อน', installmentTotalRemaining: 'ยอดคงเหลือรวม',
-    installmentEmpty: 'ยังไม่มีหนี้ผ่อน แตะ + เพื่อเพิ่ม',
+    installmentEmptyTitle: 'ยังไม่มีหนี้ผ่อน', installmentEmpty: 'ติดตามหนี้ผ่อนรถหรือบ้านพร้อมจำนวนงวด แตะ + เพื่อเพิ่ม',
     finishedTitle: 'ผ่อนครบแล้ว',
     nextPayment: 'จ่ายครั้งถัดไป', onceEmpty: 'ยังไม่มีหนี้ก้อนเดียว แตะ + เพื่อเพิ่ม',
     sortLabel: 'เรียง', sortExpensive: 'แพงสุด', sortCheap: 'ถูกสุด',
@@ -418,7 +421,7 @@ const th = {
     title: 'การลงทุน', totalValue: 'มูลค่ารวม', today: 'วันนี้', allGainLoss: 'กำไร/ขาดทุนรวม',
     addPortfolio: 'เพิ่มพอร์ต', editPortfolio: 'แก้ไขพอร์ต', portfolioName: 'ชื่อพอร์ต',
     portfolioNameHint: 'เช่น ระยะยาว', note: 'โน้ต',
-    emptyPortfolios: 'ยังไม่มีพอร์ต สร้างพอร์ตเพื่อเริ่มติดตามหุ้น',
+    emptyTitle: 'ยังไม่มีพอร์ต', emptyPortfolios: 'สร้างพอร์ตแล้วเพิ่มหุ้นที่ถือ เพื่อติดตามมูลค่าและกำไร/ขาดทุน',
     deletePortfolioConfirm: 'ลบพอร์ตนี้และหุ้นทั้งหมดในพอร์ต?',
     positions: (n) => `${n} รายการ`,
     holdings: 'หุ้นในพอร์ต', addHolding: 'เพิ่มหุ้น', editHolding: 'แก้ไขหุ้น', symbol: 'สัญลักษณ์',
@@ -446,7 +449,8 @@ const th = {
     target: 'ยอดเป้าหมาย',
     current: 'ออมแล้ว',
     deadline: 'วันที่ตั้งเป้า',
-    empty: 'ยังไม่มีเป้าหมาย แตะ + เพื่อตั้ง',
+    empty: 'ตั้งเป้าหมายแล้วหยอดเงินเก็บทีละนิด เห็นความคืบหน้าชัดเจน',
+    emptyTitle: 'ออมเงินเข้าเป้าหมาย',
     deleteConfirm: 'ลบเป้าหมายนี้?',
     addFunds: 'เพิ่มเงิน',
     addFundsTitle: 'เพิ่มเงินออม',

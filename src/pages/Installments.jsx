@@ -6,6 +6,7 @@ import { strings } from '../constants/strings'
 import { formatDate, daysUntil } from '../utils/date'
 import { formatMoney } from '../utils/money'
 import Card from '../components/ui/Card'
+import EmptyState from '../components/ui/EmptyState'
 import MoneyText from '../components/MoneyText'
 import DebtModal from '../components/DebtModal'
 import PageHeader from '../components/PageHeader'
@@ -111,9 +112,12 @@ export default function Installments() {
       <PageHeader icon={CreditCard} title={strings.debt.installmentTitle} subtitle={strings.pageSub.installment} onBack={() => navigate('/debt')} />
 
       {active.length === 0 && done.length === 0 ? (
-        <Card className="flex flex-col items-center gap-3 py-10 text-center">
-          <CreditCard size={40} className="text-slate-300 dark:text-slate-700" />
-          <p className="text-sm text-slate-500">{strings.debt.installmentEmpty}</p>
+        <Card>
+          <EmptyState
+            icon={CreditCard}
+            title={strings.debt.installmentEmptyTitle}
+            message={strings.debt.installmentEmpty}
+          />
         </Card>
       ) : (
         <>

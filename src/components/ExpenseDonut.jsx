@@ -2,13 +2,16 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { formatMoney } from '../utils/money'
 import { strings } from '../constants/strings'
 import MoneyText from './MoneyText'
+import AnimatedMoney from './AnimatedMoney'
 import CategoryIcon from './CategoryIcon'
+import { useReducedMotion } from '../hooks/useReducedMotion'
 
 // Donut of expenses grouped by category for the period.
 // `data`: [{ id, name, value(satang), color, icon }] already sorted desc.
 // Identity is carried by the legend (name + amount + %), never color alone,
 // so it stays readable for colorblind users and in print.
 export default function ExpenseDonut({ data, currency }) {
+  const reduce = useReducedMotion()
   const total = data.reduce((sum, d) => sum + d.value, 0)
   if (total === 0) return null
 
@@ -25,7 +28,9 @@ export default function ExpenseDonut({ data, currency }) {
               outerRadius={92}
               paddingAngle={data.length > 1 ? 2 : 0}
               stroke="none"
-              isAnimationActive={false}
+              isAnimationActive={!reduce}
+              animationDuration={800}
+              animationEasing="ease-out"
             >
               {data.map((d) => (
                 <Cell key={d.id} fill={d.color} />
@@ -45,7 +50,7 @@ export default function ExpenseDonut({ data, currency }) {
         {/* Center total overlay */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-xs text-slate-500">{strings.common.total}</span>
-          <MoneyText satang={total} currency={currency} className="text-lg font-bold" />
+          <AnimatedMoney satang={total} currency={currency} duration={800} className="text-lg font-bold" />
         </div>
       </div>
 

@@ -7,6 +7,8 @@ import { totalsByCurrency, combineToPrimary, sumField } from '../utils/portfolio
 import { useQuotes } from '../hooks/useQuotes'
 import { useFx } from '../hooks/useFx'
 import Card from '../components/ui/Card'
+import EmptyState from '../components/ui/EmptyState'
+import { StocksArt } from '../components/illustrations'
 import MoneyText from '../components/MoneyText'
 import DualMoney from '../components/DualMoney'
 import FxChange from '../components/FxChange'
@@ -100,9 +102,12 @@ export default function Stocks() {
 
       {/* Portfolios */}
       {portfolios.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center
-          text-sm text-slate-500 dark:border-slate-700">
-          {strings.stock.emptyPortfolios}
+        <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+          <EmptyState
+            illustration={<StocksArt />}
+            title={strings.stock.emptyTitle}
+            message={strings.stock.emptyPortfolios}
+          />
         </div>
       ) : (
         <div className="space-y-3">

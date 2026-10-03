@@ -13,6 +13,7 @@ import CategoryManager from '../components/CategoryManager'
 import TagSummary from '../components/TagSummary'
 import PageHeader from '../components/PageHeader'
 import EmptyState from '../components/ui/EmptyState'
+import { WalletArt } from '../components/illustrations'
 
 const EMPTY_FILTERS = { q: '', type: 'all', categoryId: 'all', from: '', to: '' }
 
@@ -270,10 +271,15 @@ export default function Transactions() {
       {/* List */}
       {grouped.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
-          <EmptyState
-            icon={hasActiveFilters ? Search : Wallet}
-            message={hasActiveFilters ? strings.tx.noResults : strings.tx.empty}
-          />
+          {hasActiveFilters ? (
+            <EmptyState icon={Search} message={strings.tx.noResults} />
+          ) : (
+            <EmptyState
+              illustration={<WalletArt />}
+              title={strings.tx.emptyTitle}
+              message={strings.tx.emptyBody}
+            />
+          )}
         </div>
       ) : (
         <div className="space-y-4">
