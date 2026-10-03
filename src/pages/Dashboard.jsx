@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, lazy, Suspense } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   Eye, EyeOff, ArrowUpRight, ArrowDownRight, Plus,
-  ChevronRight, LineChart, PiggyBank, Users, Inbox, PieChart,
+  ChevronRight, LineChart, PiggyBank, Calculator, Inbox, PieChart,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -170,11 +170,17 @@ export default function Dashboard() {
         </div>
       </button>
 
-      {/* Investments (Dime-style: value + today's change + portfolio shares) */}
-      <InvestmentsCard portfolios={portfolios} holdings={holdings} onOpen={() => navigate('/stocks')} />
+      {/* Investments (Dime-style: value + today's change + portfolio shares).
+          `!== false` so existing users (whose saved settings predate this flag)
+          still see the card by default. */}
+      {settings.showInvestments !== false && (
+        <InvestmentsCard portfolios={portfolios} holdings={holdings} onOpen={() => navigate('/stocks')} />
+      )}
 
       {/* Savings goals */}
-      <SavingsCard goals={savingsGoals} onOpen={() => navigate('/savings')} />
+      {settings.showSavings !== false && (
+        <SavingsCard goals={savingsGoals} onOpen={() => navigate('/savings')} />
+      )}
 
       {/* Spending by category (donut) */}
       <div>
@@ -219,13 +225,13 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Split-the-bill entry — low-key tool link */}
+      {/* Tax calculator entry — low-key tool link (swapped off the bottom nav) */}
       <button
-        onClick={() => navigate('/split')}
+        onClick={() => navigate('/tax')}
         className="flex w-full items-center justify-center gap-1.5 py-1 text-sm font-medium
           text-slate-400 hover:text-brand-600"
       >
-        <Users size={15} /> {strings.split.cta}
+        <Calculator size={15} /> {strings.tax.cta}
       </button>
 
       {/* Floating add (frosted/translucent so content shows through) */}

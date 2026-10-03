@@ -5,7 +5,7 @@
 const en = {
   appName: 'MySync',
 
-  nav: { dashboard: 'Home', transactions: 'Records', debt: 'Debt', tax: 'Tax', settings: 'Settings' },
+  nav: { dashboard: 'Home', transactions: 'Records', debt: 'Debt', tax: 'Tax', split: 'Split', settings: 'Settings' },
 
   common: {
     add: 'Add', edit: 'Edit', delete: 'Delete', save: 'Save', cancel: 'Cancel',
@@ -100,6 +100,7 @@ const en = {
   },
 
   tax: {
+    cta: 'Income tax calculator →',
     title: 'Tax Calculator', subtitle: 'Thai personal income tax (progressive)',
     annualIncome: 'Annual income', perYear: 'year', infoAria: 'How tax is calculated',
     extraDeductions: 'Extra deductions', extraHint: 'Insurance, RMF/SSF, donations, etc.',
@@ -244,6 +245,10 @@ const en = {
     title: 'Settings', appearance: 'Appearance', darkMode: 'Dark mode', hideBalances: 'Hide balances',
     haptics: 'Vibration feedback',
     accentColor: 'Accent color',
+    animSpeed: 'Animation speed',
+    animOff: 'Off', animNormal: 'Normal', animFast: 'Fast',
+    homeCards: 'Home screen cards',
+    showInvestments: 'Show Investments', showSavings: 'Show Savings goals',
     installApp: 'Install app', installHint: 'Add MySync to your home screen for a full-screen, app-like experience.',
     language: 'Language', currency: 'Primary currency',
     currencyNote: 'Changing currency only changes the symbol/format — it does not convert existing amounts.',
@@ -288,7 +293,7 @@ const en = {
 const th = {
   appName: 'MySync',
 
-  nav: { dashboard: 'หน้าหลัก', transactions: 'รายการ', debt: 'หนี้สิน', tax: 'ภาษี', settings: 'ตั้งค่า' },
+  nav: { dashboard: 'หน้าหลัก', transactions: 'รายการ', debt: 'หนี้สิน', tax: 'ภาษี', split: 'หารบิล', settings: 'ตั้งค่า' },
 
   common: {
     add: 'เพิ่ม', edit: 'แก้ไข', delete: 'ลบ', save: 'บันทึก', cancel: 'ยกเลิก',
@@ -383,6 +388,7 @@ const th = {
   },
 
   tax: {
+    cta: 'คำนวณภาษีเงินได้ →',
     title: 'คำนวณภาษี', subtitle: 'ภาษีเงินได้บุคคลธรรมดา (ขั้นบันได)',
     annualIncome: 'รายได้ทั้งปี', perYear: 'ปี', infoAria: 'วิธีคิดภาษี',
     extraDeductions: 'ค่าลดหย่อนเพิ่มเติม', extraHint: 'ประกัน, RMF/SSF, เงินบริจาค ฯลฯ',
@@ -527,6 +533,10 @@ const th = {
     title: 'ตั้งค่า', appearance: 'การแสดงผล', darkMode: 'โหมดมืด', hideBalances: 'ซ่อนยอดเงิน',
     haptics: 'สั่นเมื่อกดปุ่ม',
     accentColor: 'สีธีม',
+    animSpeed: 'ความเร็วอนิเมชัน',
+    animOff: 'ปิด', animNormal: 'ปกติ', animFast: 'เร็ว',
+    homeCards: 'การ์ดบนหน้าหลัก',
+    showInvestments: 'แสดงการลงทุน', showSavings: 'แสดงเป้าหมายการออม',
     installApp: 'ติดตั้งแอป', installHint: 'เพิ่ม MySync ลงหน้าจอโฮม ใช้งานแบบเต็มจอเหมือนแอปจริง',
     language: 'ภาษา', currency: 'สกุลเงินหลัก',
     currencyNote: 'เปลี่ยนสกุลเงินจะเปลี่ยนแค่สัญลักษณ์/รูปแบบ ไม่แปลงตัวเลขข้อมูลเดิม',

@@ -1,13 +1,14 @@
 import { NavLink } from 'react-router-dom'
-import { Home, ListPlus, Landmark, Calculator, Settings } from 'lucide-react'
+import { Home, ListPlus, Landmark, Users, Settings } from 'lucide-react'
 import { strings } from '../constants/strings'
 
 // Style 2 bottom bar: rounded top corners + a raised circular center button.
-// Order (left→right): Tax · Debt · Home (center, raised) · Records · Settings.
+// Order (left→right): Split · Debt · Home (center, raised) · Records · Settings.
 // Home is the primary tab, so it gets the prominent purple floating button.
+// (Tax moved to a dashboard link — swapped with Split, which gets more use.)
 export default function BottomNav() {
   const LEFT = [
-    { to: '/tax', label: strings.nav.tax, icon: Calculator },
+    { to: '/split', label: strings.nav.split, icon: Users },
     { to: '/debt', label: strings.nav.debt, icon: Landmark },
   ]
   const RIGHT = [

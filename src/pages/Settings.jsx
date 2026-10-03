@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { ACCENTS } from '../constants/accents'
@@ -247,6 +247,31 @@ export default function Settings() {
             </div>
           </div>
 
+          {/* Animation speed */}
+          <div className="flex items-center gap-3 py-2">
+            <Zap size={20} className="text-slate-500" />
+            <span className="flex-1 font-medium">{strings.settings.animSpeed}</span>
+            <div className="flex rounded-lg bg-slate-100 p-0.5 dark:bg-slate-800">
+              {[
+                ['off', strings.settings.animOff],
+                ['normal', strings.settings.animNormal],
+                ['fast', strings.settings.animFast],
+              ].map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => updateSettings({ animSpeed: val })}
+                  className={`rounded-md px-3 py-1 text-sm font-semibold transition ${
+                    (settings.animSpeed || 'fast') === val
+                      ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700'
+                      : 'text-slate-500'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Language */}
           <div className="flex items-center gap-3 py-2">
             <Languages size={20} className="text-slate-500" />
@@ -290,6 +315,25 @@ export default function Settings() {
           </div>
         </Card>
         <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.currencyNote}</p>
+      </div>
+
+      {/* Home screen cards — let people hide features they don't use */}
+      <div>
+        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.settings.homeCards}</h2>
+        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+          <ToggleRow
+            icon={LineChart}
+            label={strings.settings.showInvestments}
+            checked={settings.showInvestments !== false}
+            onChange={(v) => updateSettings({ showInvestments: v })}
+          />
+          <ToggleRow
+            icon={PiggyBank}
+            label={strings.settings.showSavings}
+            checked={settings.showSavings !== false}
+            onChange={(v) => updateSettings({ showSavings: v })}
+          />
+        </Card>
       </div>
 
       {/* Security & alerts */}

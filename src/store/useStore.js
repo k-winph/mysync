@@ -53,6 +53,9 @@ const DEFAULT_SETTINGS = {
   onboarded: false, // has the first-run welcome been dismissed?
   haptics: true, // light vibration on important taps (save/pay/confirm/delete)
   accent: 'indigo', // brand accent color preset (see constants/accents.js)
+  animSpeed: 'fast', // count-up / donut animation speed: 'off' | 'normal' | 'fast'
+  showInvestments: true, // show the Investments card on the dashboard
+  showSavings: true, // show the Savings goals card on the dashboard
 }
 
 export const useStore = create(

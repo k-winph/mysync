@@ -5,6 +5,8 @@ import MoneyText from './MoneyText'
 import AnimatedMoney from './AnimatedMoney'
 import CategoryIcon from './CategoryIcon'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useStore } from '../store/useStore'
+import { animDuration } from '../utils/anim'
 
 // Donut of expenses grouped by category for the period.
 // `data`: [{ id, name, value(satang), color, icon }] already sorted desc.
@@ -12,6 +14,8 @@ import { useReducedMotion } from '../hooks/useReducedMotion'
 // so it stays readable for colorblind users and in print.
 export default function ExpenseDonut({ data, currency }) {
   const reduce = useReducedMotion()
+  const speed = useStore((s) => s.settings.animSpeed) || 'fast'
+  const animate = speed !== 'off' && !reduce
   const total = data.reduce((sum, d) => sum + d.value, 0)
   if (total === 0) return null
 
@@ -28,8 +32,8 @@ export default function ExpenseDonut({ data, currency }) {
               outerRadius={92}
               paddingAngle={data.length > 1 ? 2 : 0}
               stroke="none"
-              isAnimationActive={!reduce}
-              animationDuration={800}
+              isAnimationActive={animate}
+              animationDuration={animDuration(speed)}
               animationEasing="ease-out"
             >
               {data.map((d) => (
@@ -50,7 +54,7 @@ export default function ExpenseDonut({ data, currency }) {
         {/* Center total overlay */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-xs text-slate-500">{strings.common.total}</span>
-          <AnimatedMoney satang={total} currency={currency} duration={800} className="text-lg font-bold" />
+          <AnimatedMoney satang={total} currency={currency} className="text-lg font-bold" />
         </div>
       </div>
 

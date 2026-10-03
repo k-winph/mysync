@@ -35,7 +35,7 @@ const th = {
       '"รายการล่าสุด" = 10 รายการใหม่สุด แตะเพื่อแก้ไข',
       'ปุ่ม + ลอยมุมขวาล่าง = เพิ่มรายการเร็ว',
       'ไอคอนดวงตามุมขวาบน = ซ่อน/แสดงยอดเงินทั้งแอป · ไอคอนกระดิ่ง = การแจ้งเตือน',
-      'ลิงก์ "หารบิลกับเพื่อน" ล่างสุด = เครื่องมือหารค่าใช้จ่าย',
+      'ลิงก์ "คำนวณภาษี" ล่างสุด = เครื่องมือคำนวณภาษี (ฟังก์ชันหารบิลย้ายไปที่แท็บ "หารบิล" แถบล่างแล้ว)',
     ],
     notes: ['ตัวเลขทั้งหมดคิดเฉพาะเดือนปัจจุบัน'],
   },
@@ -141,7 +141,7 @@ const th = {
   tax: {
     title: 'คำนวณภาษี (Tax)',
     whatFor: 'ประมาณภาษีเงินได้บุคคลธรรมดาแบบขั้นบันไดของไทย',
-    location: 'แท็บ "ภาษี" ด้านล่าง',
+    location: 'หน้าหลัก เลื่อนลงล่างสุด แตะลิงก์ "คำนวณภาษี →"',
     steps: [
       'ใส่รายได้ทั้งปี',
       'ใส่ค่าลดหย่อนเพิ่มเติม (ประกัน, กองทุน, บริจาค ฯลฯ)',
@@ -153,7 +153,7 @@ const th = {
   split: {
     title: 'หารค่าใช้จ่าย (หารบิลกับเพื่อน)',
     whatFor: 'ช่วยหารเงินเวลาไปกินข้าว/ปาร์ตี้กับเพื่อนหลายคน แต่ละคนกินไม่เหมือนกัน',
-    location: 'หน้าหลัก เลื่อนลงล่างสุด แตะลิงก์ "หารบิลกับเพื่อน →"',
+    location: 'แท็บ "หารบิล" ที่แถบด้านล่าง',
     steps: [
       'เพิ่มคนที่หาร: พิมพ์ชื่อในช่องแล้วกด "เพิ่มชื่อ" (หรือ Enter) เพิ่มได้หลายคน กดกากบาทข้างชื่อเพื่อลบ',
       'เพิ่มรายการ: กด "เพิ่มรายการ" ใส่ชื่อ (ไม่บังคับ) และราคา',
@@ -191,6 +191,8 @@ const th = {
       'ภาษา: สลับไทย/อังกฤษ',
       'สกุลเงินหลัก: เปลี่ยนสัญลักษณ์เงินที่แสดง',
       'สีธีม: เลือกสี accent ของแอปได้ (ม่วง/เขียว/ฟ้า/ชมพู/ส้ม ฯลฯ) เปลี่ยนสีการ์ด ปุ่ม และพื้นหลังทั้งแอป',
+      'ความเร็วอนิเมชัน: ตั้งความเร็วของยอดเงินนับขึ้นและกราฟวงกลมตอนเข้าหน้า (ปิด/ปกติ/เร็ว)',
+      'การ์ดบนหน้าหลัก: เปิด/ปิดการ์ด "การลงทุน" และ "เป้าหมายการออม" บนหน้าหลัก เผื่อไม่ได้ใช้',
       'สั่นเมื่อกดปุ่ม: เปิด/ปิดการสั่นเบา ๆ ตอนกดปุ่มสำคัญ (บันทึก/จ่าย/ยืนยัน)',
       'ติดตั้งแอป: ถ้าเบราว์เซอร์รองรับจะมีปุ่มติดตั้ง MySync ลงหน้าจอโฮม ใช้แบบเต็มจอเหมือนแอปจริง',
       'ล็อกด้วย PIN: ตั้งรหัส 6 หลักล็อกแอป · เปิดปลดล็อกด้วยลายนิ้วมือ/ใบหน้าได้ (ถ้าเครื่องรองรับ)',
@@ -229,7 +231,7 @@ const en = {
       'Recent transactions = the 10 newest; tap one to edit.',
       'The floating + button = quick add a transaction.',
       'Eye icon (top right) = hide/show all money · Bell icon = notifications.',
-      'The "Split a bill with friends" link at the bottom = the bill splitter.',
+      'The "Income tax calculator" link at the bottom = the tax tool (the bill splitter is now the "Split" tab in the bottom bar).',
     ],
     notes: ['All figures cover the current month only.'],
   },
@@ -335,7 +337,7 @@ Pay one installment → becomes 13/48, ฿280,000 left, and a ฿8,000 expense l
   tax: {
     title: 'Tax calculator',
     whatFor: 'Estimate Thai personal income tax (progressive brackets).',
-    location: 'The "Tax" tab at the bottom.',
+    location: 'On the Dashboard, scroll to the bottom and tap "Income tax calculator →".',
     steps: [
       'Enter your annual income.',
       'Enter extra deductions (insurance, funds, donations, etc.).',
@@ -347,7 +349,7 @@ Pay one installment → becomes 13/48, ฿280,000 left, and a ฿8,000 expense l
   split: {
     title: 'Split the bill',
     whatFor: 'Split a bill among several friends when everyone ordered different things.',
-    location: 'Dashboard, scroll to the bottom, tap "Split a bill with friends →".',
+    location: 'The "Split" tab at the bottom.',
     steps: [
       'Add people: type a name and tap "Add name" (or Enter). Add several; tap the × by a name to remove.',
       'Add items: tap "Add item", enter a name (optional) and a price.',
@@ -385,6 +387,8 @@ Result: A ฿500 · B ฿500 · C ฿300 · total ฿1,300`,
       'Language: switch Thai/English.',
       'Primary currency: change the money symbol shown.',
       'Accent color: pick the app’s theme color (indigo/violet/sky/emerald/rose/amber) — it recolors cards, buttons and the background.',
+      'Animation speed: how fast balances count up and the donut draws in on each screen (Off / Normal / Fast).',
+      'Home screen cards: show or hide the "Investments" and "Savings goals" cards on the dashboard if you don’t use them.',
       'Vibration feedback: toggle the light buzz on important taps (save/pay/confirm).',
       'Install app: if your browser supports it, a button appears to add MySync to your home screen for a full-screen, app-like experience.',
       'App lock (PIN): set a 6-digit lock · optionally unlock with fingerprint/face (if supported).',
