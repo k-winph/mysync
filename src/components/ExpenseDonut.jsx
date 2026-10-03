@@ -8,6 +8,11 @@ import { useReducedMotion } from '../hooks/useReducedMotion'
 import { useStore } from '../store/useStore'
 import { animDuration } from '../utils/anim'
 
+// Remembers the last slice data shown this session, so the donut draws in on
+// first open and when the spending actually changes (e.g. after adding an
+// expense), but not when you simply return to the dashboard. Resets on relaunch.
+let lastDonutSig = null
+
 // Donut of expenses grouped by category for the period.
 // `data`: [{ id, name, value(satang), color, icon }] already sorted desc.
 // Identity is carried by the legend (name + amount + %), never color alone,
@@ -15,8 +20,11 @@ import { animDuration } from '../utils/anim'
 export default function ExpenseDonut({ data, currency }) {
   const reduce = useReducedMotion()
   const speed = useStore((s) => s.settings.animSpeed) || 'fast'
-  const animate = speed !== 'off' && !reduce
   const total = data.reduce((sum, d) => sum + d.value, 0)
+  // Animate only when the slices differ from what we last drew this session.
+  const sig = data.map((d) => `${d.id}:${d.value}`).join('|')
+  const animate = speed !== 'off' && !reduce && lastDonutSig !== sig
+  lastDonutSig = sig
   if (total === 0) return null
 
   return (
@@ -54,7 +62,7 @@ export default function ExpenseDonut({ data, currency }) {
         {/* Center total overlay */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-xs text-slate-500">{strings.common.total}</span>
-          <AnimatedMoney satang={total} currency={currency} className="text-lg font-bold" />
+          <AnimatedMoney satang={total} currency={currency} trackKey="donutTotal" className="text-lg font-bold" />
         </div>
       </div>
 

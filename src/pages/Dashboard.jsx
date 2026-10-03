@@ -144,7 +144,7 @@ export default function Dashboard() {
             <p className="text-sm opacity-80">{strings.dashboard.balance}</p>
             <ChevronRight size={18} className="opacity-80" />
           </div>
-          <AnimatedMoney satang={runningBalance} className="text-3xl font-bold" />
+          <AnimatedMoney satang={runningBalance} trackKey="balance" className="text-3xl font-bold" />
 
           {/* Horizontal divider — inset from the card edges */}
           <div className="my-3 border-t border-white/20" />
@@ -158,13 +158,13 @@ export default function Dashboard() {
             <div className="flex flex-1 items-center gap-1">
               <ArrowUpRight size={16} className="shrink-0 text-emerald-300" />
               <span className="text-xs font-medium text-emerald-300">{strings.dashboard.income}</span>
-              <AnimatedMoney satang={cur.income} className="ml-auto text-sm font-bold" />
+              <AnimatedMoney satang={cur.income} trackKey="income" className="ml-auto text-sm font-bold" />
             </div>
             <div className="mx-3 my-0.5 w-px bg-white/20" />
             <div className="flex flex-1 items-center gap-1">
               <ArrowDownRight size={16} className="shrink-0 text-rose-300" />
               <span className="text-xs font-medium text-rose-300">{strings.dashboard.expense}</span>
-              <AnimatedMoney satang={cur.expense} className="ml-auto text-sm font-bold" />
+              <AnimatedMoney satang={cur.expense} trackKey="expense" className="ml-auto text-sm font-bold" />
             </div>
           </div>
         </div>
