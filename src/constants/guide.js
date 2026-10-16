@@ -51,11 +51,12 @@ const th = {
       'เลือกวันที่ · ใส่แท็กและโน้ตเพิ่มได้ (ไม่บังคับ)',
       'กด "บันทึก"',
       'แก้ไข/ลบ: แตะที่รายการนั้นเพื่อเปิดขึ้นมาแก้',
-      'ค้นหา/กรอง: ใช้ช่องค้นหาด้านบน หรือปุ่มกรอง (ตามประเภท/หมวด/ช่วงวันที่)',
+      'เลือกเดือน: หน้านี้จะโชว์เฉพาะรายการของเดือนที่เลือก แตะปุ่มชื่อเดือนตรงกลาง (หรือลูกศร ‹ ›) เพื่อสลับเดือน พร้อมเห็นสรุปรายรับ/รายจ่ายของเดือนนั้นด้านบน',
+      'ค้นหา/กรอง: ใช้ช่องค้นหา หรือปุ่มกรอง (ตามประเภท/หมวด) — กรองภายในเดือนที่เลือก',
     ],
     notes: [
       'รายการเรียงจากใหม่สุดไปเก่าสุดเสมอ',
-      'เวลากรองอยู่ จะมีบรรทัดเล็ก ๆ สรุปยอดรวมรายรับ/รายจ่ายเฉพาะรายการที่กรองไว้',
+      'เปิดหน้ามาจะอยู่ที่เดือนปัจจุบันเสมอ',
     ],
   },
   balance: {
@@ -247,11 +248,12 @@ const en = {
       'Pick a date · add tags and a note if you like (optional).',
       'Tap "Save".',
       'Edit/delete: tap an entry to open and change it.',
-      'Search/filter: use the search box up top, or the filter button (by type / category / date range).',
+      'Pick a month: this page shows only the selected month. Tap the month name in the middle (or the ‹ › arrows) to switch months — that month’s income/expense totals show at the top.',
+      'Search/filter: use the search box or the filter button (by type / category) — it filters within the selected month.',
     ],
     notes: [
       'Entries are always sorted newest first.',
-      'While a filter is active, a small line shows the total income/expense for just the filtered entries.',
+      'The page always opens on the current month.',
     ],
   },
   balance: {

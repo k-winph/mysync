@@ -43,6 +43,7 @@ const en = {
     addTitle: 'Add transaction', editTitle: 'Edit transaction', deleteConfirm: 'Delete this transaction?',
     empty: 'No transactions.', pickCategory: 'Select a category', noResults: 'No transactions match your filters.',
     emptyTitle: 'Start tracking', emptyBody: 'Your income and expenses will appear here. Tap + to add your first entry.',
+    prevMonth: 'Previous month', nextMonth: 'Next month', selectMonth: 'Select month',
   },
 
   filter: {
@@ -342,6 +343,7 @@ const th = {
     addTitle: 'เพิ่มรายการ', editTitle: 'แก้ไขรายการ', deleteConfirm: 'ลบรายการนี้?',
     empty: 'ไม่มีรายการ', pickCategory: 'เลือกหมวดหมู่', noResults: 'ไม่มีรายการตรงกับตัวกรอง',
     emptyTitle: 'เริ่มบันทึกรายการ', emptyBody: 'รายรับและรายจ่ายของคุณจะแสดงที่นี่ แตะ + เพื่อเพิ่มรายการแรก',
+    prevMonth: 'เดือนก่อนหน้า', nextMonth: 'เดือนถัดไป', selectMonth: 'เลือกเดือน',
   },
 
   filter: {

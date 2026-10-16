@@ -1,12 +1,13 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, SlidersHorizontal, Search, Tag, X, Filter, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import {
+  Plus, SlidersHorizontal, Search, Tag, X, Filter, Wallet,
+  ArrowUpRight, ArrowDownRight, ChevronLeft, ChevronRight, ChevronDown,
+} from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { formatDate, isWithin } from '../utils/date'
-import Button from '../components/ui/Button'
+import { formatDate, currentMonth, monthLabel } from '../utils/date'
 import MoneyText from '../components/MoneyText'
-import DateInput from '../components/ui/DateInput'
 import TransactionItem from '../components/TransactionItem'
 import TransactionModal from '../components/TransactionModal'
 import CategoryManager from '../components/CategoryManager'
@@ -15,12 +16,15 @@ import PageHeader from '../components/PageHeader'
 import EmptyState from '../components/ui/EmptyState'
 import { WalletArt } from '../components/illustrations'
 
-const EMPTY_FILTERS = { q: '', type: 'all', categoryId: 'all', from: '', to: '' }
+const EMPTY_FILTERS = { q: '', type: 'all', categoryId: 'all' }
 
 export default function Transactions() {
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
+  const language = useStore((s) => s.settings.language)
 
+  const [month, setMonth] = useState(currentMonth) // "YYYY-MM"
+  const [monthMenu, setMonthMenu] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [catOpen, setCatOpen] = useState(false)
@@ -29,14 +33,11 @@ export default function Transactions() {
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [searchParams, setSearchParams] = useSearchParams()
 
-  // Preset the date filter when arriving with ?from&to (e.g. from a month card
-  // on the Balance page). Runs once, then clears the params from the URL.
+  // Deep link from a month card (?from=YYYY-MM-DD) → open that month.
   useEffect(() => {
     const from = searchParams.get('from')
-    const to = searchParams.get('to')
-    if (from || to) {
-      setFilters((f) => ({ ...f, from: from || '', to: to || '' }))
-      setShowFilters(true)
+    if (from) {
+      setMonth(from.slice(0, 7))
       searchParams.delete('from')
       searchParams.delete('to')
       setSearchParams(searchParams, { replace: true })
@@ -46,49 +47,48 @@ export default function Transactions() {
 
   const setFilter = (patch) => setFilters((f) => ({ ...f, ...patch }))
   const hasActiveFilters =
-    filters.q !== '' ||
-    filters.type !== 'all' ||
-    filters.categoryId !== 'all' ||
-    filters.from !== '' ||
-    filters.to !== ''
+    filters.q !== '' || filters.type !== 'all' || filters.categoryId !== 'all'
 
-  // Quick lookup for category names (used by search).
   const catNameById = useMemo(() => {
     const m = {}
     for (const c of categories) m[c.id] = c.name
     return m
   }, [categories])
 
-  // Apply all filters, then group by date (newest first).
-  const { grouped, count, totals } = useMemo(() => {
+  // Per-month income/expense, and the list of months to offer in the picker
+  // (every month that has data, plus the current month), newest first.
+  const { monthStats, months } = useMemo(() => {
+    const stats = {}
+    for (const t of transactions) {
+      const ym = t.date.slice(0, 7)
+      const s = (stats[ym] ||= { income: 0, expense: 0 })
+      if (t.type === 'income') s.income += t.amount
+      else s.expense += t.amount
+    }
+    const set = new Set(Object.keys(stats))
+    set.add(currentMonth())
+    return { monthStats: stats, months: [...set].sort().reverse() }
+  }, [transactions])
+
+  const monthIdx = months.indexOf(month)
+  const totals = monthStats[month] || { income: 0, expense: 0 }
+
+  // Transactions of the selected month, after search / type / category filters,
+  // grouped by day (newest first).
+  const grouped = useMemo(() => {
     const q = filters.q.trim().toLowerCase()
     const matches = transactions.filter((t) => {
+      if (t.date.slice(0, 7) !== month) return false
       if (filters.type !== 'all' && t.type !== filters.type) return false
       if (filters.categoryId !== 'all' && t.categoryId !== filters.categoryId) return false
-      if (filters.from && t.date < filters.from) return false
-      if (filters.to && t.date > filters.to) return false
       if (q) {
-        const haystack = [
-          t.note || '',
-          (t.tags || []).join(' '),
-          catNameById[t.categoryId] || '',
-        ]
+        const haystack = [t.note || '', (t.tags || []).join(' '), catNameById[t.categoryId] || '']
           .join(' ')
           .toLowerCase()
         if (!haystack.includes(q)) return false
       }
       return true
     })
-
-    // Income/expense totals of the filtered set (satang), for the summary line.
-    let income = 0
-    let expense = 0
-    for (const t of matches) {
-      if (t.type === 'income') income += t.amount
-      else expense += t.amount
-    }
-
-    // Newest first: by date, then by creation time within the same day.
     const sorted = [...matches].sort((a, b) =>
       a.date !== b.date
         ? a.date < b.date ? 1 : -1
@@ -96,8 +96,8 @@ export default function Transactions() {
     )
     const groups = {}
     for (const t of sorted) (groups[t.date] ||= []).push(t)
-    return { grouped: Object.entries(groups), count: matches.length, totals: { income, expense } }
-  }, [transactions, filters, catNameById])
+    return Object.entries(groups)
+  }, [transactions, month, filters, catNameById])
 
   const openNew = () => {
     setEditing(null)
@@ -106,6 +106,12 @@ export default function Transactions() {
   const openEdit = (tx) => {
     setEditing(tx)
     setFormOpen(true)
+  }
+
+  // Step one month older (idx+1) / newer (idx-1) within the available list.
+  const step = (delta) => {
+    const i = monthIdx + delta
+    if (i >= 0 && i < months.length) setMonth(months[i])
   }
 
   return (
@@ -133,6 +139,78 @@ export default function Transactions() {
           </div>
         }
       />
+
+      {/* Month selector: ‹  [ October 2026 ▾ ]  › */}
+      <div className="relative flex items-center gap-2">
+        <button
+          onClick={() => step(1)}
+          disabled={monthIdx >= months.length - 1}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200
+            text-slate-500 transition disabled:opacity-30 dark:border-slate-700"
+          aria-label={strings.tx.prevMonth}
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <button
+          onClick={() => setMonthMenu((v) => !v)}
+          className="flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200
+            bg-white text-base font-bold transition hover:border-brand-400 dark:border-slate-700 dark:bg-slate-900"
+          aria-label={strings.tx.selectMonth}
+        >
+          {monthLabel(month, language)}
+          <ChevronDown size={16} className="text-slate-400" />
+        </button>
+        <button
+          onClick={() => step(-1)}
+          disabled={monthIdx <= 0}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200
+            text-slate-500 transition disabled:opacity-30 dark:border-slate-700"
+          aria-label={strings.tx.nextMonth}
+        >
+          <ChevronRight size={20} />
+        </button>
+
+        {monthMenu && (
+          <>
+            <div className="fixed inset-0 z-20" onClick={() => setMonthMenu(false)} />
+            <div
+              className="absolute inset-x-12 top-12 z-30 max-h-72 overflow-y-auto rounded-2xl border
+                border-slate-200 bg-white py-1 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+            >
+              {months.map((ym) => {
+                const s = monthStats[ym] || { income: 0, expense: 0 }
+                const active = ym === month
+                return (
+                  <button
+                    key={ym}
+                    onClick={() => {
+                      setMonth(ym)
+                      setMonthMenu(false)
+                    }}
+                    className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left
+                      ${active ? 'font-extrabold text-brand-600 dark:text-brand-500' : 'font-medium'}`}
+                  >
+                    <span>{monthLabel(ym, language)}</span>
+                    <MoneyText satang={s.income - s.expense} className="text-xs text-slate-400" />
+                  </button>
+                )
+              })}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* This month's income / expense */}
+      <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-2.5 dark:border-slate-800 dark:bg-slate-900">
+          <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-500">{strings.balance.income}</p>
+          <MoneyText satang={totals.income} className="text-base font-bold" />
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-2.5 dark:border-slate-800 dark:bg-slate-900">
+          <p className="text-[11px] font-semibold text-rose-600 dark:text-rose-500">{strings.balance.expense}</p>
+          <MoneyText satang={totals.expense} className="text-base font-bold" />
+        </div>
+      </div>
 
       {/* Search bar + filter toggle */}
       <div className="flex gap-2">
@@ -165,11 +243,10 @@ export default function Transactions() {
         </button>
       </div>
 
-      {/* Filter panel */}
+      {/* Filter panel (type + category; the month picker handles the period) */}
       {showFilters && (
         <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-3
           dark:border-slate-800 dark:bg-slate-900">
-          {/* Type */}
           <div>
             <label className="mb-1 block text-xs font-semibold text-slate-500">
               {strings.filter.type}
@@ -184,9 +261,7 @@ export default function Transactions() {
                   key={val}
                   onClick={() => setFilter({ type: val })}
                   className={`rounded-lg py-1.5 text-xs font-semibold transition ${
-                    filters.type === val
-                      ? 'bg-brand-600 text-white'
-                      : 'text-slate-600 dark:text-slate-300'
+                    filters.type === val ? 'bg-brand-600 text-white' : 'text-slate-600 dark:text-slate-300'
                   }`}
                 >
                   {label}
@@ -195,7 +270,6 @@ export default function Transactions() {
             </div>
           </div>
 
-          {/* Category */}
           <div>
             <label className="mb-1 block text-xs font-semibold text-slate-500">
               {strings.filter.category}
@@ -214,30 +288,6 @@ export default function Transactions() {
             </select>
           </div>
 
-          {/* Date range */}
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-500">
-                {strings.filter.from}
-              </label>
-              <DateInput
-                value={filters.from}
-                onChange={(e) => setFilter({ from: e.target.value })}
-                className="input-base"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-500">
-                {strings.filter.to}
-              </label>
-              <DateInput
-                value={filters.to}
-                onChange={(e) => setFilter({ to: e.target.value })}
-                className="input-base"
-              />
-            </div>
-          </div>
-
           {hasActiveFilters && (
             <button
               onClick={() => setFilters(EMPTY_FILTERS)}
@@ -245,25 +295,6 @@ export default function Transactions() {
             >
               <X size={14} /> {strings.filter.clear}
             </button>
-          )}
-        </div>
-      )}
-
-      {/* Result count + income/expense totals for the filtered set (small) */}
-      {hasActiveFilters && (
-        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1 text-xs text-slate-500">
-          <span>{strings.filter.resultCount(count)}</span>
-          {(totals.income > 0 || totals.expense > 0) && (
-            <span className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-500">
-                <ArrowUpRight size={12} className="shrink-0" />
-                <MoneyText satang={totals.income} className="font-semibold tabular-nums" />
-              </span>
-              <span className="inline-flex items-center gap-0.5 text-rose-600 dark:text-rose-500">
-                <ArrowDownRight size={12} className="shrink-0" />
-                <MoneyText satang={totals.expense} className="font-semibold tabular-nums" />
-              </span>
-            </span>
           )}
         </div>
       )}

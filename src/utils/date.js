@@ -2,6 +2,24 @@ import dayjs from 'dayjs'
 
 // All dates are stored as ISO date strings (e.g. "2026-09-09").
 
+const TH_MONTHS = [
+  'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+  'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม',
+]
+
+/** Current month as "YYYY-MM" (used by the Records month picker). */
+export function currentMonth() {
+  return dayjs().format('YYYY-MM')
+}
+
+/** Human label for a "YYYY-MM" month, localized (e.g. "ตุลาคม 2026" / "October 2026"). */
+export function monthLabel(ym, lang) {
+  if (!ym) return ''
+  const [y, m] = ym.split('-').map(Number)
+  if (lang === 'th') return `${TH_MONTHS[m - 1]} ${y}`
+  return dayjs(`${ym}-01`).format('MMMM YYYY')
+}
+
 /** Today as ISO date string, for form defaults. */
 export function todayISO() {
   return dayjs().format('YYYY-MM-DD')
