@@ -14,6 +14,7 @@ import CategoryManager from '../components/CategoryManager'
 import TagSummary from '../components/TagSummary'
 import PageHeader from '../components/PageHeader'
 import EmptyState from '../components/ui/EmptyState'
+import { useToast } from '../components/ui/Feedback'
 import { WalletArt } from '../components/illustrations'
 
 const EMPTY_FILTERS = { q: '', type: 'all', categoryId: 'all' }
@@ -22,6 +23,9 @@ export default function Transactions() {
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
   const language = useStore((s) => s.settings.language)
+  const deleteTransaction = useStore((s) => s.deleteTransaction)
+  const restoreTransaction = useStore((s) => s.restoreTransaction)
+  const toast = useToast()
 
   const [month, setMonth] = useState(currentMonth) // "YYYY-MM"
   const [monthMenu, setMonthMenu] = useState(false)
@@ -108,6 +112,14 @@ export default function Transactions() {
     setFormOpen(true)
   }
 
+  // Swipe-delete with an Undo toast.
+  const handleDelete = (tx) => {
+    deleteTransaction(tx.id)
+    toast(strings.toast.deleted, {
+      action: { label: strings.toast.undo, onClick: () => restoreTransaction(tx) },
+    })
+  }
+
   // Step one month older (idx+1) / newer (idx-1) within the available list.
   const step = (delta) => {
     const i = monthIdx + delta
@@ -124,14 +136,14 @@ export default function Transactions() {
           <div className="flex items-center gap-1">
             <button
               onClick={() => setTagOpen(true)}
-              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 active:scale-90 dark:hover:bg-slate-800"
               aria-label={strings.tag.title}
             >
               <Tag size={20} />
             </button>
             <button
               onClick={() => setCatOpen(true)}
-              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 active:scale-90 dark:hover:bg-slate-800"
               aria-label={strings.category.manage}
             >
               <SlidersHorizontal size={20} />
@@ -146,7 +158,7 @@ export default function Transactions() {
           onClick={() => step(1)}
           disabled={monthIdx >= months.length - 1}
           className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200
-            text-slate-500 transition disabled:opacity-30 dark:border-slate-700"
+            text-slate-500 transition active:scale-95 disabled:opacity-30 dark:border-slate-700"
           aria-label={strings.tx.prevMonth}
         >
           <ChevronLeft size={20} />
@@ -164,7 +176,7 @@ export default function Transactions() {
           onClick={() => step(-1)}
           disabled={monthIdx <= 0}
           className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200
-            text-slate-500 transition disabled:opacity-30 dark:border-slate-700"
+            text-slate-500 transition active:scale-95 disabled:opacity-30 dark:border-slate-700"
           aria-label={strings.tx.nextMonth}
         >
           <ChevronRight size={20} />
@@ -224,8 +236,18 @@ export default function Transactions() {
             value={filters.q}
             onChange={(e) => setFilter({ q: e.target.value })}
             placeholder={strings.filter.searchHint}
-            className="input-base pl-10"
+            className="input-base pl-10 pr-9"
           />
+          {filters.q && (
+            <button
+              onClick={() => setFilter({ q: '' })}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400
+                transition hover:bg-slate-100 active:scale-90 dark:hover:bg-slate-800"
+              aria-label={strings.common.close}
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
         <button
           onClick={() => setShowFilters((v) => !v)}
@@ -322,7 +344,7 @@ export default function Transactions() {
               <div className="rounded-2xl border border-slate-200 bg-white p-1
                 dark:border-slate-800 dark:bg-slate-900">
                 {items.map((tx) => (
-                  <TransactionItem key={tx.id} tx={tx} onEdit={openEdit} />
+                  <TransactionItem key={tx.id} tx={tx} onEdit={openEdit} onDelete={handleDelete} />
                 ))}
               </div>
             </div>

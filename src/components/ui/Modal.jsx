@@ -16,8 +16,13 @@ export default function Modal({ open, onClose, title, children }) {
     window.addEventListener('keydown', onKey)
     // Lock body scroll while open
     document.body.style.overflow = 'hidden'
-    // Move focus into the dialog so keyboard/AT users land inside it.
-    panelRef.current?.focus()
+    // Move focus into the dialog so keyboard/AT users land inside it — but don't
+    // steal focus from a field that already autofocused (e.g. the amount input).
+    const panel = panelRef.current
+    if (panel && !panel.contains(document.activeElement)) {
+      const field = panel.querySelector('input, select, textarea, button, [tabindex]')
+      ;(field || panel).focus()
+    }
     return () => {
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''

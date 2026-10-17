@@ -94,6 +94,10 @@ export const useStore = create(
       deleteTransaction: (id) =>
         set((s) => ({ transactions: s.transactions.filter((t) => t.id !== id) })),
 
+      // Put a just-deleted transaction back exactly as it was (for Undo).
+      restoreTransaction: (tx) =>
+        set((s) => ({ transactions: [tx, ...s.transactions.filter((t) => t.id !== tx.id)] })),
+
       // --- Categories ------------------------------------------------------
       addCategory: (data) =>
         set((s) => ({
