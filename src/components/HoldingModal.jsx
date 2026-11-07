@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Trash2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -24,6 +24,20 @@ export default function HoldingModal({ open, portfolioId, editing, onClose }) {
   const [avgCost, setAvgCost] = useState(editing ? formatMoneyInput(satangToInput(editing.avgCost)) : '')
   const [currency, setCurrency] = useState(editing?.currency || 'THB')
   const [error, setError] = useState('')
+
+  // This modal stays mounted while closed, so the initial state above only runs
+  // once. Re-sync every field from `editing` each time it opens — otherwise the
+  // first edit shows blanks and later opens show the PREVIOUS holding's values
+  // (and "add" keeps the last-edited holding's data).
+  useEffect(() => {
+    if (!open) return
+    setSymbol(editing?.symbol || '')
+    setShares(editing ? String(editing.shares) : '')
+    setAvgCost(editing ? formatMoneyInput(satangToInput(editing.avgCost)) : '')
+    setCurrency(editing?.currency || 'THB')
+    setError('')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editing])
 
   const handleSubmit = (e) => {
     e.preventDefault()

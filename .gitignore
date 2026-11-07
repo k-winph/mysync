@@ -20,6 +20,6 @@ dist-ssr
 .env.*
 !.env.example
 
-#Claude
+# Claude
 Claude outputs
 CLAUDE.md

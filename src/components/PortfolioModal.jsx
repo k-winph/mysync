@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Trash2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -17,6 +17,16 @@ export default function PortfolioModal({ open, editing, onClose, onDeleted }) {
   const [name, setName] = useState(editing?.name || '')
   const [note, setNote] = useState(editing?.note || '')
   const [error, setError] = useState('')
+
+  // Modal stays mounted, so re-sync from `editing` on each open — otherwise the
+  // add form keeps the last-typed values and editing can show stale data.
+  useEffect(() => {
+    if (!open) return
+    setName(editing?.name || '')
+    setNote(editing?.note || '')
+    setError('')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editing])
 
   const handleSubmit = (e) => {
     e.preventDefault()
