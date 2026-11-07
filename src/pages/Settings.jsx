@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, FlaskConical, Trash2, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { ACCENTS } from '../constants/accents'
@@ -17,6 +17,7 @@ import { useToast } from '../components/ui/Feedback'
 import CategoryManager from '../components/CategoryManager'
 import TagManager from '../components/TagManager'
 import PinSetupModal from '../components/PinSetupModal'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 // A row with a label and a right-aligned toggle switch.
 function ToggleRow({ icon: Icon, label, checked, onChange }) {
@@ -63,6 +64,8 @@ export default function Settings() {
   const updateSettings = useStore((s) => s.updateSettings)
   const markBackupNow = useStore((s) => s.markBackupNow)
   const replaceData = useStore((s) => s.replaceData)
+  const loadSampleData = useStore((s) => s.loadSampleData)
+  const clearAllData = useStore((s) => s.clearAllData)
   const syncTagsFromTransactions = useStore((s) => s.syncTagsFromTransactions)
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
@@ -81,6 +84,13 @@ export default function Settings() {
   const [bioAvailable, setBioAvailable] = useState(false)
   const [bioMsg, setBioMsg] = useState('')
   const [showKey, setShowKey] = useState(false)
+  const [demoDialog, setDemoDialog] = useState(null) // 'load' | 'clear1' | 'clear2' | 'exit' | null
+
+  // True when there's anything worth protecting before a destructive action.
+  // (Categories alone don't count — they're seeded defaults.)
+  const hasData =
+    transactions.length > 0 || debts.length > 0 || portfolios.length > 0 ||
+    holdings.length > 0 || savingsGoals.length > 0
 
   const { canInstall, install } = usePwaInstall()
   const canShare = canShareFiles()
@@ -179,6 +189,39 @@ export default function Settings() {
     } catch {
       setImportMsg(strings.settings.importError)
     }
+  }
+
+  // --- Demo mode & reset -----------------------------------------------------
+  // Save a complete JSON backup to the user's device before we overwrite/erase
+  // real data. Best-effort: a failed download must never block the reset.
+  const backupNow = () => {
+    try {
+      downloadBackupJSON({ transactions, categories, tags, debts, portfolios, holdings, savingsGoals })
+      markBackupNow()
+    } catch {
+      /* ignore — the confirm dialog still lets the user proceed */
+    }
+  }
+
+  // Load sample data. If the user already has real data, confirm first and back
+  // it up; if the store is empty or already showing the demo, just (re)load.
+  const onLoadSample = () => {
+    if (settings.demoMode || !hasData) {
+      loadSampleData()
+      toast(strings.toast.demoLoaded)
+      return
+    }
+    setDemoDialog('load')
+  }
+
+  // Clear everything. Three paths: demo data -> single confirm, no backup;
+  // real data -> two confirmations with an automatic backup; nothing to lose
+  // -> reset straight away.
+  const onClearData = () => {
+    if (settings.demoMode) return setDemoDialog('exit')
+    if (hasData) return setDemoDialog('clear1')
+    clearAllData()
+    toast(strings.toast.allCleared)
   }
 
   return (
@@ -503,6 +546,28 @@ export default function Settings() {
         />
       </div>
 
+      {/* Demo / reset */}
+      <div>
+        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.demo.title}</h2>
+        {settings.demoMode && (
+          <div className="mb-2 flex items-center gap-2 rounded-xl bg-amber-100 px-3 py-2 text-sm font-medium text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
+            <FlaskConical size={16} className="shrink-0" />
+            <span>{strings.demo.banner}</span>
+          </div>
+        )}
+        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+          <ActionRow icon={FlaskConical} label={strings.demo.load} onClick={onLoadSample} />
+          <button
+            onClick={onClearData}
+            className="flex w-full items-center gap-3 py-2.5 text-left text-red-600 hover:opacity-80 dark:text-red-400"
+          >
+            <Trash2 size={20} />
+            <span className="flex-1 font-medium">{strings.demo.clear}</span>
+          </button>
+        </Card>
+        <p className="mt-2 px-1 text-xs text-slate-500">{strings.demo.loadHint}</p>
+      </div>
+
       {/* Help */}
       <div>
         <Card className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -519,6 +584,67 @@ export default function Settings() {
       <CategoryManager open={catOpen} onClose={() => setCatOpen(false)} />
       <TagManager open={tagManageOpen} onClose={() => setTagManageOpen(false)} />
       <PinSetupModal open={pinModal !== null} mode={pinModal} onClose={() => setPinModal(null)} />
+
+      {/* Load sample data over existing real data (backs up first). */}
+      <ConfirmDialog
+        open={demoDialog === 'load'}
+        onClose={() => setDemoDialog(null)}
+        onConfirm={() => {
+          backupNow()
+          loadSampleData()
+          setDemoDialog(null)
+          toast(strings.toast.demoLoaded)
+        }}
+        title={strings.demo.loadTitle}
+        message={strings.demo.loadBody}
+        note={strings.demo.loadBackupNote}
+        confirmLabel={strings.demo.loadConfirm}
+      />
+
+      {/* Clear all real data — step 1: back up on continue. */}
+      <ConfirmDialog
+        open={demoDialog === 'clear1'}
+        onClose={() => setDemoDialog(null)}
+        onConfirm={() => {
+          backupNow()
+          setDemoDialog('clear2')
+        }}
+        title={strings.demo.clearTitle}
+        message={strings.demo.clearBody}
+        confirmLabel={strings.demo.clearNext}
+        danger
+      />
+
+      {/* Clear all real data — step 2: final, irreversible confirm. */}
+      <ConfirmDialog
+        open={demoDialog === 'clear2'}
+        onClose={() => setDemoDialog(null)}
+        onConfirm={() => {
+          clearAllData()
+          setDemoDialog(null)
+          toast(strings.toast.allCleared)
+        }}
+        title={strings.demo.clearFinalTitle}
+        message={strings.demo.clearFinalBody}
+        note={strings.demo.clearBackupNote}
+        confirmLabel={strings.demo.clearFinalConfirm}
+        danger
+      />
+
+      {/* Exit demo — clearing sample data, no backup needed. */}
+      <ConfirmDialog
+        open={demoDialog === 'exit'}
+        onClose={() => setDemoDialog(null)}
+        onConfirm={() => {
+          clearAllData()
+          setDemoDialog(null)
+          toast(strings.toast.allCleared)
+        }}
+        title={strings.demo.exitTitle}
+        message={strings.demo.exitBody}
+        confirmLabel={strings.demo.exitConfirm}
+        danger
+      />
     </div>
   )
 }

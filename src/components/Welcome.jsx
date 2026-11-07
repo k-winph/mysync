@@ -8,6 +8,7 @@ import Button from './ui/Button'
 export default function Welcome() {
   const onboarded = useStore((s) => s.settings.onboarded)
   const updateSettings = useStore((s) => s.updateSettings)
+  const loadSampleData = useStore((s) => s.loadSampleData)
   const navigate = useNavigate()
 
   if (onboarded) return null
@@ -16,6 +17,12 @@ export default function Welcome() {
   const openGuide = () => {
     done()
     navigate('/guide')
+  }
+  // First-run users have no data yet, so loading the demo here is always safe.
+  // They can wipe it anytime from Settings → Sample data.
+  const tryDemo = () => {
+    loadSampleData()
+    done()
   }
 
   return (
@@ -36,6 +43,12 @@ export default function Welcome() {
           <Button variant="secondary" className="w-full" onClick={openGuide}>
             {strings.welcome.openGuide}
           </Button>
+          <button
+            onClick={tryDemo}
+            className="w-full pt-1 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+          >
+            {strings.welcome.tryDemo}
+          </button>
         </div>
       </div>
     </div>

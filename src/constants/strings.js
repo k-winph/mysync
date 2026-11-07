@@ -239,6 +239,7 @@ const en = {
     paid: 'Payment logged', undo: 'Undo',
     backup: 'Backup saved', added: 'Money added', cleared: 'Cleared',
     imported: 'Data imported',
+    demoLoaded: 'Sample data loaded', allCleared: 'All data cleared',
   },
 
   welcome: {
@@ -246,6 +247,7 @@ const en = {
     body: 'Your private finance tracker — everything stays on your device. Track spending, debts, savings and investments, all in one place.',
     start: 'Get started',
     openGuide: 'View the guide',
+    tryDemo: 'Explore with sample data',
   },
   pwa: {
     updateReady: 'A new version is available.',
@@ -256,6 +258,34 @@ const en = {
     title: 'Something went wrong',
     body: 'The app hit an unexpected error. Your data is safe on this device — reloading usually fixes it.',
     reload: 'Reload app',
+  },
+
+  demo: {
+    title: 'Sample data',
+    banner: 'You are viewing sample data',
+    bannerAction: 'Clear',
+    load: 'Load sample data',
+    loadHint: 'See what MySync looks like with example transactions, debts, goals and investments.',
+    clear: 'Clear all data',
+    clearHint: 'Erase everything and start over with a clean app.',
+    // Load sample over existing real data
+    loadTitle: 'Load sample data?',
+    loadBody: 'This replaces your current data with sample data so you can explore the app.',
+    loadBackupNote: 'Your current data was first saved to your Downloads folder.',
+    loadConfirm: 'Load sample data',
+    // Clear all — step 1
+    clearTitle: 'Clear all data?',
+    clearBody: 'This erases every transaction, debt, goal and investment on this device.',
+    clearBackupNote: 'A backup was first saved to your Downloads folder, just in case.',
+    clearNext: 'Continue',
+    // Clear all — step 2 (final)
+    clearFinalTitle: 'Are you absolutely sure?',
+    clearFinalBody: 'Last check — this permanently clears all of your data and cannot be undone.',
+    clearFinalConfirm: 'Yes, clear everything',
+    // Exit demo (clearing sample data — no backup needed)
+    exitTitle: 'Exit sample data?',
+    exitBody: 'This removes the sample data and leaves you with a clean, empty app.',
+    exitConfirm: 'Exit & clear',
   },
 
   settings: {
@@ -545,6 +575,7 @@ const th = {
     paid: 'บันทึกการจ่ายแล้ว', undo: 'เลิกทำ',
     backup: 'สำรองข้อมูลแล้ว', added: 'เพิ่มเงินแล้ว', cleared: 'ล้างแล้ว',
     imported: 'นำเข้าข้อมูลแล้ว',
+    demoLoaded: 'โหลดข้อมูลตัวอย่างแล้ว', allCleared: 'ล้างข้อมูลทั้งหมดแล้ว',
   },
 
   welcome: {
@@ -552,6 +583,7 @@ const th = {
     body: 'แอปจัดการเงินส่วนตัว ข้อมูลทั้งหมดเก็บในเครื่องคุณเท่านั้น ติดตามรายรับรายจ่าย หนี้สิน เงินออม และการลงทุน ครบในที่เดียว',
     start: 'เริ่มใช้งาน',
     openGuide: 'ดูคู่มือ',
+    tryDemo: 'ลองดูด้วยข้อมูลตัวอย่าง',
   },
   pwa: {
     updateReady: 'มีเวอร์ชันใหม่พร้อมใช้งาน',
@@ -562,6 +594,34 @@ const th = {
     title: 'เกิดข้อผิดพลาด',
     body: 'แอปเจอข้อผิดพลาดที่ไม่คาดคิด ข้อมูลของคุณยังปลอดภัยในเครื่อง — กดรีโหลดมักจะหายเอง',
     reload: 'รีโหลดแอป',
+  },
+
+  demo: {
+    title: 'ข้อมูลตัวอย่าง',
+    banner: 'กำลังแสดงข้อมูลตัวอย่าง',
+    bannerAction: 'ล้าง',
+    load: 'โหลดข้อมูลตัวอย่าง',
+    loadHint: 'ดูหน้าตาแอปเมื่อมีรายการ หนี้สิน เป้าหมายการออม และการลงทุนตัวอย่าง',
+    clear: 'ล้างข้อมูลทั้งหมด',
+    clearHint: 'ลบทุกอย่างแล้วเริ่มต้นใหม่จากแอปเปล่า ๆ',
+    // โหลดตัวอย่างทับข้อมูลจริง
+    loadTitle: 'โหลดข้อมูลตัวอย่าง?',
+    loadBody: 'จะแทนที่ข้อมูลปัจจุบันด้วยข้อมูลตัวอย่าง เพื่อให้คุณได้ลองใช้งานแอป',
+    loadBackupNote: 'ได้สำรองข้อมูลปัจจุบันไว้ในโฟลเดอร์ดาวน์โหลดให้ก่อนแล้ว',
+    loadConfirm: 'โหลดข้อมูลตัวอย่าง',
+    // ล้างทั้งหมด — ขั้นที่ 1
+    clearTitle: 'ล้างข้อมูลทั้งหมด?',
+    clearBody: 'จะลบทุกรายการ ทั้งรายรับรายจ่าย หนี้สิน เป้าหมายการออม และการลงทุนในเครื่องนี้',
+    clearBackupNote: 'ได้สำรองข้อมูลไว้ในโฟลเดอร์ดาวน์โหลดให้ก่อนแล้ว เผื่อไว้',
+    clearNext: 'ดำเนินการต่อ',
+    // ล้างทั้งหมด — ขั้นที่ 2 (ยืนยันสุดท้าย)
+    clearFinalTitle: 'แน่ใจจริง ๆ ใช่ไหม?',
+    clearFinalBody: 'เช็กอีกครั้ง — การล้างนี้จะลบข้อมูลทั้งหมดอย่างถาวร และกู้คืนไม่ได้',
+    clearFinalConfirm: 'ใช่ ล้างทั้งหมด',
+    // ออกจากโหมดตัวอย่าง (ล้างข้อมูลตัวอย่าง — ไม่ต้องสำรอง)
+    exitTitle: 'ออกจากข้อมูลตัวอย่าง?',
+    exitBody: 'จะลบข้อมูลตัวอย่างออก แล้วเหลือไว้เป็นแอปเปล่า ๆ สะอาด',
+    exitConfirm: 'ออกและล้าง',
   },
 
   settings: {

@@ -211,10 +211,12 @@ const th = {
       'Export to Excel: ได้ไฟล์ครบทุกอย่าง (รายการ, หมวด, แท็ก, หนี้, หุ้น, เป้าออม) เซฟลงเครื่อง — แนะนำใช้อันนี้',
       'Export to CSV: ได้เฉพาะรายการรับ-จ่าย',
       'Import from file: เลือกไฟล์ที่เคย export ไว้เพื่อกู้ข้อมูลกลับ',
+      'ข้อมูลตัวอย่าง (หมวด Sample data): "โหลดข้อมูลตัวอย่าง" เพื่อลองดูหน้าตาแอปเมื่อมีข้อมูล และ "ล้างข้อมูลทั้งหมด" เพื่อเริ่มใหม่จากแอปเปล่า',
     ],
     notes: [
       'ข้อมูลทั้งหมดเก็บในเครื่องของคุณเท่านั้น (ไม่มีเซิร์ฟเวอร์) — ควร backup เป็นประจำ',
       'แอปจะเตือนให้ backup อัตโนมัติถ้าไม่ได้สำรองเกิน 14 วัน',
+      'เวลาจะล้างข้อมูลจริง แอปจะให้ยืนยัน 2 ครั้งและดาวน์โหลดไฟล์สำรองให้อัตโนมัติก่อนลบเสมอ',
     ],
   },
 }
@@ -408,10 +410,12 @@ Result: A ฿500 · B ฿500 · C ฿300 · total ฿1,300`,
       'Export to Excel: a full file (transactions, categories, tags, debts, stocks, goals) saved to your device — recommended.',
       'Export to CSV: transactions only.',
       'Import from file: pick a file you exported before to restore.',
+      'Sample data section: "Load sample data" to see the app filled in, and "Clear all data" to start over with an empty app.',
     ],
     notes: [
       'All data lives only on your device (no server) — back up regularly.',
       'The app reminds you to back up if it’s been over 14 days.',
+      'Clearing real data always asks you to confirm twice and auto-downloads a backup first.',
     ],
   },
 }

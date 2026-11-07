@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { uuid } from '../utils/id'
 import { DEFAULT_CATEGORIES } from '../constants/categories'
+import { buildSampleData } from '../constants/sampleData'
 import { todayISO, addPeriod } from '../utils/date'
 import { STORE_VERSION, migratePersisted } from './migrate'
 
@@ -51,6 +52,7 @@ const DEFAULT_SETTINGS = {
   biometricEnabled: false, // unlock with fingerprint/Face (WebAuthn), needs PIN as fallback
   biometricCredId: null, // stored WebAuthn credential id (base64url)
   autoLockMinutes: 0, // re-lock after N minutes idle when a PIN is set (0 = off)
+  demoMode: false, // currently showing opt-in sample data (see loadSampleData)
   onboarded: false, // has the first-run welcome been dismissed?
   haptics: true, // light vibration on important taps (save/pay/confirm/delete)
   accent: 'indigo', // brand accent color preset (see constants/accents.js)
@@ -338,6 +340,43 @@ export const useStore = create(
       markBackupNow: () =>
         set((s) => ({ settings: { ...s.settings, lastBackupAt: now() } })),
 
+      // --- Demo / reset ----------------------------------------------------
+      // Load the opt-in sample dataset so a new user can see a filled-in app.
+      // Replaces every collection (the caller confirms / backs up first) and
+      // flips on the demo flag so the UI can show a "sample data" banner.
+      loadSampleData: () =>
+        set(() => {
+          const s = buildSampleData()
+          return {
+            transactions: s.transactions,
+            categories: s.categories,
+            tags: s.tags,
+            debts: s.debts,
+            portfolios: s.portfolios,
+            holdings: s.holdings,
+            fx: null,
+            savingsGoals: s.savingsGoals,
+            settings: { ...get().settings, demoMode: true },
+          }
+        }),
+
+      // Wipe all data back to a brand-new state: empty collections plus freshly
+      // seeded default categories (so the app is never left with none). Keeps
+      // the user's preferences (theme, language, PIN, accent, ...) and clears
+      // the demo flag. The caller is responsible for confirming / backing up.
+      clearAllData: () =>
+        set((s) => ({
+          transactions: [],
+          categories: DEFAULT_CATEGORIES.map((c) => withStamps({ ...c, isDefault: true })),
+          tags: [],
+          debts: [],
+          portfolios: [],
+          holdings: [],
+          fx: null,
+          savingsGoals: [],
+          settings: { ...s.settings, demoMode: false, lastBackupAt: null },
+        })),
+
       // --- Import / restore ------------------------------------------------
       // Replace transactions and categories from an imported backup.
       // Settings are intentionally left as-is (device-specific).
@@ -350,6 +389,8 @@ export const useStore = create(
           portfolios: Array.isArray(portfolios) ? portfolios : s.portfolios,
           holdings: Array.isArray(holdings) ? holdings : s.holdings,
           savingsGoals: Array.isArray(savingsGoals) ? savingsGoals : s.savingsGoals,
+          // Importing real data means we're no longer looking at the demo.
+          settings: { ...s.settings, demoMode: false },
         })),
     }),
     {
