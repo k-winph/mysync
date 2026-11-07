@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, RefreshCw, Eye, EyeOff, ChevronRight, KeyRound, LineChart } from 'lucide-react'
+import { Plus, RefreshCw, Eye, EyeOff, ChevronRight, KeyRound, LineChart, CalendarDays } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { totalsByCurrency, combineToPrimary, sumField } from '../utils/portfolio'
@@ -14,6 +14,7 @@ import DualMoney from '../components/DualMoney'
 import FxChange from '../components/FxChange'
 import PortfolioModal from '../components/PortfolioModal'
 import PageHeader from '../components/PageHeader'
+import InvestmentCalendar from '../components/InvestmentCalendar'
 
 export default function Stocks() {
   const navigate = useNavigate()
@@ -21,6 +22,8 @@ export default function Stocks() {
   const holdings = useStore((s) => s.holdings)
   const settings = useStore((s) => s.settings)
   const updateSettings = useStore((s) => s.updateSettings)
+  const investmentSnapshots = useStore((s) => s.investmentSnapshots)
+  const recordInvestmentSnapshot = useStore((s) => s.recordInvestmentSnapshot)
   const primary = settings.primaryCurrency
 
   const { quoteMap, loading, error, hasKey, refresh } = useQuotes(holdings)
@@ -42,6 +45,23 @@ export default function Stocks() {
   const rawValue = sumField(grand, 'value')
   const gainPct = rawCost > 0 ? (sumField(grand, 'gain') / rawCost) * 100 : 0
   const todayPct = rawValue - rawToday > 0 ? (rawToday / (rawValue - rawToday)) * 100 : 0
+
+  // Record today's value (combined + per portfolio, in the primary currency) so
+  // the daily-return calendar fills in. Runs once values/FX are ready; writing
+  // the same day again just updates it (last view of the day wins).
+  useEffect(() => {
+    if (holdings.length === 0 || !valueC.ok || valueC.primaryMinor <= 0) return
+    const byPortfolio = {}
+    for (const pf of portfolios) {
+      const pc = combineToPrimary(
+        totalsByCurrency(holdings.filter((h) => h.portfolioId === pf.id), quoteMap),
+        'value', convert, primary
+      )
+      if (pc.ok && pc.primaryMinor > 0) byPortfolio[pf.id] = pc.primaryMinor
+    }
+    recordInvestmentSnapshot({ total: valueC.primaryMinor, byPortfolio })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valueC.primaryMinor, valueC.ok, holdings.length, portfolios.length])
 
   return (
     <div className="space-y-5">
@@ -146,6 +166,16 @@ export default function Stocks() {
               </button>
             )
           })}
+        </div>
+      )}
+
+      {/* Daily-change calendar — all portfolios combined (primary currency) */}
+      {holdings.length > 0 && (
+        <div>
+          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-500">
+            <CalendarDays size={15} /> {strings.invest.calendarAll}
+          </h2>
+          <InvestmentCalendar snapshots={investmentSnapshots} scope="total" language={settings.language} />
         </div>
       )}
 

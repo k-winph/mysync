@@ -85,6 +85,12 @@ export const useStore = create(
       fx: null, // cached FX rates: { base, rates: {CUR: perBase}, at } for converting to primary currency
       savingsGoals: [], // [{ id, name, targetAmount(satang), currentAmount(satang), deadline|null, ... }]
       recurringIncomes: [], // [{ id, name, amount(satang), frequency, nextDate, categoryId, tags, note, active, ... }]
+      // Daily portfolio-value snapshots in the PRIMARY currency (minor units),
+      // keyed by 'YYYY-MM-DD'. Each day: { date, total, byPortfolio:{id:value}, at }.
+      // Recorded when the Stocks pages are viewed; powers the daily % calendar.
+      // We store value per day and derive the % between consecutive days, so no
+      // historical price feed is needed — it fills in going forward.
+      investmentSnapshots: {},
       settings: { ...DEFAULT_SETTINGS },
 
       // --- Seeding ---------------------------------------------------------
@@ -481,6 +487,29 @@ export const useStore = create(
           }
         }),
 
+      // --- Investment snapshots -------------------------------------------
+      // Record today's portfolio value(s) in the primary currency. Merges into
+      // today's entry so a full snapshot (Stocks page) and a single-portfolio
+      // one (PortfolioDetail) can both contribute. Keeps the latest value of the
+      // day (last write wins) and prunes history to ~450 days.
+      recordInvestmentSnapshot: ({ total, byPortfolio } = {}) =>
+        set((s) => {
+          const date = todayISO()
+          const prev = s.investmentSnapshots[date] || {}
+          const entry = {
+            date,
+            total: total != null ? total : prev.total ?? null,
+            byPortfolio: { ...(prev.byPortfolio || {}), ...(byPortfolio || {}) },
+            at: now(),
+          }
+          const all = { ...s.investmentSnapshots, [date]: entry }
+          const dates = Object.keys(all).sort()
+          if (dates.length <= 450) return { investmentSnapshots: all }
+          const kept = {}
+          for (const d of dates.slice(-450)) kept[d] = all[d]
+          return { investmentSnapshots: kept }
+        }),
+
       // --- Settings --------------------------------------------------------
       updateSettings: (patch) =>
         set((s) => ({ settings: { ...s.settings, ...patch } })),
@@ -523,6 +552,7 @@ export const useStore = create(
           fx: null,
           savingsGoals: [],
           recurringIncomes: [],
+          investmentSnapshots: {},
           settings: { ...s.settings, demoMode: false, lastBackupAt: null },
         })),
 
@@ -560,6 +590,7 @@ export const useStore = create(
         fx: s.fx,
         savingsGoals: s.savingsGoals,
         recurringIncomes: s.recurringIncomes,
+        investmentSnapshots: s.investmentSnapshots,
         settings: s.settings,
       }),
     }

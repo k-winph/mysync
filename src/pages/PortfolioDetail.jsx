@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Plus, RefreshCw, Pencil, KeyRound, ChevronRight, LineChart } from 'lucide-react'
+import { Plus, RefreshCw, Pencil, KeyRound, ChevronRight, LineChart, CalendarDays } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { holdingMetrics, totalsByCurrency, combineToPrimary, singleToPrimary, sumField } from '../utils/portfolio'
@@ -14,6 +14,7 @@ import FxChange from '../components/FxChange'
 import PortfolioModal from '../components/PortfolioModal'
 import HoldingModal from '../components/HoldingModal'
 import PageHeader from '../components/PageHeader'
+import InvestmentCalendar from '../components/InvestmentCalendar'
 
 // Value & gain convert to the primary currency (native shown smaller); the
 // per-share price stays in the stock's own currency.
@@ -78,8 +79,23 @@ export default function PortfolioDetail() {
   )
 
   const primary = useStore((s) => s.settings.primaryCurrency)
+  const language = useStore((s) => s.settings.language)
+  const investmentSnapshots = useStore((s) => s.investmentSnapshots)
+  const recordInvestmentSnapshot = useStore((s) => s.recordInvestmentSnapshot)
   const { quoteMap, loading, hasKey, error, refresh } = useQuotes(holdings)
   const { convert } = useFx(holdings.map((h) => h.currency), primary)
+
+  // This portfolio's current value in the primary currency, used both to record
+  // the daily snapshot and (via the store) to draw the calendar.
+  const myValue = useMemo(
+    () => combineToPrimary(totalsByCurrency(holdings, quoteMap), 'value', convert, primary),
+    [holdings, quoteMap, convert, primary]
+  )
+  useEffect(() => {
+    if (!myValue.ok || myValue.primaryMinor <= 0) return
+    recordInvestmentSnapshot({ byPortfolio: { [portfolioId]: myValue.primaryMinor } })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [portfolioId, myValue.primaryMinor, myValue.ok])
 
   const [editPf, setEditPf] = useState(false)
   const [holdingOpen, setHoldingOpen] = useState(false)
@@ -203,6 +219,16 @@ export default function PortfolioDetail() {
           </>
         )}
       </Card>
+
+      {/* Daily-change calendar for this portfolio */}
+      {holdings.length > 0 && (
+        <div>
+          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-500">
+            <CalendarDays size={15} /> {strings.invest.calendarOne}
+          </h2>
+          <InvestmentCalendar snapshots={investmentSnapshots} scope={portfolioId} language={language} />
+        </div>
+      )}
 
       {/* Holdings */}
       <div>

@@ -180,6 +180,15 @@ const en = {
     showKey: 'Show key', hideKey: 'Hide key',
   },
 
+  invest: {
+    calendarAll: 'Daily change · all portfolios',
+    calendarOne: 'Daily change',
+    dow: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+    monthReturn: 'This month', prevMonth: 'Previous month', nextMonth: 'Next month',
+    up: 'Up', down: 'Down',
+    noData: 'Open this page each day to build up the calendar — today onward.',
+  },
+
   savings: {
     title: 'Savings goals',
     trackSavings: 'Set a savings goal →',
@@ -550,6 +559,15 @@ const th = {
     sortValueDesc: 'มูลค่า: มาก → น้อย', sortValueAsc: 'มูลค่า: น้อย → มาก',
     sortTodayDesc: 'วันนี้: มาก → น้อย', sortTodayAsc: 'วันนี้: น้อย → มาก',
     showKey: 'แสดงคีย์', hideKey: 'ซ่อนคีย์',
+  },
+
+  invest: {
+    calendarAll: 'เปลี่ยนแปลงรายวัน · รวมทุกพอร์ต',
+    calendarOne: 'เปลี่ยนแปลงรายวัน',
+    dow: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
+    monthReturn: 'เดือนนี้', prevMonth: 'เดือนก่อนหน้า', nextMonth: 'เดือนถัดไป',
+    up: 'ขึ้น', down: 'ลง',
+    noData: 'เปิดดูหน้านี้ทุกวัน แล้วปฏิทินจะค่อยๆ เก็บข้อมูลให้ตั้งแต่วันนี้เป็นต้นไป',
   },
 
   savings: {
