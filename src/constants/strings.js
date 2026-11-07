@@ -50,6 +50,9 @@ const en = {
     empty: 'No transactions.', pickCategory: 'Select a category', noResults: 'No transactions match your filters.',
     emptyTitle: 'Start tracking', emptyBody: 'Your income and expenses will appear here. Tap + to add your first entry.',
     prevMonth: 'Previous month', nextMonth: 'Next month', selectMonth: 'Select month',
+    makeRecurring: 'Make this a recurring income',
+    makeRecurringHint: 'We’ll log this income automatically each period, starting next cycle. Manage it under Records → recurring income.',
+    recurringSaved: 'Saved · recurring income set up',
   },
 
   filter: {
@@ -419,6 +422,9 @@ const th = {
     empty: 'ไม่มีรายการ', pickCategory: 'เลือกหมวดหมู่', noResults: 'ไม่มีรายการตรงกับตัวกรอง',
     emptyTitle: 'เริ่มบันทึกรายการ', emptyBody: 'รายรับและรายจ่ายของคุณจะแสดงที่นี่ แตะ + เพื่อเพิ่มรายการแรก',
     prevMonth: 'เดือนก่อนหน้า', nextMonth: 'เดือนถัดไป', selectMonth: 'เลือกเดือน',
+    makeRecurring: 'ตั้งเป็นรายรับประจำ',
+    makeRecurringHint: 'ระบบจะบันทึกรายรับนี้ให้อัตโนมัติทุกงวด เริ่มงวดถัดไป · จัดการได้ที่ รายการ → รายรับประจำ',
+    recurringSaved: 'บันทึกแล้ว · ตั้งรายรับประจำให้แล้ว',
   },
 
   filter: {

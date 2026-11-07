@@ -4,7 +4,7 @@ import { strings } from '../constants/strings'
 import { parseMoney, satangToInput } from '../utils/money'
 import { todayISO } from '../utils/date'
 import { pickableCategories } from '../utils/category'
-import { Plus } from 'lucide-react'
+import { Plus, Check, Repeat } from 'lucide-react'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
 import DateInput from './ui/DateInput'
@@ -26,6 +26,10 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
   const [note, setNote] = useState(initial?.note || '')
   const [date, setDate] = useState(initial?.date || todayISO())
   const [error, setError] = useState('')
+  // "Also make this a recurring income" — only offered when adding a new income.
+  const [makeRecurring, setMakeRecurring] = useState(false)
+  const [recurringFreq, setRecurringFreq] = useState('monthly')
+  const isNewIncome = type === 'income' && !initial
 
   // Toggle a tag name in/out of the selection.
   const toggleTag = (name) =>
@@ -65,6 +69,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
       tags: selectedTags,
       note: note.trim(),
       date,
+      recurring: type === 'income' && makeRecurring ? { frequency: recurringFreq } : null,
     })
   }
 
@@ -79,6 +84,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
             onClick={() => {
               setType(t)
               setCategoryId('') // reset category when switching type
+              if (t === 'expense') setMakeRecurring(false)
             }}
             className={`rounded-lg py-2 text-sm font-semibold transition ${
               type === t
@@ -145,6 +151,46 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
           className="input-base"
         />
       </div>
+
+      {/* Make this a recurring income (new income only) */}
+      {isNewIncome && (
+        <div className="rounded-xl border border-slate-200 p-3 dark:border-slate-700">
+          <button
+            type="button"
+            onClick={() => setMakeRecurring((v) => !v)}
+            className="flex w-full items-center gap-2.5"
+          >
+            <span
+              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
+                makeRecurring ? 'border-brand-600 bg-brand-600 text-white' : 'border-slate-300 dark:border-slate-600'
+              }`}
+            >
+              {makeRecurring && <Check size={14} />}
+            </span>
+            <Repeat size={15} className="shrink-0 text-green-600" />
+            <span className="flex-1 text-left text-sm font-medium">{strings.tx.makeRecurring}</span>
+          </button>
+          {makeRecurring && (
+            <div className="mt-3">
+              <div className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+                {['weekly', 'monthly', 'yearly'].map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setRecurringFreq(f)}
+                    className={`rounded-lg py-1.5 text-xs font-semibold transition ${
+                      recurringFreq === f ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700' : 'text-slate-500'
+                    }`}
+                  >
+                    {strings.debt.freq[f]}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-1.5 text-xs text-slate-400">{strings.tx.makeRecurringHint}</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tags — pick from managed tags (chips scroll horizontally) */}
       <div>

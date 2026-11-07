@@ -1,5 +1,6 @@
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
+import { addPeriod } from '../utils/date'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import TransactionForm from './TransactionForm'
@@ -14,12 +15,33 @@ export default function TransactionModal({ open, editing, onClose }) {
   const updateTransaction = useStore((s) => s.updateTransaction)
   const deleteTransaction = useStore((s) => s.deleteTransaction)
   const restoreTransaction = useStore((s) => s.restoreTransaction)
+  const addRecurringIncome = useStore((s) => s.addRecurringIncome)
+  const categories = useStore((s) => s.categories)
   const toast = useToast()
 
-  const handleSubmit = (data) => {
-    if (editing) updateTransaction(editing.id, data)
-    else addTransaction(data)
-    toast(editing ? strings.toast.updated : strings.toast.saved)
+  // `recurring` is form-only metadata — strip it before saving the transaction.
+  const handleSubmit = ({ recurring, ...data }) => {
+    if (editing) {
+      updateTransaction(editing.id, data)
+      toast(strings.toast.updated)
+    } else {
+      addTransaction(data)
+      if (recurring) {
+        // Schedule the repeat starting NEXT cycle, so today's entry isn't
+        // double-counted. Name it after the note, else the category.
+        const cat = categories.find((c) => c.id === data.categoryId)
+        addRecurringIncome({
+          name: data.note?.trim() || cat?.name || strings.recIncome.title,
+          amount: data.amount,
+          frequency: recurring.frequency,
+          nextDate: addPeriod(data.date, recurring.frequency),
+          categoryId: data.categoryId,
+          tags: data.tags,
+          note: data.note,
+        })
+      }
+      toast(recurring ? strings.tx.recurringSaved : strings.toast.saved)
+    }
     onClose()
   }
 
