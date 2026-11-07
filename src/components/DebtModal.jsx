@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Trash2, Plus } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -43,6 +43,28 @@ export default function DebtModal({ open, editing, defaultKind = 'once', onClose
   const [newTag, setNewTag] = useState('')
   const [note, setNote] = useState(editing?.note || '')
   const [error, setError] = useState('')
+
+  // This modal stays mounted while closed (unlike the transaction form, whose
+  // state lives inside <Modal> and remounts on open). So re-sync every field
+  // from `editing` each time it opens — otherwise editing shows stale/blank
+  // values and "add" can keep a previous edit's data.
+  useEffect(() => {
+    if (!open) return
+    setKind(editing?.kind || defaultKind)
+    setCreditor(editing?.creditor || '')
+    setAmount(editing ? formatMoneyInput(satangToInput(editing.amount)) : '')
+    setFrequency(editing?.frequency || 'monthly')
+    setTotalInstallments(editing?.totalInstallments ? String(editing.totalInstallments) : '')
+    setPaidInstallments(editing?.paidInstallments ? String(editing.paidInstallments) : '0')
+    setDueDate(editing?.dueDate || todayISO())
+    setCategoryId(editing?.categoryId || '')
+    setSelectedTags(editing?.tags || [])
+    setNote(editing?.note || '')
+    setAddingTag(false)
+    setNewTag('')
+    setError('')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editing, defaultKind])
 
   const expenseCategories = useMemo(
     () => categories.filter((c) => c.type === 'expense' || c.type === 'both'),
