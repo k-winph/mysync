@@ -16,6 +16,8 @@ const en = {
     title: 'Income vs Expense', income: 'Income', expense: 'Expense', net: 'Net',
     totalIncome: 'Total income', totalExpense: 'Total expense',
     noData: 'No transactions in this year.', tapMonthHint: 'Tap a month to see its breakdown',
+    netThisYear: 'Net this year', savingsRate: 'Savings rate', avgPerMonth: 'Avg / active month',
+    thisMonth: 'This month', best: 'Best month', chartTitle: 'Monthly income & expense',
   },
 
   month: {
@@ -76,7 +78,15 @@ const en = {
     manage: 'Manage categories', name: 'Category name', type: 'Type', both: 'Both',
     addTitle: 'Add category',
     deleteConfirm: 'Delete this category? Transactions using it will keep their record but show as uncategorized.',
+    deleteInUse: (n) => `This category is used by ${n} item${n === 1 ? '' : 's'}. They'll become uncategorized. Merging or hiding keeps them tidy — delete anyway?`,
     defaultBadge: 'default',
+    pin: 'Pin to top', unpin: 'Unpin', pinnedBadge: 'pinned',
+    archive: 'Hide', unarchive: 'Unhide', archivedBadge: 'hidden',
+    archiveHint: 'Hidden categories stay on past transactions but won’t show when adding new ones.',
+    mergeInto: 'Merge into…', mergeNone: 'Don’t merge',
+    mergeHint: 'Moves every transaction here to the chosen category, then removes this one.',
+    used: (n) => `${n} use${n === 1 ? '' : 's'}`, edit: 'Edit category',
+    showArchived: 'Show hidden', hideArchived: 'Hide hidden',
   },
 
   debt: {
@@ -375,6 +385,8 @@ const th = {
     title: 'รายรับ vs รายจ่าย', income: 'รายรับ', expense: 'รายจ่าย', net: 'คงเหลือ',
     totalIncome: 'รายรับรวม', totalExpense: 'รายจ่ายรวม',
     noData: 'ไม่มีรายการในปีนี้', tapMonthHint: 'แตะที่เดือนเพื่อดูรายละเอียด',
+    netThisYear: 'คงเหลือสุทธิปีนี้', savingsRate: 'อัตราการออม', avgPerMonth: 'เฉลี่ย/เดือนที่มีรายการ',
+    thisMonth: 'เดือนนี้', best: 'เดือนที่ดีที่สุด', chartTitle: 'รายรับ-รายจ่ายรายเดือน',
   },
 
   month: {
@@ -435,7 +447,15 @@ const th = {
     manage: 'จัดการหมวดหมู่', name: 'ชื่อหมวด', type: 'ประเภท', both: 'ทั้งคู่',
     addTitle: 'เพิ่มหมวด',
     deleteConfirm: 'ลบหมวดนี้? รายการที่ใช้หมวดนี้จะยังอยู่แต่แสดงเป็นไม่มีหมวด',
+    deleteInUse: (n) => `หมวดนี้ถูกใช้ ${n} รายการ ถ้าลบ รายการเหล่านั้นจะกลายเป็นไม่มีหมวด · แนะนำให้รวมหรือซ่อนแทน · ยืนยันลบ?`,
     defaultBadge: 'เริ่มต้น',
+    pin: 'ปักหมุดขึ้นบน', unpin: 'เลิกปักหมุด', pinnedBadge: 'ปักหมุด',
+    archive: 'ซ่อน', unarchive: 'เลิกซ่อน', archivedBadge: 'ซ่อนอยู่',
+    archiveHint: 'หมวดที่ซ่อนจะยังอยู่กับรายการเดิม แต่ไม่โผล่ตอนเพิ่มรายการใหม่',
+    mergeInto: 'รวมเข้ากับ…', mergeNone: 'ไม่รวม',
+    mergeHint: 'ย้ายทุกรายการในหมวดนี้ไปหมวดที่เลือก แล้วลบหมวดนี้ทิ้ง',
+    used: (n) => `ใช้ ${n} รายการ`, edit: 'แก้ไขหมวด',
+    showArchived: 'แสดงที่ซ่อน', hideArchived: 'ซ่อนที่ซ่อน',
   },
 
   debt: {

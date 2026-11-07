@@ -4,6 +4,7 @@ import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { parseMoney, satangToInput } from '../utils/money'
 import { todayISO } from '../utils/date'
+import { pickableCategories } from '../utils/category'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
@@ -51,10 +52,7 @@ export default function RecurringIncomeModal({ open, editing, onClose }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editing])
 
-  const incomeCategories = useMemo(
-    () => categories.filter((c) => c.type === 'income' || c.type === 'both'),
-    [categories]
-  )
+  const incomeCategories = useMemo(() => pickableCategories(categories, 'income'), [categories])
 
   const toggleTag = (n) =>
     setSelectedTags((prev) => (prev.includes(n) ? prev.filter((t) => t !== n) : [...prev, n]))

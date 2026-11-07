@@ -45,17 +45,30 @@ export default function Balance() {
     return rows
   }, [transactions, year])
 
-  const yearTotals = useMemo(() => {
+  const stats = useMemo(() => {
     let income = 0
     let expense = 0
+    let activeMonths = 0
+    let maxVal = 0
     for (const r of months) {
       income += r.income
       expense += r.expense
+      if (r.income > 0 || r.expense > 0) activeMonths += 1
+      maxVal = Math.max(maxVal, r.income, r.expense)
     }
-    return { income, expense, net: income - expense }
+    const net = income - expense
+    return {
+      income,
+      expense,
+      net,
+      activeMonths,
+      maxVal,
+      savingsRate: income > 0 ? Math.round((net / income) * 100) : null,
+      avgPerMonth: activeMonths > 0 ? Math.round(net / activeMonths) : 0,
+    }
   }, [months])
 
-  const hasData = yearTotals.income > 0 || yearTotals.expense > 0
+  const hasData = stats.income > 0 || stats.expense > 0
 
   // Chart works in baht (satang / 100) for readable axis values.
   const chartData = months.map((r) => ({
@@ -64,7 +77,9 @@ export default function Balance() {
     expense: r.expense / 100,
   }))
 
-  const goMonth = (m) => setDetailMonth(m)
+  const now = dayjs()
+  const isCurrentYear = year === String(now.year())
+  const currentMonthIdx = now.month()
 
   return (
     <div className="space-y-5">
@@ -91,33 +106,49 @@ export default function Balance() {
         </button>
       </div>
 
-      {/* Year totals */}
-      <div className="grid grid-cols-3 gap-2">
-        <Card className="py-3">
-          <p className="text-xs text-green-600">{strings.balance.income}</p>
-          <MoneyText satang={yearTotals.income} currency={currency} className="text-sm font-bold" />
-        </Card>
-        <Card className="py-3">
-          <p className="text-xs text-red-600">{strings.balance.expense}</p>
-          <MoneyText satang={yearTotals.expense} currency={currency} className="text-sm font-bold" />
-        </Card>
-        <Card className="py-3">
-          <p className="text-xs text-slate-500">{strings.balance.net}</p>
-          <MoneyText
-            satang={yearTotals.net}
-            currency={currency}
-            className={`text-sm font-bold ${yearTotals.net >= 0 ? 'text-green-600' : 'text-red-600'}`}
-          />
-        </Card>
-      </div>
-
       {!hasData ? (
         <Card className="text-center text-sm text-slate-500">{strings.balance.noData}</Card>
       ) : (
         <>
+          {/* Hero: net for the year + income/expense + savings rate / avg */}
+          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 p-4 text-white shadow-sm">
+            <p className="text-sm opacity-80">{strings.balance.netThisYear}</p>
+            <MoneyText satang={stats.net} currency={currency} className="text-3xl font-bold" />
+            <div className="mt-3 flex items-stretch border-t border-white/20 pt-3">
+              <div className="flex-1">
+                <p className="text-[11px] font-medium text-emerald-200">{strings.balance.income}</p>
+                <MoneyText satang={stats.income} currency={currency} className="text-sm font-bold" />
+              </div>
+              <div className="mx-3 w-px bg-white/20" />
+              <div className="flex-1">
+                <p className="text-[11px] font-medium text-rose-200">{strings.balance.expense}</p>
+                <MoneyText satang={stats.expense} currency={currency} className="text-sm font-bold" />
+              </div>
+            </div>
+          </div>
+
+          {/* Secondary stats */}
+          <div className="grid grid-cols-2 gap-2">
+            <Card className="py-3">
+              <p className="text-xs text-slate-500">{strings.balance.savingsRate}</p>
+              <p className={`text-lg font-bold ${stats.savingsRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {stats.savingsRate === null ? '—' : `${stats.savingsRate}%`}
+              </p>
+            </Card>
+            <Card className="py-3">
+              <p className="text-xs text-slate-500">{strings.balance.avgPerMonth}</p>
+              <MoneyText
+                satang={stats.avgPerMonth}
+                currency={currency}
+                className={`text-lg font-bold ${stats.avgPerMonth >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              />
+            </Card>
+          </div>
+
           {/* Grouped bar chart — all 12 months fit the width (thin bars) */}
           <Card>
-            <div style={{ height: 240 }}>
+            <p className="mb-2 text-xs font-semibold text-slate-500">{strings.balance.chartTitle}</p>
+            <div style={{ height: 230 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 8, right: 4, left: 4, bottom: 0 }} barCategoryGap="20%" barGap={1}>
                   <XAxis
@@ -129,8 +160,6 @@ export default function Balance() {
                   />
                   <Tooltip
                     formatter={(value, name) => [formatMoney(Math.round(value * 100), currency), name]}
-                    // Force a white box with dark label text so the month name is
-                    // readable in both light and dark mode.
                     contentStyle={{ borderRadius: 12, border: 'none', fontSize: 13, backgroundColor: '#ffffff' }}
                     labelStyle={{ color: '#0f172a', fontWeight: 600 }}
                     itemStyle={{ paddingTop: 2, paddingBottom: 2 }}
@@ -144,39 +173,50 @@ export default function Balance() {
             </div>
           </Card>
 
-          {/* Per-month cards (tap to see that month's transactions) */}
+          {/* Per-month cards with comparison bars (tap to see that month) */}
           <div>
             <p className="mb-2 px-1 text-xs text-slate-400">{strings.balance.tapMonthHint}</p>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {months.map((r) => {
                 const net = r.income - r.expense
                 const empty = r.income === 0 && r.expense === 0
+                const isCurrent = isCurrentYear && r.m === currentMonthIdx
+                const incW = stats.maxVal > 0 ? (r.income / stats.maxVal) * 100 : 0
+                const expW = stats.maxVal > 0 ? (r.expense / stats.maxVal) * 100 : 0
                 return (
                   <button
                     key={r.m}
-                    onClick={() => goMonth(r.m)}
+                    onClick={() => setDetailMonth(r.m)}
                     disabled={empty}
-                    className="block w-full text-left disabled:opacity-50"
+                    className="block w-full text-left disabled:opacity-40"
                   >
-                    <Card className="flex items-center gap-3">
-                      <span className="w-10 shrink-0 font-semibold">{MONTHS[r.m]}</span>
-                      <div className="flex flex-1 flex-col gap-0.5 text-sm">
-                        <span className="text-green-600">
-                          + <MoneyText satang={r.income} currency={currency} />
-                        </span>
-                        <span className="text-red-600">
-                          − <MoneyText satang={r.expense} currency={currency} />
-                        </span>
+                    <Card className={`flex items-center gap-3 ${isCurrent ? 'ring-1 ring-brand-400' : ''}`}>
+                      <div className="w-9 shrink-0">
+                        <span className="font-semibold">{MONTHS[r.m]}</span>
+                        {isCurrent && (
+                          <span className="block text-[9px] font-semibold uppercase leading-tight text-brand-600">
+                            {strings.balance.thisMonth}
+                          </span>
+                        )}
                       </div>
-                      <div className="text-right">
-                        <p className="text-xs text-slate-400">{strings.balance.net}</p>
+                      {/* Comparison bars */}
+                      <div className="flex min-w-0 flex-1 flex-col gap-1">
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                          <div className="h-full rounded-full bg-emerald-500" style={{ width: `${incW}%` }} />
+                        </div>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                          <div className="h-full rounded-full bg-rose-500" style={{ width: `${expW}%` }} />
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className="text-[10px] text-slate-400">{strings.balance.net}</p>
                         <MoneyText
                           satang={net}
                           currency={currency}
-                          className={`font-bold ${net >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                          className={`text-sm font-bold ${net >= 0 ? 'text-green-600' : 'text-red-600'}`}
                         />
                       </div>
-                      {!empty && <ChevronRight size={16} className="shrink-0 text-slate-400" />}
+                      {!empty && <ChevronRight size={15} className="shrink-0 text-slate-400" />}
                     </Card>
                   </button>
                 )

@@ -4,6 +4,7 @@ import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { parseMoney, satangToInput } from '../utils/money'
 import { todayISO } from '../utils/date'
+import { pickableCategories } from '../utils/category'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
@@ -66,10 +67,7 @@ export default function DebtModal({ open, editing, defaultKind = 'once', onClose
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editing, defaultKind])
 
-  const expenseCategories = useMemo(
-    () => categories.filter((c) => c.type === 'expense' || c.type === 'both'),
-    [categories]
-  )
+  const expenseCategories = useMemo(() => pickableCategories(categories, 'expense'), [categories])
 
   const toggleTag = (name) =>
     setSelectedTags((prev) =>

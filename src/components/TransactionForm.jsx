@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { parseMoney, satangToInput } from '../utils/money'
 import { todayISO } from '../utils/date'
+import { pickableCategories } from '../utils/category'
 import { Plus } from 'lucide-react'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
@@ -42,11 +43,9 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
     setAddingTag(false)
   }
 
-  // Categories usable for the selected type (type-specific or "both").
-  const options = useMemo(
-    () => categories.filter((c) => c.type === type || c.type === 'both'),
-    [categories, type]
-  )
+  // Categories usable for the selected type: type-specific or "both", minus
+  // archived ones, with pinned (frequently used) categories first.
+  const options = useMemo(() => pickableCategories(categories, type), [categories, type])
 
   const handleSubmit = (e) => {
     e.preventDefault()

@@ -6,6 +6,7 @@ import { buildSampleData } from '../constants/sampleData'
 import { todayISO, addPeriod } from '../utils/date'
 import { collectDue } from '../utils/recurring'
 import { rewriteTagName } from './tagOps'
+import { reassignCategory } from './categoryOps'
 import { STORE_VERSION, migratePersisted } from './migrate'
 
 // Single source of truth for the whole app, persisted to localStorage.
@@ -126,8 +127,25 @@ export const useStore = create(
           ),
         })),
 
+      // Delete a category and clear it from any item that used it (those become
+      // uncategorized). The UI warns first when the category is still in use.
       deleteCategory: (id) =>
-        set((s) => ({ categories: s.categories.filter((c) => c.id !== id) })),
+        set((s) => ({
+          ...reassignCategory(s, id, null),
+          categories: s.categories.filter((c) => c.id !== id),
+        })),
+
+      // Merge one category into another: repoint every item that used the
+      // source category to the target, then drop the source.
+      mergeCategory: (sourceId, targetId) =>
+        set((s) => {
+          if (!sourceId || !targetId || sourceId === targetId) return {}
+          if (!s.categories.some((c) => c.id === targetId)) return {}
+          return {
+            ...reassignCategory(s, sourceId, targetId),
+            categories: s.categories.filter((c) => c.id !== sourceId),
+          }
+        }),
 
       // --- Tags (managed list) --------------------------------------------
       // Add a tag by name, ignoring blanks and case-insensitive duplicates.
