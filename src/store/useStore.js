@@ -59,6 +59,7 @@ const DEFAULT_SETTINGS = {
   animSpeed: 'fast', // count-up / donut animation speed: 'off' | 'normal' | 'fast'
   showInvestments: true, // show the Investments card on the dashboard
   showSavings: true, // show the Savings goals card on the dashboard
+  showTrend: true, // show the monthly trend chart on the dashboard
 }
 
 export const useStore = create(

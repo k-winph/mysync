@@ -34,6 +34,10 @@ const en = {
     quickAdd: 'Quick add', trackStocks: 'Track your stocks →',
     vsLastMonth: 'vs last month', noChange: 'no change', noExpenseData: 'No spending this month yet.',
     spentThisMonth: 'Spent this month',
+    trend: 'Monthly trend', noTrendData: 'Not enough data to show a trend yet.',
+    trendUp: (pct) => `This month's spending is ${pct}% above your 3-month average`,
+    trendDown: (pct) => `This month's spending is ${pct}% below your 3-month average`,
+    trendSame: "This month's spending is about the same as your 3-month average",
   },
 
   tx: {
@@ -295,7 +299,7 @@ const en = {
     animSpeed: 'Animation speed',
     animOff: 'Off', animNormal: 'Normal', animFast: 'Fast',
     homeCards: 'Home screen cards',
-    showInvestments: 'Show Investments', showSavings: 'Show Savings goals',
+    showInvestments: 'Show Investments', showSavings: 'Show Savings goals', showTrend: 'Show Monthly trend',
     installApp: 'Install app', installHint: 'Add MySync to your home screen for a full-screen, app-like experience.',
     language: 'Language', currency: 'Primary currency',
     currencyNote: 'Changing currency only changes the symbol/format — it does not convert existing amounts.',
@@ -370,6 +374,10 @@ const th = {
     quickAdd: 'เพิ่มด่วน', trackStocks: 'ติดตามหุ้นของคุณ →',
     vsLastMonth: 'เทียบเดือนก่อน', noChange: 'ไม่เปลี่ยนแปลง', noExpenseData: 'เดือนนี้ยังไม่มีรายจ่าย',
     spentThisMonth: 'รายจ่ายเดือนนี้',
+    trend: 'แนวโน้มรายเดือน', noTrendData: 'ข้อมูลยังไม่พอแสดงแนวโน้ม',
+    trendUp: (pct) => `เดือนนี้ใช้จ่ายมากกว่าค่าเฉลี่ย 3 เดือน ${pct}%`,
+    trendDown: (pct) => `เดือนนี้ใช้จ่ายน้อยกว่าค่าเฉลี่ย 3 เดือน ${pct}%`,
+    trendSame: 'เดือนนี้ใช้จ่ายพอ ๆ กับค่าเฉลี่ย 3 เดือน',
   },
 
   tx: {
@@ -631,7 +639,7 @@ const th = {
     animSpeed: 'ความเร็วอนิเมชัน',
     animOff: 'ปิด', animNormal: 'ปกติ', animFast: 'เร็ว',
     homeCards: 'การ์ดบนหน้าหลัก',
-    showInvestments: 'แสดงการลงทุน', showSavings: 'แสดงเป้าหมายการออม',
+    showInvestments: 'แสดงการลงทุน', showSavings: 'แสดงเป้าหมายการออม', showTrend: 'แสดงแนวโน้มรายเดือน',
     installApp: 'ติดตั้งแอป', installHint: 'เพิ่ม MySync ลงหน้าจอโฮม ใช้งานแบบเต็มจอเหมือนแอปจริง',
     language: 'ภาษา', currency: 'สกุลเงินหลัก',
     currencyNote: 'เปลี่ยนสกุลเงินจะเปลี่ยนแค่สัญลักษณ์/รูปแบบ ไม่แปลงตัวเลขข้อมูลเดิม',

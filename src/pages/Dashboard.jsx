@@ -19,6 +19,7 @@ import TransactionItem from '../components/TransactionItem'
 // Lazy so Recharts (its only heavy dependency) loads after the dashboard
 // paints, instead of blocking the initial bundle.
 const ExpenseDonut = lazy(() => import('../components/ExpenseDonut'))
+const MonthlyTrend = lazy(() => import('../components/MonthlyTrend'))
 import TransactionModal from '../components/TransactionModal'
 import NotificationBell from '../components/NotificationBell'
 import EmptyState from '../components/ui/EmptyState'
@@ -199,6 +200,22 @@ export default function Dashboard() {
           )}
         </Card>
       </div>
+
+      {/* Monthly trend (rolling last 6 months + a one-line insight) */}
+      {settings.showTrend !== false && (
+        <div>
+          <h2 className="mb-2 text-sm font-semibold text-slate-500">
+            {strings.dashboard.trend}
+          </h2>
+          <Card>
+            <Suspense fallback={<div className="flex h-[190px] items-center justify-center">
+              <div className="h-7 w-7 animate-spin rounded-full border-2 border-brand-500/30 border-t-brand-600" />
+            </div>}>
+              <MonthlyTrend transactions={transactions} currency={settings.primaryCurrency} />
+            </Suspense>
+          </Card>
+        </div>
+      )}
 
       {/* Recent */}
       <div>

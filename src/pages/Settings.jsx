@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, FlaskConical, Trash2, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, TrendingUp, FlaskConical, Trash2, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { ACCENTS } from '../constants/accents'
@@ -375,6 +375,12 @@ export default function Settings() {
             label={strings.settings.showSavings}
             checked={settings.showSavings !== false}
             onChange={(v) => updateSettings({ showSavings: v })}
+          />
+          <ToggleRow
+            icon={TrendingUp}
+            label={strings.settings.showTrend}
+            checked={settings.showTrend !== false}
+            onChange={(v) => updateSettings({ showTrend: v })}
           />
         </Card>
       </div>
