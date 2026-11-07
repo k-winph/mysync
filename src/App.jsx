@@ -51,6 +51,7 @@ export default function App() {
   const language = useStore((s) => s.settings.language)
   const pinEnabled = useStore((s) => s.settings.pinEnabled)
   const accent = useStore((s) => s.settings.accent)
+  const autoLockMinutes = useStore((s) => s.settings.autoLockMinutes)
 
   // Apply the active language before children render so `strings.x` (a live
   // Proxy) resolves to it. Subscribing to `language` re-renders the whole tree
@@ -97,6 +98,37 @@ export default function App() {
     })
     s.updateSettings({ lastDebtNotifyAt: today })
   }, [])
+
+  // Auto-lock after inactivity (only when a PIN is set and currently unlocked).
+  // Any tap/key resets the timer; returning to the tab restarts it. When it
+  // fires, we re-lock and LockScreen asks for the PIN again.
+  useEffect(() => {
+    if (!pinEnabled || !unlocked) return
+    const mins = autoLockMinutes || 0
+    if (mins <= 0) return
+    const ms = mins * 60000
+    let timer
+    const lock = () => setUnlocked(false)
+    const reset = () => {
+      clearTimeout(timer)
+      timer = setTimeout(lock, ms)
+    }
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') reset()
+    }
+    reset()
+    window.addEventListener('pointerdown', reset, { passive: true })
+    window.addEventListener('keydown', reset)
+    window.addEventListener('touchstart', reset, { passive: true })
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('pointerdown', reset)
+      window.removeEventListener('keydown', reset)
+      window.removeEventListener('touchstart', reset)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [pinEnabled, unlocked, autoLockMinutes])
 
   if (pinEnabled && !unlocked) {
     return <LockScreen onUnlock={() => setUnlocked(true)} />

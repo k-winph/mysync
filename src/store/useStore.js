@@ -50,6 +50,7 @@ const DEFAULT_SETTINGS = {
   lastDebtNotifyAt: null, // YYYY-MM-DD of the last debt notification (once per day)
   biometricEnabled: false, // unlock with fingerprint/Face (WebAuthn), needs PIN as fallback
   biometricCredId: null, // stored WebAuthn credential id (base64url)
+  autoLockMinutes: 0, // re-lock after N minutes idle when a PIN is set (0 = off)
   onboarded: false, // has the first-run welcome been dismissed?
   haptics: true, // light vibration on important taps (save/pay/confirm/delete)
   accent: 'indigo', // brand accent color preset (see constants/accents.js)

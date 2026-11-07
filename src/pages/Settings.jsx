@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { ACCENTS } from '../constants/accents'
@@ -353,6 +353,27 @@ export default function Settings() {
               checked={settings.biometricEnabled}
               onChange={onToggleBiometric}
             />
+          )}
+          {settings.pinEnabled && (
+            <div className="flex items-center gap-3 py-2">
+              <Clock size={20} className="text-slate-500" />
+              <span className="flex-1 font-medium">{strings.settings.autoLock}</span>
+              <div className="flex rounded-lg bg-slate-100 p-0.5 dark:bg-slate-800">
+                {[0, 1, 5, 15].map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => updateSettings({ autoLockMinutes: m })}
+                    className={`rounded-md px-2.5 py-1 text-xs font-semibold transition ${
+                      (settings.autoLockMinutes || 0) === m
+                        ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700'
+                        : 'text-slate-500'
+                    }`}
+                  >
+                    {m === 0 ? strings.settings.autoLockOff : `${m} ${strings.settings.minuteShort}`}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
           <ToggleRow
             icon={Bell}
