@@ -252,6 +252,11 @@ const en = {
     reload: 'Refresh',
     dismiss: 'Later',
   },
+  error: {
+    title: 'Something went wrong',
+    body: 'The app hit an unexpected error. Your data is safe on this device — reloading usually fixes it.',
+    reload: 'Reload app',
+  },
 
   settings: {
     title: 'Settings', appearance: 'Appearance', darkMode: 'Dark mode', hideBalances: 'Hide balances',
@@ -551,6 +556,11 @@ const th = {
     updateReady: 'มีเวอร์ชันใหม่พร้อมใช้งาน',
     reload: 'รีเฟรช',
     dismiss: 'ไว้ก่อน',
+  },
+  error: {
+    title: 'เกิดข้อผิดพลาด',
+    body: 'แอปเจอข้อผิดพลาดที่ไม่คาดคิด ข้อมูลของคุณยังปลอดภัยในเครื่อง — กดรีโหลดมักจะหายเอง',
+    reload: 'รีโหลดแอป',
   },
 
   settings: {
