@@ -110,40 +110,56 @@ export default function Balance() {
         <Card className="text-center text-sm text-slate-500">{strings.balance.noData}</Card>
       ) : (
         <>
-          {/* Hero: net for the year + income/expense + savings rate / avg */}
-          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 p-4 text-white shadow-sm">
-            <p className="text-sm opacity-80">{strings.balance.netThisYear}</p>
-            <MoneyText satang={stats.net} currency={currency} className="text-3xl font-bold" />
-            <div className="mt-3 flex items-stretch border-t border-white/20 pt-3">
-              <div className="flex-1">
-                <p className="text-[11px] font-medium text-emerald-200">{strings.balance.income}</p>
-                <MoneyText satang={stats.income} currency={currency} className="text-sm font-bold" />
-              </div>
-              <div className="mx-3 w-px bg-white/20" />
-              <div className="flex-1">
-                <p className="text-[11px] font-medium text-rose-200">{strings.balance.expense}</p>
-                <MoneyText satang={stats.expense} currency={currency} className="text-sm font-bold" />
-              </div>
-            </div>
-          </div>
+          {/* Compact year summary — deliberately flat (no gradient) so this page
+              reads differently from the Dashboard's hero card. */}
+          {(() => {
+            const sum = stats.income + stats.expense
+            const incPct = sum > 0 ? (stats.income / sum) * 100 : 0
+            return (
+              <Card className="space-y-2.5">
+                <div className="flex items-end justify-between">
+                  <div>
+                    <p className="text-xs text-slate-500">{strings.balance.netThisYear}</p>
+                    <MoneyText
+                      satang={stats.net}
+                      currency={currency}
+                      className={`text-2xl font-extrabold ${stats.net >= 0 ? 'text-slate-900 dark:text-white' : 'text-red-600'}`}
+                    />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[11px] text-slate-400">{strings.balance.savingsRate}</p>
+                    <p className={`text-base font-bold ${stats.savingsRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {stats.savingsRate === null ? '—' : `${stats.savingsRate}%`}
+                    </p>
+                  </div>
+                </div>
 
-          {/* Secondary stats */}
-          <div className="grid grid-cols-2 gap-2">
-            <Card className="py-3">
-              <p className="text-xs text-slate-500">{strings.balance.savingsRate}</p>
-              <p className={`text-lg font-bold ${stats.savingsRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {stats.savingsRate === null ? '—' : `${stats.savingsRate}%`}
-              </p>
-            </Card>
-            <Card className="py-3">
-              <p className="text-xs text-slate-500">{strings.balance.avgPerMonth}</p>
-              <MoneyText
-                satang={stats.avgPerMonth}
-                currency={currency}
-                className={`text-lg font-bold ${stats.avgPerMonth >= 0 ? 'text-green-600' : 'text-red-600'}`}
-              />
-            </Card>
-          </div>
+                {/* Income vs expense split bar */}
+                <div className="flex h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                  <div className="h-full bg-emerald-500" style={{ width: `${incPct}%` }} />
+                  <div className="h-full bg-rose-500" style={{ width: `${100 - incPct}%` }} />
+                </div>
+
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="text-slate-500">{strings.balance.income}</span>
+                    <MoneyText satang={stats.income} currency={currency} className="font-semibold" />
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-rose-500" />
+                    <span className="text-slate-500">{strings.balance.expense}</span>
+                    <MoneyText satang={stats.expense} currency={currency} className="font-semibold" />
+                  </span>
+                </div>
+
+                <p className="border-t border-slate-100 pt-2 text-xs text-slate-400 dark:border-slate-800">
+                  {strings.balance.avgPerMonth}:{' '}
+                  <MoneyText satang={stats.avgPerMonth} currency={currency} className="font-semibold text-slate-500" />
+                </p>
+              </Card>
+            )
+          })()}
 
           {/* Grouped bar chart — all 12 months fit the width (thin bars) */}
           <Card>
