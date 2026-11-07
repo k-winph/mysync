@@ -164,16 +164,23 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
                 onClick={() => toggleTag(t.name)}
                 className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition ${
                   active
-                    ? 'border-brand-600 bg-brand-600 text-white'
+                    ? 'border-transparent text-white'
                     : 'border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-300'
                 }`}
+                style={
+                  active
+                    ? { backgroundColor: t.color || '#6366f1' }
+                    : t.color
+                      ? { borderColor: t.color, color: t.color }
+                      : undefined
+                }
               >
                 #{t.name}
               </button>
             )
           })}
 
-          {/* Inline add-new-tag */}
+          {/* Inline add-new-tag (with autocomplete over existing tags) */}
           {addingTag ? (
             <input
               type="text"
@@ -188,6 +195,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
               onBlur={handleAddNewTag}
               placeholder={strings.tx.newTag}
               autoFocus
+              list="tx-tag-suggest"
               className="w-28 shrink-0 rounded-full border border-brand-500 bg-white px-3 py-1.5
                 text-sm outline-none dark:bg-slate-900"
             />
@@ -202,6 +210,9 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
               <Plus size={14} /> {strings.common.add}
             </button>
           )}
+          <datalist id="tx-tag-suggest">
+            {tagList.map((t) => <option key={t.id} value={t.name} />)}
+          </datalist>
         </div>
         {tagList.length === 0 && !addingTag && (
           <p className="mt-1 text-xs text-slate-400">{strings.tx.noTagsHint}</p>

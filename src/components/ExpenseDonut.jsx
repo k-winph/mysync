@@ -17,7 +17,7 @@ let lastDonutSig = null
 // `data`: [{ id, name, value(satang), color, icon }] already sorted desc.
 // Identity is carried by the legend (name + amount + %), never color alone,
 // so it stays readable for colorblind users and in print.
-export default function ExpenseDonut({ data, currency }) {
+export default function ExpenseDonut({ data, currency, onSelect }) {
   const reduce = useReducedMotion()
   const speed = useStore((s) => s.settings.animSpeed) || 'fast'
   const total = data.reduce((sum, d) => sum + d.value, 0)
@@ -66,12 +66,20 @@ export default function ExpenseDonut({ data, currency }) {
         </div>
       </div>
 
-      {/* Legend / table (identity + values) */}
+      {/* Legend / table (identity + values). Tappable to drill into that
+          category's transactions when `onSelect` is provided (aggregated
+          "Other" row is not clickable). */}
       <div className="mt-3 space-y-2">
         {data.map((d) => {
           const pct = Math.round((d.value / total) * 100)
+          const clickable = onSelect && d.id !== '__other'
+          const Row = clickable ? 'button' : 'div'
           return (
-            <div key={d.id} className="flex items-center gap-2 text-sm">
+            <Row
+              key={d.id}
+              {...(clickable ? { type: 'button', onClick: () => onSelect(d.id) } : {})}
+              className={`flex w-full items-center gap-2 text-left text-sm ${clickable ? 'rounded-lg transition hover:opacity-80 active:scale-[0.99]' : ''}`}
+            >
               <span
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white"
                 style={{ backgroundColor: d.color }}
@@ -81,7 +89,7 @@ export default function ExpenseDonut({ data, currency }) {
               <span className="flex-1 truncate font-medium">{d.name}</span>
               <span className="text-xs text-slate-400">{pct}%</span>
               <MoneyText satang={d.value} currency={currency} className="w-24 text-right font-semibold" />
-            </div>
+            </Row>
           )
         })}
       </div>

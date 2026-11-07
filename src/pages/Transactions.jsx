@@ -1,8 +1,8 @@
 import { useMemo, useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   Plus, SlidersHorizontal, Search, Tag, X, Filter, Wallet,
-  ArrowUpRight, ArrowDownRight, ChevronLeft, ChevronRight, ChevronDown,
+  ArrowUpRight, ArrowDownRight, ChevronLeft, ChevronRight, ChevronDown, CalendarArrowUp,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
@@ -17,15 +17,17 @@ import EmptyState from '../components/ui/EmptyState'
 import { useToast } from '../components/ui/Feedback'
 import { WalletArt } from '../components/illustrations'
 
-const EMPTY_FILTERS = { q: '', type: 'all', categoryId: 'all' }
+const EMPTY_FILTERS = { q: '', type: 'all', categoryId: 'all', tags: [] }
 
 export default function Transactions() {
   const transactions = useStore((s) => s.transactions)
   const categories = useStore((s) => s.categories)
+  const tagList = useStore((s) => s.tags)
   const language = useStore((s) => s.settings.language)
   const deleteTransaction = useStore((s) => s.deleteTransaction)
   const restoreTransaction = useStore((s) => s.restoreTransaction)
   const toast = useToast()
+  const navigate = useNavigate()
 
   const [month, setMonth] = useState(currentMonth) // "YYYY-MM"
   const [monthMenu, setMonthMenu] = useState(false)
@@ -37,21 +39,40 @@ export default function Transactions() {
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [searchParams, setSearchParams] = useSearchParams()
 
-  // Deep link from a month card (?from=YYYY-MM-DD) → open that month.
+  // Deep links:
+  //  ?from=YYYY-MM-DD        → open that month (from a month card)
+  //  ?tag=NAME               → filter to that tag (drill-down from Tag summary)
+  //  ?category=ID &type=...  → filter to that category/type (drill-down)
   useEffect(() => {
     const from = searchParams.get('from')
-    if (from) {
-      setMonth(from.slice(0, 7))
-      searchParams.delete('from')
-      searchParams.delete('to')
+    const tag = searchParams.get('tag')
+    const category = searchParams.get('category')
+    const type = searchParams.get('type')
+    if (from) setMonth(from.slice(0, 7))
+    if (tag || category || type) {
+      setFilters((f) => ({
+        ...f,
+        tags: tag ? [tag] : f.tags,
+        categoryId: category || f.categoryId,
+        type: type === 'income' || type === 'expense' ? type : f.type,
+      }))
+      setShowFilters(true)
+    }
+    if (from || tag || category || type) {
+      ;['from', 'to', 'tag', 'category', 'type'].forEach((k) => searchParams.delete(k))
       setSearchParams(searchParams, { replace: true })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const setFilter = (patch) => setFilters((f) => ({ ...f, ...patch }))
+  const toggleTagFilter = (name) =>
+    setFilters((f) => ({
+      ...f,
+      tags: f.tags.includes(name) ? f.tags.filter((t) => t !== name) : [...f.tags, name],
+    }))
   const hasActiveFilters =
-    filters.q !== '' || filters.type !== 'all' || filters.categoryId !== 'all'
+    filters.q !== '' || filters.type !== 'all' || filters.categoryId !== 'all' || filters.tags.length > 0
 
   const catNameById = useMemo(() => {
     const m = {}
@@ -85,6 +106,10 @@ export default function Transactions() {
       if (t.date.slice(0, 7) !== month) return false
       if (filters.type !== 'all' && t.type !== filters.type) return false
       if (filters.categoryId !== 'all' && t.categoryId !== filters.categoryId) return false
+      if (filters.tags.length > 0) {
+        const txTags = t.tags || []
+        if (!filters.tags.every((tag) => txTags.includes(tag))) return false
+      }
       if (q) {
         const haystack = [t.note || '', (t.tags || []).join(' '), catNameById[t.categoryId] || '']
           .join(' ')
@@ -134,6 +159,13 @@ export default function Transactions() {
         subtitle={strings.pageSub.records}
         right={
           <div className="flex items-center gap-1">
+            <button
+              onClick={() => navigate('/income/recurring')}
+              className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 active:scale-90 dark:hover:bg-slate-800"
+              aria-label={strings.recIncome.title}
+            >
+              <CalendarArrowUp size={20} />
+            </button>
             <button
               onClick={() => setTagOpen(true)}
               className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 active:scale-90 dark:hover:bg-slate-800"
@@ -309,6 +341,36 @@ export default function Transactions() {
               ))}
             </select>
           </div>
+
+          {tagList.length > 0 && (
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-slate-500">
+                {strings.filter.tags}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {tagList.map((t) => {
+                  const active = filters.tags.includes(t.name)
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => toggleTagFilter(t.name)}
+                      className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                        active ? 'border-transparent text-white' : 'border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-300'
+                      }`}
+                      style={
+                        active
+                          ? { backgroundColor: t.color || '#6366f1' }
+                          : t.color ? { borderColor: t.color, color: t.color } : undefined
+                      }
+                    >
+                      #{t.name}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {hasActiveFilters && (
             <button

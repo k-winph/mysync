@@ -19,6 +19,7 @@ const Balance = lazy(() => import('./pages/Balance'))
 const Transactions = lazy(() => import('./pages/Transactions'))
 const Debt = lazy(() => import('./pages/Debt'))
 const Recurring = lazy(() => import('./pages/Recurring'))
+const RecurringIncome = lazy(() => import('./pages/RecurringIncome'))
 const Installments = lazy(() => import('./pages/Installments'))
 const Tax = lazy(() => import('./pages/Tax'))
 const Stocks = lazy(() => import('./pages/Stocks'))
@@ -59,6 +60,7 @@ export default function App() {
   setLang(language)
   const seedDefaults = useStore((s) => s.seedDefaults)
   const syncTagsFromTransactions = useStore((s) => s.syncTagsFromTransactions)
+  const runRecurringIncomes = useStore((s) => s.runRecurringIncomes)
 
   // Locked on every load when a PIN is set; unlock lasts for the session only.
   // Initialised from the PIN state at load, so enabling a PIN mid-session does
@@ -70,7 +72,9 @@ export default function App() {
   useEffect(() => {
     seedDefaults()
     syncTagsFromTransactions()
-  }, [seedDefaults, syncTagsFromTransactions])
+    // Post any recurring income that has come due since the last open.
+    runRecurringIncomes()
+  }, [seedDefaults, syncTagsFromTransactions, runRecurringIncomes])
 
   // Apply/remove the `dark` class on <html> whenever the theme changes.
   useEffect(() => {
@@ -142,6 +146,7 @@ export default function App() {
             <Route index element={<Dashboard />} />
             <Route path="balance" element={<Balance />} />
             <Route path="transactions" element={<Transactions />} />
+            <Route path="income/recurring" element={<RecurringIncome />} />
             <Route path="debt" element={<Debt />} />
             <Route path="debt/recurring" element={<Recurring />} />
             <Route path="debt/installments" element={<Installments />} />

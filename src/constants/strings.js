@@ -53,6 +53,7 @@ const en = {
   filter: {
     search: 'Search', searchHint: 'Search note, tag or category', type: 'Type', allTypes: 'All',
     category: 'Category', allCategories: 'All categories', from: 'From', to: 'To',
+    tags: 'Tags (match all selected)',
     clear: 'Clear filters', filters: 'Filters', tagSummary: 'Totals by tag',
     resultCount: (n) => `${n} result${n === 1 ? '' : 's'}`,
   },
@@ -60,11 +61,15 @@ const en = {
   tag: {
     title: 'Totals by tag', empty: 'No tags used yet. Add tags to transactions to see totals here.',
     spent: 'Spent', received: 'Received', count: (n) => `${n} item${n === 1 ? '' : 's'}`,
+    tapHint: 'Tap a tag to see its transactions',
   },
 
   tagManage: {
     title: 'Manage tags', name: 'New tag name', empty: 'No tags yet. Create one below.',
-    deleteConfirm: 'Delete this tag? Existing transactions keep the tag on their record.',
+    deleteConfirm: 'Delete this tag? It will be removed from all transactions that use it.',
+    rename: 'Name', color: 'Color', mergeInto: 'Merge into…', mergeNone: 'Don’t merge',
+    used: (n) => `${n} use${n === 1 ? '' : 's'}`, edit: 'Edit tag',
+    mergeHint: 'Picking another tag merges this one into it and rewrites every transaction.',
   },
 
   category: {
@@ -232,6 +237,7 @@ const en = {
     debt: 'Debts and dues to pay',
     recurring: 'Bills you pay every cycle',
     installment: "Loans you're paying off",
+    recIncome: 'Income that arrives on a schedule',
     savings: 'Your saving targets',
     stocks: 'Your holdings and gain/loss',
     split: 'Divide a shared bill with friends',
@@ -252,6 +258,19 @@ const en = {
     start: 'Get started',
     openGuide: 'View the guide',
     tryDemo: 'Explore with sample data',
+  },
+  recIncome: {
+    title: 'Recurring income',
+    name: 'Source', nameHint: 'e.g. Salary, Allowance',
+    amount: 'Amount', frequency: 'Frequency', category: 'Category',
+    nextDate: 'Next date', nextDateHint: "When the next deposit lands. It's logged automatically on that day.",
+    next: 'Next', monthlyTotal: 'Per month (approx.)',
+    autoNote: 'These post themselves as income automatically — no need to tap anything.',
+    addTitle: 'Add recurring income', editTitle: 'Edit recurring income',
+    deleteConfirm: 'Delete this recurring income? Transactions already logged are kept.',
+    emptyTitle: 'No recurring income yet',
+    empty: 'Add income that arrives on a schedule — like salary — and it will be logged automatically each period.',
+    manage: 'Recurring income',
   },
   pwa: {
     updateReady: 'A new version is available.',
@@ -393,6 +412,7 @@ const th = {
   filter: {
     search: 'ค้นหา', searchHint: 'ค้นหาโน้ต แท็ก หรือหมวด', type: 'ประเภท', allTypes: 'ทั้งหมด',
     category: 'หมวดหมู่', allCategories: 'ทุกหมวด', from: 'จาก', to: 'ถึง',
+    tags: 'แท็ก (ตรงทุกอันที่เลือก)',
     clear: 'ล้างตัวกรอง', filters: 'ตัวกรอง', tagSummary: 'สรุปตามแท็ก',
     resultCount: (n) => `${n} รายการ`,
   },
@@ -400,11 +420,15 @@ const th = {
   tag: {
     title: 'สรุปตามแท็ก', empty: 'ยังไม่มีแท็กที่ใช้ เพิ่มแท็กในรายการเพื่อดูสรุปที่นี่',
     spent: 'จ่าย', received: 'รับ', count: (n) => `${n} รายการ`,
+    tapHint: 'แตะแท็กเพื่อดูรายการ',
   },
 
   tagManage: {
     title: 'จัดการแท็ก', name: 'ชื่อแท็กใหม่', empty: 'ยังไม่มีแท็ก สร้างด้านล่าง',
-    deleteConfirm: 'ลบแท็กนี้? รายการเดิมยังเก็บแท็กไว้ในบันทึก',
+    deleteConfirm: 'ลบแท็กนี้? จะถูกเอาออกจากทุกรายการที่ใช้แท็กนี้',
+    rename: 'ชื่อ', color: 'สี', mergeInto: 'รวมเข้ากับ…', mergeNone: 'ไม่รวม',
+    used: (n) => `ใช้ ${n} รายการ`, edit: 'แก้ไขแท็ก',
+    mergeHint: 'เลือกแท็กอื่นเพื่อรวมแท็กนี้เข้าไป แล้วเขียนทับทุกรายการให้',
   },
 
   category: {
@@ -572,6 +596,7 @@ const th = {
     debt: 'หนี้และรายการที่ต้องจ่าย',
     recurring: 'ค่าใช้จ่ายที่จ่ายซ้ำเรื่อยๆ',
     installment: 'หนี้ผ่อนที่มีวันจบ',
+    recIncome: 'รายรับที่เข้าตามรอบเวลา',
     savings: 'เป้าหมายเก็บเงินของคุณ',
     stocks: 'พอร์ตหุ้นและกำไร/ขาดทุน',
     split: 'หารบิลกับเพื่อนหลายคน',
@@ -592,6 +617,19 @@ const th = {
     start: 'เริ่มใช้งาน',
     openGuide: 'ดูคู่มือ',
     tryDemo: 'ลองดูด้วยข้อมูลตัวอย่าง',
+  },
+  recIncome: {
+    title: 'รายรับประจำ',
+    name: 'แหล่งที่มา', nameHint: 'เช่น เงินเดือน, ค่าขนม',
+    amount: 'จำนวนเงิน', frequency: 'ความถี่', category: 'หมวดหมู่',
+    nextDate: 'รอบถัดไป', nextDateHint: 'วันที่เงินจะเข้ารอบหน้า ระบบจะบันทึกให้อัตโนมัติในวันนั้น',
+    next: 'ถัดไป', monthlyTotal: 'ต่อเดือน (โดยประมาณ)',
+    autoNote: 'รายการเหล่านี้จะถูกบันทึกเป็นรายรับให้อัตโนมัติ ไม่ต้องกดเอง',
+    addTitle: 'เพิ่มรายรับประจำ', editTitle: 'แก้ไขรายรับประจำ',
+    deleteConfirm: 'ลบรายรับประจำนี้? รายการที่บันทึกไปแล้วจะยังอยู่',
+    emptyTitle: 'ยังไม่มีรายรับประจำ',
+    empty: 'เพิ่มรายรับที่เข้าตามรอบ เช่น เงินเดือน แล้วระบบจะบันทึกให้อัตโนมัติทุกงวด',
+    manage: 'รายรับประจำ',
   },
   pwa: {
     updateReady: 'มีเวอร์ชันใหม่พร้อมใช้งาน',

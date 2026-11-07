@@ -195,7 +195,11 @@ export default function Dashboard() {
             <Suspense fallback={<div className="flex h-[200px] items-center justify-center">
               <div className="h-7 w-7 animate-spin rounded-full border-2 border-brand-500/30 border-t-brand-600" />
             </div>}>
-              <ExpenseDonut data={donutData} currency={settings.primaryCurrency} />
+              <ExpenseDonut
+                data={donutData}
+                currency={settings.primaryCurrency}
+                onSelect={(id) => navigate(`/transactions?category=${id}&type=expense`)}
+              />
             </Suspense>
           )}
         </Card>

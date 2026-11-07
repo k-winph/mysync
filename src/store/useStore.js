@@ -4,6 +4,8 @@ import { uuid } from '../utils/id'
 import { DEFAULT_CATEGORIES } from '../constants/categories'
 import { buildSampleData } from '../constants/sampleData'
 import { todayISO, addPeriod } from '../utils/date'
+import { collectDue } from '../utils/recurring'
+import { rewriteTagName } from './tagOps'
 import { STORE_VERSION, migratePersisted } from './migrate'
 
 // Single source of truth for the whole app, persisted to localStorage.
@@ -13,6 +15,14 @@ import { STORE_VERSION, migratePersisted } from './migrate'
 const STORAGE_KEY = 'mysync-store'
 
 const now = () => new Date().toISOString()
+
+// Palette for tag chips. New tags get the next unused color (cycling), so the
+// user gets variety without having to pick one every time.
+const TAG_COLORS = [
+  '#6366f1', '#0ea5e9', '#14b8a6', '#22c55e', '#eab308',
+  '#f97316', '#ef4444', '#ec4899', '#8b5cf6', '#64748b',
+]
+
 
 const withStamps = (obj) => ({
   id: uuid(),
@@ -73,6 +83,7 @@ export const useStore = create(
       holdings: [], // [{ id, portfolioId, symbol, shares, avgCost(cents), currency, lastPrice, lastPriceAt, ... }]
       fx: null, // cached FX rates: { base, rates: {CUR: perBase}, at } for converting to primary currency
       savingsGoals: [], // [{ id, name, targetAmount(satang), currentAmount(satang), deadline|null, ... }]
+      recurringIncomes: [], // [{ id, name, amount(satang), frequency, nextDate, categoryId, tags, note, active, ... }]
       settings: { ...DEFAULT_SETTINGS },
 
       // --- Seeding ---------------------------------------------------------
@@ -124,15 +135,65 @@ export const useStore = create(
       addTag: (rawName) => {
         const name = (rawName || '').trim()
         if (!name) return null
-        const exists = get().tags.some(
+        const existing = get().tags.find(
           (t) => t.name.toLowerCase() === name.toLowerCase()
         )
-        if (!exists) set((s) => ({ tags: [...s.tags, withStamps({ name })] }))
+        // Return the canonical existing name so callers select the real tag.
+        if (existing) return existing.name
+        const color = TAG_COLORS[get().tags.length % TAG_COLORS.length]
+        set((s) => ({ tags: [...s.tags, withStamps({ name, color })] }))
         return name
       },
 
+      // Change a tag's color (and nothing else).
+      setTagColor: (id, color) =>
+        set((s) => ({
+          tags: s.tags.map((t) => (t.id === id ? { ...t, color, updatedAt: now() } : t)),
+        })),
+
+      // Rename a tag. If the new name matches another existing tag (case-
+      // insensitive), the two are MERGED: references are rewritten and the
+      // duplicate tag entry removed. Otherwise it's a plain rename, propagated
+      // to every transaction / debt / recurring income that used the old name.
+      renameTag: (id, rawName) =>
+        set((s) => {
+          const name = (rawName || '').trim()
+          const tag = s.tags.find((t) => t.id === id)
+          if (!tag || !name || name === tag.name) return {}
+          const clash = s.tags.find(
+            (t) => t.id !== id && t.name.toLowerCase() === name.toLowerCase()
+          )
+          const rewritten = rewriteTagName(s, tag.name, clash ? clash.name : name)
+          const tags = clash
+            ? s.tags.filter((t) => t.id !== id) // merged into the existing tag
+            : s.tags.map((t) => (t.id === id ? { ...t, name, updatedAt: now() } : t))
+          return { ...rewritten, tags }
+        }),
+
+      // Merge one tag into another: rewrite references and drop the source tag.
+      mergeTag: (sourceId, targetId) =>
+        set((s) => {
+          const src = s.tags.find((t) => t.id === sourceId)
+          const dst = s.tags.find((t) => t.id === targetId)
+          if (!src || !dst || sourceId === targetId) return {}
+          return {
+            ...rewriteTagName(s, src.name, dst.name),
+            tags: s.tags.filter((t) => t.id !== sourceId),
+          }
+        }),
+
+      // Delete a tag AND strip it from every transaction / debt / recurring
+      // income — otherwise syncTagsFromTransactions would resurrect it on the
+      // next launch.
       deleteTag: (id) =>
-        set((s) => ({ tags: s.tags.filter((t) => t.id !== id) })),
+        set((s) => {
+          const tag = s.tags.find((t) => t.id === id)
+          if (!tag) return {}
+          return {
+            ...rewriteTagName(s, tag.name, null),
+            tags: s.tags.filter((t) => t.id !== id),
+          }
+        }),
 
       // Make sure every tag name used by a transaction exists in the managed
       // list. Run on mount so existing data and CSV imports (which only carry
@@ -146,7 +207,8 @@ export const useStore = create(
               const key = name.toLowerCase()
               if (name && !known.has(key)) {
                 known.add(key)
-                additions.push(withStamps({ name }))
+                const color = TAG_COLORS[(s.tags.length + additions.length) % TAG_COLORS.length]
+                additions.push(withStamps({ name, color }))
               }
             }
           }
@@ -334,6 +396,73 @@ export const useStore = create(
           ),
         })),
 
+      // --- Recurring incomes ----------------------------------------------
+      // Scheduled income (salary, allowance, ...) that posts itself as an
+      // 'income' transaction when due. Unlike recurring debts (which you tap to
+      // pay), these are logged automatically by runRecurringIncomes() on app
+      // open, so money you know is coming shows up without any action.
+      addRecurringIncome: (data) =>
+        set((s) => ({
+          recurringIncomes: [
+            ...s.recurringIncomes,
+            withStamps({
+              name: '',
+              amount: 0,
+              frequency: 'monthly',
+              nextDate: todayISO(),
+              categoryId: '',
+              tags: [],
+              note: '',
+              active: true,
+              lastPostedAt: null,
+              ...data,
+            }),
+          ],
+        })),
+
+      updateRecurringIncome: (id, patch) =>
+        set((s) => ({
+          recurringIncomes: s.recurringIncomes.map((r) =>
+            r.id === id ? { ...r, ...patch, updatedAt: now() } : r
+          ),
+        })),
+
+      deleteRecurringIncome: (id) =>
+        set((s) => ({ recurringIncomes: s.recurringIncomes.filter((r) => r.id !== id) })),
+
+      // Post every due occurrence of every active recurring income, catching up
+      // if several periods have passed (e.g. the app wasn't opened for months).
+      // Capped so a bad date can never loop forever. Call once on app mount.
+      runRecurringIncomes: () =>
+        set((s) => {
+          const today = todayISO()
+          const created = []
+          const updated = s.recurringIncomes.map((r) => {
+            if (!r.active || !r.nextDate || r.amount <= 0) return r
+            const { dates, nextDate } = collectDue(r.nextDate, r.frequency, today)
+            if (dates.length === 0) return r
+            for (const date of dates) {
+              created.push(
+                withStamps({
+                  type: 'income',
+                  amount: r.amount,
+                  categoryId: r.categoryId || '',
+                  tags: r.tags || [],
+                  note: r.note || r.name,
+                  date,
+                  recurringIncomeId: r.id, // provenance, for future features
+                })
+              )
+            }
+            return { ...r, nextDate, lastPostedAt: dates[dates.length - 1] }
+          })
+          if (created.length === 0) return {}
+          return {
+            transactions: [...created, ...s.transactions],
+            recurringIncomes: updated,
+          }
+        }),
+
       // --- Settings --------------------------------------------------------
       updateSettings: (patch) =>
         set((s) => ({ settings: { ...s.settings, ...patch } })),
@@ -375,13 +504,14 @@ export const useStore = create(
           holdings: [],
           fx: null,
           savingsGoals: [],
+          recurringIncomes: [],
           settings: { ...s.settings, demoMode: false, lastBackupAt: null },
         })),
 
       // --- Import / restore ------------------------------------------------
       // Replace transactions and categories from an imported backup.
       // Settings are intentionally left as-is (device-specific).
-      replaceData: ({ transactions, categories, tags, debts, portfolios, holdings, savingsGoals }) =>
+      replaceData: ({ transactions, categories, tags, debts, portfolios, holdings, savingsGoals, recurringIncomes }) =>
         set((s) => ({
           transactions: Array.isArray(transactions) ? transactions : [],
           categories: Array.isArray(categories) ? categories : s.categories,
@@ -390,6 +520,7 @@ export const useStore = create(
           portfolios: Array.isArray(portfolios) ? portfolios : s.portfolios,
           holdings: Array.isArray(holdings) ? holdings : s.holdings,
           savingsGoals: Array.isArray(savingsGoals) ? savingsGoals : s.savingsGoals,
+          recurringIncomes: Array.isArray(recurringIncomes) ? recurringIncomes : s.recurringIncomes,
           // Importing real data means we're no longer looking at the demo.
           settings: { ...s.settings, demoMode: false },
         })),
@@ -410,6 +541,7 @@ export const useStore = create(
         holdings: s.holdings,
         fx: s.fx,
         savingsGoals: s.savingsGoals,
+        recurringIncomes: s.recurringIncomes,
         settings: s.settings,
       }),
     }
