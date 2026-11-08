@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, TrendingUp, FlaskConical, Trash2, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, CalendarClock, TrendingUp, FlaskConical, Trash2, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { ACCENTS } from '../constants/accents'
@@ -125,6 +125,14 @@ export default function Settings() {
     if (!on) return updateSettings({ debtNotify: false })
     const perm = await requestNotificationPermission()
     if (perm === 'granted') updateSettings({ debtNotify: true })
+    else setNotifMsg(strings.settings.notifBlocked)
+  }
+
+  const onToggleDailyReminder = async (on) => {
+    setNotifMsg('')
+    if (!on) return updateSettings({ dailyReminder: false })
+    const perm = await requestNotificationPermission()
+    if (perm === 'granted') updateSettings({ dailyReminder: true })
     else setNotifMsg(strings.settings.notifBlocked)
   }
 
@@ -430,12 +438,35 @@ export default function Settings() {
             checked={settings.debtNotify}
             onChange={onToggleDebtNotify}
           />
+          <ToggleRow
+            icon={CalendarClock}
+            label={strings.settings.dailyReminder}
+            checked={settings.dailyReminder}
+            onChange={onToggleDailyReminder}
+          />
+          {settings.dailyReminder && (
+            <div className="flex items-center gap-3 py-2.5">
+              <CalendarClock size={20} className="text-transparent" />
+              <span className="flex-1 font-medium text-slate-600 dark:text-slate-300">
+                {strings.settings.dailyReminderTime}
+              </span>
+              <input
+                type="time"
+                value={settings.dailyReminderTime || '21:00'}
+                onChange={(e) => updateSettings({ dailyReminderTime: e.target.value || '21:00' })}
+                className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900"
+              />
+            </div>
+          )}
         </Card>
         {settings.pinEnabled && bioAvailable && (
           <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.biometricHint}</p>
         )}
         {bioMsg && <p className="mt-1 px-1 text-xs font-medium text-amber-600">{bioMsg}</p>}
         <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.debtRemindersHint}</p>
+        {settings.dailyReminder && (
+          <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.dailyReminderHint}</p>
+        )}
         {notifMsg && <p className="mt-1 px-1 text-xs font-medium text-amber-600">{notifMsg}</p>}
       </div>
 

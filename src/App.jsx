@@ -4,7 +4,7 @@ import { useStore } from './store/useStore'
 import { strings, setLang } from './constants/strings'
 import { applyAccent } from './constants/accents'
 import { todayISO, daysUntil } from './utils/date'
-import { notificationPermission, showNotification } from './utils/notify'
+import { notificationPermission, showNotification, scheduleDailyReminder, cancelDailyReminder } from './utils/notify'
 import Layout from './components/Layout'
 import LockScreen from './components/LockScreen'
 import Dashboard from './pages/Dashboard'
@@ -102,6 +102,43 @@ export default function App() {
     })
     s.updateSettings({ lastDebtNotifyAt: today })
   }, [])
+
+  // Daily "log your spending" reminder. Two layers:
+  //  1) on-open nudge — reliable: if it's past the set time and nothing was
+  //     logged today (and we haven't nudged today), show it now.
+  //  2) scheduled best-effort — a real timed notification for next time via the
+  //     Notification Triggers API, where the browser supports it.
+  // Re-runs when the toggle/time changes; reads fresh state from the store.
+  const dailyReminder = useStore((s) => s.settings.dailyReminder)
+  const dailyReminderTime = useStore((s) => s.settings.dailyReminderTime)
+  useEffect(() => {
+    const s = useStore.getState()
+    if (!s.settings.dailyReminder) {
+      cancelDailyReminder()
+      return
+    }
+    if (notificationPermission() !== 'granted') return
+    const hhmm = s.settings.dailyReminderTime || '21:00'
+    const today = todayISO()
+    const loggedToday = s.transactions.some((t) => t.date === today)
+
+    // Layer 2 — schedule the next one (skip today if already logged).
+    scheduleDailyReminder({
+      hhmm,
+      skipToday: loggedToday,
+      title: strings.notify.dailyTitle,
+      body: strings.notify.dailyBody,
+    })
+
+    // Layer 1 — nudge right now if due and nothing logged yet today.
+    const [h, m] = hhmm.split(':').map(Number)
+    const now = new Date()
+    const pastTime = now.getHours() * 60 + now.getMinutes() >= (h || 0) * 60 + (m || 0)
+    if (pastTime && !loggedToday && s.settings.lastDailyReminderAt !== today) {
+      showNotification(strings.notify.dailyTitle, { body: strings.notify.dailyBody })
+      s.updateSettings({ lastDailyReminderAt: today })
+    }
+  }, [dailyReminder, dailyReminderTime])
 
   // Auto-lock after inactivity (only when a PIN is set and currently unlocked).
   // Any tap/key resets the timer; returning to the tab restarts it. When it

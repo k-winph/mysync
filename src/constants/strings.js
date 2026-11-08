@@ -368,6 +368,8 @@ const en = {
     biometricFailed: 'Could not set up biometrics. Try again.',
     debtReminders: 'Debt due reminders',
     debtRemindersHint: 'Get a notification when a debt is overdue or due soon — checked when you open the app.',
+    dailyReminder: 'Daily logging reminder', dailyReminderTime: 'Reminder time',
+    dailyReminderHint: 'A nudge at your chosen time if you haven’t logged anything that day. The timed alert works best with the app installed; otherwise you’ll still get a reminder when you next open the app.',
     notifBlocked: 'Notifications are blocked in your browser settings.',
   },
 
@@ -387,6 +389,8 @@ const en = {
     debtTitle: 'Debt reminder',
     debtOne: (creditor) => `${creditor} is due soon`,
     debtMany: (n) => `${n} debts are due soon or overdue`,
+    dailyTitle: 'Log today’s spending?',
+    dailyBody: 'You haven’t recorded anything today. Tap to add.',
   },
 }
 
@@ -756,6 +760,8 @@ const th = {
     biometricFailed: 'ตั้งค่าไบโอเมตริกไม่สำเร็จ ลองใหม่',
     debtReminders: 'แจ้งเตือนหนี้ใกล้ครบ',
     debtRemindersHint: 'แจ้งเตือนเมื่อหนี้เกินกำหนดหรือใกล้ครบ — เช็กตอนเปิดแอพ',
+    dailyReminder: 'เตือนบันทึกรายจ่ายประจำวัน', dailyReminderTime: 'เวลาเตือน',
+    dailyReminderHint: 'เตือนตามเวลาที่ตั้งถ้าวันนั้นยังไม่ได้ลงรายการ · การเตือนตามเวลาจริงได้ผลดีสุดเมื่อติดตั้งแอป ถ้าไม่ก็จะเตือนให้ตอนเปิดแอปครั้งถัดไป',
     notifBlocked: 'การแจ้งเตือนถูกปิดในตั้งค่าเบราว์เซอร์',
   },
 
@@ -775,6 +781,8 @@ const th = {
     debtTitle: 'เตือนหนี้',
     debtOne: (creditor) => `${creditor} ใกล้ครบกำหนด`,
     debtMany: (n) => `มีหนี้ ${n} รายการใกล้ครบ/เกินกำหนด`,
+    dailyTitle: 'บันทึกรายจ่ายวันนี้หรือยัง?',
+    dailyBody: 'วันนี้ยังไม่มีรายการเลย แตะเพื่อเพิ่ม',
   },
 }
 

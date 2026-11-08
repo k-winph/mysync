@@ -60,6 +60,9 @@ const DEFAULT_SETTINGS = {
   stockApiKey: '', // user's own free API key, stored on-device only
   debtNotify: false, // fire a local notification for due/overdue debts on app open
   lastDebtNotifyAt: null, // YYYY-MM-DD of the last debt notification (once per day)
+  dailyReminder: false, // remind to log spending each day at dailyReminderTime
+  dailyReminderTime: '21:00', // HH:MM local time for the daily logging reminder
+  lastDailyReminderAt: null, // YYYY-MM-DD of the last on-open daily reminder shown
   biometricEnabled: false, // unlock with fingerprint/Face (WebAuthn), needs PIN as fallback
   biometricCredId: null, // stored WebAuthn credential id (base64url)
   autoLockMinutes: 0, // re-lock after N minutes idle when a PIN is set (0 = off)
