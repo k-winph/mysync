@@ -21,6 +21,12 @@ const en = {
     thisMonth: 'This month', best: 'Best month', chartTitle: 'Monthly income & expense',
   },
 
+  spendCal: {
+    title: 'Daily spending', monthExpense: 'This month',
+    tapHint: 'Tap a day to see its transactions', empty: 'No spending recorded this month.',
+    dayNoTx: 'No transactions on this day.',
+  },
+
   month: {
     incomeByCat: 'Income by category', expenseByCat: 'Expense by category',
     noIncome: 'No income', noExpense: 'No expense',
@@ -401,6 +407,12 @@ const th = {
     noData: 'ไม่มีรายการในปีนี้', tapMonthHint: 'แตะที่เดือนเพื่อดูรายละเอียด',
     netThisYear: 'คงเหลือสุทธิปีนี้', savingsRate: 'อัตราการออม', avgPerMonth: 'เฉลี่ย/เดือนที่มีรายการ',
     thisMonth: 'เดือนนี้', best: 'เดือนที่ดีที่สุด', chartTitle: 'รายรับ-รายจ่ายรายเดือน',
+  },
+
+  spendCal: {
+    title: 'ปฏิทินรายจ่าย', monthExpense: 'เดือนนี้',
+    tapHint: 'แตะวันเพื่อดูรายการ', empty: 'เดือนนี้ยังไม่มีรายจ่าย',
+    dayNoTx: 'ไม่มีรายการในวันนี้',
   },
 
   month: {

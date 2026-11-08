@@ -8,10 +8,13 @@ import { ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { formatMoney } from '../utils/money'
+import { CalendarDays } from 'lucide-react'
 import Card from '../components/ui/Card'
 import MoneyText from '../components/MoneyText'
 import PageHeader from '../components/PageHeader'
 import MonthDetailModal from '../components/MonthDetailModal'
+import SpendingCalendar from '../components/SpendingCalendar'
+import DayDetailModal from '../components/DayDetailModal'
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => dayjs().month(i).format('MMM'))
 const INCOME_COLOR = '#22c55e'
@@ -32,6 +35,8 @@ export default function Balance() {
   const [year, setYear] = useState(years[0])
   const yearIdx = years.indexOf(year)
   const [detailMonth, setDetailMonth] = useState(null) // 0-based month, or null
+  const [dayDetail, setDayDetail] = useState(null) // 'YYYY-MM-DD' for the spending calendar, or null
+  const language = useStore((s) => s.settings.language)
 
   // Per-month income/expense totals (in satang) for the selected year.
   const months = useMemo(() => {
@@ -242,12 +247,28 @@ export default function Balance() {
         </>
       )}
 
+      {/* Daily spending heatmap (its own month nav; tap a day for its list) */}
+      {transactions.length > 0 && (
+        <div>
+          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-500">
+            <CalendarDays size={15} /> {strings.spendCal.title}
+          </h2>
+          <SpendingCalendar
+            transactions={transactions}
+            currency={currency}
+            language={language}
+            onPickDay={setDayDetail}
+          />
+        </div>
+      )}
+
       <MonthDetailModal
         open={detailMonth !== null}
         onClose={() => setDetailMonth(null)}
         year={year}
         month={detailMonth}
       />
+      <DayDetailModal open={dayDetail !== null} date={dayDetail} onClose={() => setDayDetail(null)} />
     </div>
   )
 }
