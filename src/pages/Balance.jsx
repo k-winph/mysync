@@ -194,6 +194,19 @@ export default function Balance() {
             </div>
           </Card>
 
+          {/* Daily spending heatmap (its own month nav; tap a day for its list) */}
+          <div>
+            <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-500">
+              <CalendarDays size={15} /> {strings.spendCal.title}
+            </h2>
+            <SpendingCalendar
+              transactions={transactions}
+              currency={currency}
+              language={language}
+              onPickDay={setDayDetail}
+            />
+          </div>
+
           {/* Per-month cards with comparison bars (tap to see that month) */}
           <div>
             <p className="mb-2 px-1 text-xs text-slate-400">{strings.balance.tapMonthHint}</p>
@@ -245,21 +258,6 @@ export default function Balance() {
             </div>
           </div>
         </>
-      )}
-
-      {/* Daily spending heatmap (its own month nav; tap a day for its list) */}
-      {transactions.length > 0 && (
-        <div>
-          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-500">
-            <CalendarDays size={15} /> {strings.spendCal.title}
-          </h2>
-          <SpendingCalendar
-            transactions={transactions}
-            currency={currency}
-            language={language}
-            onPickDay={setDayDetail}
-          />
-        </div>
       )}
 
       <MonthDetailModal
