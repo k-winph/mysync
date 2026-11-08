@@ -5,8 +5,8 @@ import { DEFAULT_CATEGORIES } from '../constants/categories'
 import { buildSampleData } from '../constants/sampleData'
 import { todayISO, addPeriod } from '../utils/date'
 import { collectDue } from '../utils/recurring'
-import { rewriteTagName } from './tagOps'
-import { reassignCategory } from './categoryOps'
+import { rewriteTagName, reorderTag } from './tagOps'
+import { reassignCategory, reorderCategory } from './categoryOps'
 import { STORE_VERSION, migratePersisted } from './migrate'
 
 // Single source of truth for the whole app, persisted to localStorage.
@@ -141,6 +141,11 @@ export const useStore = create(
           categories: s.categories.filter((c) => c.id !== id),
         })),
 
+      // Reorder a category one step (dir 'up' | 'down') among its same-type,
+      // same-pinned peers — the order the add-form uses.
+      moveCategory: (id, dir) =>
+        set((s) => ({ categories: reorderCategory(s.categories, id, dir) })),
+
       // Merge one category into another: repoint every item that used the
       // source category to the target, then drop the source.
       mergeCategory: (sourceId, targetId) =>
@@ -168,6 +173,10 @@ export const useStore = create(
         set((s) => ({ tags: [...s.tags, withStamps({ name, color })] }))
         return name
       },
+
+      // Reorder a tag one step (dir 'up' | 'down') in the managed list.
+      moveTag: (id, dir) =>
+        set((s) => ({ tags: reorderTag(s.tags, id, dir) })),
 
       // Change a tag's color (and nothing else).
       setTagColor: (id, color) =>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Plus, Trash2, Pencil, Tag, Check } from 'lucide-react'
+import { Plus, Trash2, Pencil, Tag, Check, ChevronUp, ChevronDown } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import Modal from './ui/Modal'
@@ -23,6 +23,7 @@ export default function TagManager({ open, onClose }) {
   const renameTag = useStore((s) => s.renameTag)
   const mergeTag = useStore((s) => s.mergeTag)
   const setTagColor = useStore((s) => s.setTagColor)
+  const moveTag = useStore((s) => s.moveTag)
   const confirm = useConfirm()
   const toast = useToast()
 
@@ -82,15 +83,34 @@ export default function TagManager({ open, onClose }) {
 
       {/* Tag list */}
       <div className="mb-4 space-y-1">
-        {tags.map((t) => {
+        {tags.map((t, i) => {
           const editing = editingId === t.id
           return (
             <div key={t.id} className="rounded-xl border border-slate-200 dark:border-slate-700">
               {/* Row */}
-              <div className="flex items-center gap-2.5 px-3 py-2.5">
+              <div className="flex items-center gap-2 px-3 py-2.5">
                 <span className="h-3.5 w-3.5 shrink-0 rounded-full" style={{ backgroundColor: t.color || '#64748b' }} />
                 <span className="flex-1 truncate font-medium">{t.name}</span>
                 <span className="text-xs text-slate-400">{strings.tagManage.used(usage[t.name] || 0)}</span>
+                {/* Reorder */}
+                <div className="flex flex-col">
+                  <button
+                    onClick={() => moveTag(t.id, 'up')}
+                    disabled={i === 0}
+                    className="text-slate-400 hover:text-brand-600 disabled:opacity-25"
+                    aria-label={strings.common.moveUp}
+                  >
+                    <ChevronUp size={16} />
+                  </button>
+                  <button
+                    onClick={() => moveTag(t.id, 'down')}
+                    disabled={i === tags.length - 1}
+                    className="text-slate-400 hover:text-brand-600 disabled:opacity-25"
+                    aria-label={strings.common.moveDown}
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                </div>
                 <button
                   onClick={() => (editing ? closeEdit() : startEdit(t))}
                   className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-slate-800"

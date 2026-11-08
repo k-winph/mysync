@@ -10,6 +10,7 @@ const en = {
   common: {
     add: 'Add', edit: 'Edit', delete: 'Delete', save: 'Save', cancel: 'Cancel',
     confirm: 'Confirm', close: 'Close', optional: 'optional', all: 'All', none: 'None', today: 'Today', total: 'Total',
+    moveUp: 'Move up', moveDown: 'Move down',
   },
 
   balance: {
@@ -391,6 +392,7 @@ const th = {
   common: {
     add: 'เพิ่ม', edit: 'แก้ไข', delete: 'ลบ', save: 'บันทึก', cancel: 'ยกเลิก',
     confirm: 'ยืนยัน', close: 'ปิด', optional: 'ไม่บังคับ', all: 'ทั้งหมด', none: 'ไม่มี', today: 'วันนี้', total: 'รวม',
+    moveUp: 'เลื่อนขึ้น', moveDown: 'เลื่อนลง',
   },
 
   balance: {

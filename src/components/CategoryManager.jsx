@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Plus, Trash2, Pin, PinOff, Eye, EyeOff, Pencil } from 'lucide-react'
+import { Plus, Trash2, Pin, PinOff, Eye, EyeOff, Pencil, ChevronUp, ChevronDown } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { categoryUsage } from '../store/categoryOps'
 import { strings } from '../constants/strings'
@@ -25,6 +25,7 @@ export default function CategoryManager({ open, onClose }) {
   const updateCategory = useStore((s) => s.updateCategory)
   const deleteCategory = useStore((s) => s.deleteCategory)
   const mergeCategory = useStore((s) => s.mergeCategory)
+  const moveCategory = useStore((s) => s.moveCategory)
   const transactions = useStore((s) => s.transactions)
   const debts = useStore((s) => s.debts)
   const recurringIncomes = useStore((s) => s.recurringIncomes)
@@ -43,13 +44,22 @@ export default function CategoryManager({ open, onClose }) {
   const [editingId, setEditingId] = useState(null)
   const [showArchived, setShowArchived] = useState(false)
 
-  // Pinned first, then insertion order (stable sort); hidden ones only when the
-  // "show hidden" toggle is on.
-  const list = useMemo(() => {
-    const visible = categories.filter((c) => showArchived || !c.archived)
-    return [...visible].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0))
+  // Group by type (the add-form shows one type at a time), and within each type
+  // put pinned first then manual order — exactly how the form lists them, so the
+  // up/down arrows here move an item the same way the form will show it.
+  const groups = useMemo(() => {
+    const order = ['expense', 'income', 'both']
+    return order
+      .map((type) => {
+        const items = categories
+          .filter((c) => c.type === type && (showArchived || !c.archived))
+          .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0))
+        return { type, items }
+      })
+      .filter((g) => g.items.length > 0)
   }, [categories, showArchived])
 
+  const typeLabel = (t) => (t === 'both' ? strings.category.both : t === 'income' ? strings.tx.income : strings.tx.expense)
   const hiddenCount = categories.filter((c) => c.archived).length
 
   const resetForm = () => {
@@ -85,88 +95,118 @@ export default function CategoryManager({ open, onClose }) {
 
   return (
     <Modal open={open} onClose={onClose} title={strings.category.manage}>
-      {/* Existing list */}
-      <div className="mb-3 space-y-1">
-        {list.map((c) => {
-          const editing = editingId === c.id
-          const mergeTargets = categories.filter(
-            (x) => x.id !== c.id && !x.archived && (x.type === c.type || x.type === 'both' || c.type === 'both')
-          )
-          return (
-            <div key={c.id} className={`rounded-xl border dark:border-slate-700 ${editing ? 'border-slate-300 dark:border-slate-600' : 'border-transparent'}`}>
-              <div className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">
-                <span
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-white ${c.archived ? 'opacity-40' : ''}`}
-                  style={{ backgroundColor: c.color }}
-                >
-                  <CategoryIcon name={c.icon} size={16} />
-                </span>
-                <div className="flex-1 min-w-0">
-                  <span className={`font-medium ${c.archived ? 'text-slate-400' : ''}`}>{c.name}</span>
-                  {c.pinned && !c.archived && (
-                    <span className="ml-1.5 text-[10px] font-semibold uppercase text-brand-600">{strings.category.pinnedBadge}</span>
-                  )}
-                  {c.archived && (
-                    <span className="ml-1.5 text-[10px] font-semibold uppercase text-slate-400">{strings.category.archivedBadge}</span>
-                  )}
-                  <span className="ml-2 text-xs text-slate-400">{strings.category.used(usage[c.id] || 0)}</span>
-                </div>
-                {/* Quick pin toggle (hidden categories can't be pinned) */}
-                {!c.archived && (
-                  <button
-                    onClick={() => updateCategory(c.id, { pinned: !c.pinned })}
-                    className={`rounded-lg p-1.5 transition hover:bg-slate-200 dark:hover:bg-slate-700 ${c.pinned ? 'text-brand-600' : 'text-slate-400'}`}
-                    aria-label={c.pinned ? strings.category.unpin : strings.category.pin}
-                  >
-                    {c.pinned ? <Pin size={15} /> : <PinOff size={15} />}
-                  </button>
-                )}
-                <button
-                  onClick={() => setEditingId(editing ? null : c.id)}
-                  className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-200 hover:text-brand-600 dark:hover:bg-slate-700"
-                  aria-label={strings.category.edit}
-                >
-                  <Pencil size={15} />
-                </button>
-              </div>
-
-              {/* Edit panel */}
-              {editing && (
-                <div className="space-y-3 border-t border-slate-100 px-3 py-3 dark:border-slate-800">
-                  {/* Archive toggle */}
-                  <div>
-                    <button
-                      onClick={() => updateCategory(c.id, { archived: !c.archived, pinned: c.archived ? c.pinned : false })}
-                      className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300"
+      {/* Existing list — grouped by type, pinned first */}
+      <div className="mb-3 space-y-3">
+        {groups.map((g) => (
+          <div key={g.type} className="space-y-1">
+            <p className="px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">{typeLabel(g.type)}</p>
+            {g.items.map((c) => {
+              const editing = editingId === c.id
+              const peers = g.items.filter((x) => !x.archived && !!x.pinned === !!c.pinned)
+              const pi = peers.findIndex((x) => x.id === c.id)
+              const canUp = !c.archived && pi > 0
+              const canDown = !c.archived && pi >= 0 && pi < peers.length - 1
+              const mergeTargets = categories.filter(
+                (x) => x.id !== c.id && !x.archived && (x.type === c.type || x.type === 'both' || c.type === 'both')
+              )
+              return (
+                <div key={c.id} className={`rounded-xl border dark:border-slate-700 ${editing ? 'border-slate-300 dark:border-slate-600' : 'border-transparent'}`}>
+                  <div className="flex items-center gap-2 rounded-xl px-2 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <span
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white ${c.archived ? 'opacity-40' : ''}`}
+                      style={{ backgroundColor: c.color }}
                     >
-                      {c.archived ? <Eye size={16} /> : <EyeOff size={16} />}
-                      {c.archived ? strings.category.unarchive : strings.category.archive}
+                      <CategoryIcon name={c.icon} size={16} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <span className={`font-medium ${c.archived ? 'text-slate-400' : ''}`}>{c.name}</span>
+                      {c.pinned && !c.archived && (
+                        <span className="ml-1.5 text-[10px] font-semibold uppercase text-brand-600">{strings.category.pinnedBadge}</span>
+                      )}
+                      {c.archived && (
+                        <span className="ml-1.5 text-[10px] font-semibold uppercase text-slate-400">{strings.category.archivedBadge}</span>
+                      )}
+                      <span className="ml-2 text-xs text-slate-400">{strings.category.used(usage[c.id] || 0)}</span>
+                    </div>
+                    {/* Reorder (active categories only) */}
+                    {!c.archived && (
+                      <div className="flex flex-col">
+                        <button
+                          onClick={() => moveCategory(c.id, 'up')}
+                          disabled={!canUp}
+                          className="text-slate-400 hover:text-brand-600 disabled:opacity-25"
+                          aria-label={strings.common.moveUp}
+                        >
+                          <ChevronUp size={16} />
+                        </button>
+                        <button
+                          onClick={() => moveCategory(c.id, 'down')}
+                          disabled={!canDown}
+                          className="text-slate-400 hover:text-brand-600 disabled:opacity-25"
+                          aria-label={strings.common.moveDown}
+                        >
+                          <ChevronDown size={16} />
+                        </button>
+                      </div>
+                    )}
+                    {/* Quick pin toggle (hidden categories can't be pinned) */}
+                    {!c.archived && (
+                      <button
+                        onClick={() => updateCategory(c.id, { pinned: !c.pinned })}
+                        className={`rounded-lg p-1.5 transition hover:bg-slate-200 dark:hover:bg-slate-700 ${c.pinned ? 'text-brand-600' : 'text-slate-400'}`}
+                        aria-label={c.pinned ? strings.category.unpin : strings.category.pin}
+                      >
+                        {c.pinned ? <Pin size={15} /> : <PinOff size={15} />}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setEditingId(editing ? null : c.id)}
+                      className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-200 hover:text-brand-600 dark:hover:bg-slate-700"
+                      aria-label={strings.category.edit}
+                    >
+                      <Pencil size={15} />
                     </button>
-                    <p className="mt-1 text-xs text-slate-400">{strings.category.archiveHint}</p>
                   </div>
 
-                  {/* Merge */}
-                  {mergeTargets.length > 0 && (
-                    <div>
-                      <label className="mb-1 block text-xs font-semibold text-slate-500">{strings.category.mergeInto}</label>
-                      <select value="" onChange={(e) => handleMerge(c.id, e.target.value)} className="input-base">
-                        <option value="">{strings.category.mergeNone}</option>
-                        {mergeTargets.map((x) => (
-                          <option key={x.id} value={x.id}>{x.name}</option>
-                        ))}
-                      </select>
-                      <p className="mt-1 text-xs text-slate-400">{strings.category.mergeHint}</p>
+                  {/* Edit panel */}
+                  {editing && (
+                    <div className="space-y-3 border-t border-slate-100 px-3 py-3 dark:border-slate-800">
+                      {/* Archive toggle */}
+                      <div>
+                        <button
+                          onClick={() => updateCategory(c.id, { archived: !c.archived, pinned: c.archived ? c.pinned : false })}
+                          className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300"
+                        >
+                          {c.archived ? <Eye size={16} /> : <EyeOff size={16} />}
+                          {c.archived ? strings.category.unarchive : strings.category.archive}
+                        </button>
+                        <p className="mt-1 text-xs text-slate-400">{strings.category.archiveHint}</p>
+                      </div>
+
+                      {/* Merge */}
+                      {mergeTargets.length > 0 && (
+                        <div>
+                          <label className="mb-1 block text-xs font-semibold text-slate-500">{strings.category.mergeInto}</label>
+                          <select value="" onChange={(e) => handleMerge(c.id, e.target.value)} className="input-base">
+                            <option value="">{strings.category.mergeNone}</option>
+                            {mergeTargets.map((x) => (
+                              <option key={x.id} value={x.id}>{x.name}</option>
+                            ))}
+                          </select>
+                          <p className="mt-1 text-xs text-slate-400">{strings.category.mergeHint}</p>
+                        </div>
+                      )}
+
+                      <button onClick={() => handleDelete(c)} className="flex items-center gap-1.5 text-sm font-medium text-red-600">
+                        <Trash2 size={15} /> {strings.common.delete}
+                      </button>
                     </div>
                   )}
-
-                  <button onClick={() => handleDelete(c)} className="flex items-center gap-1.5 text-sm font-medium text-red-600">
-                    <Trash2 size={15} /> {strings.common.delete}
-                  </button>
                 </div>
-              )}
-            </div>
-          )
-        })}
+              )
+            })}
+          </div>
+        ))}
       </div>
 
       {/* Show/hide archived toggle */}

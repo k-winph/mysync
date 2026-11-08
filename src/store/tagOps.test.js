@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { rewriteTagName } from './tagOps'
+import { rewriteTagName, reorderTag } from './tagOps'
 
 const state = () => ({
   transactions: [
@@ -10,6 +10,20 @@ const state = () => ({
   ],
   debts: [{ id: 'd1', tags: ['food'] }],
   recurringIncomes: [{ id: 'r1', tags: ['work', 'salary'] }],
+})
+
+describe('reorderTag', () => {
+  const tags = () => [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
+  it('moves a tag down', () => {
+    expect(reorderTag(tags(), 'a', 'down').map((t) => t.id)).toEqual(['b', 'a', 'c'])
+  })
+  it('moves a tag up', () => {
+    expect(reorderTag(tags(), 'c', 'up').map((t) => t.id)).toEqual(['a', 'c', 'b'])
+  })
+  it('is a no-op at the edges', () => {
+    expect(reorderTag(tags(), 'a', 'up')).toEqual(tags())
+    expect(reorderTag(tags(), 'c', 'down')).toEqual(tags())
+  })
 })
 
 describe('rewriteTagName', () => {
