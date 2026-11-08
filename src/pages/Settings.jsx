@@ -546,7 +546,7 @@ export default function Settings() {
         <input
           ref={fileRef}
           type="file"
-          accept=".xlsx,.xls,.csv,.json"
+          accept=".xlsx,.xls,.csv,.json,.txt"
           className="hidden"
           onChange={onPickFile}
         />

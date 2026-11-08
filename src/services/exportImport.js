@@ -272,9 +272,14 @@ function buildBackupJSON({
   })
 }
 
-function backupJSONFile(data) {
-  return new File([buildBackupJSON(data)], `mysync-backup-${stamp()}.json`, {
-    type: 'application/json',
+// File used specifically for the OS share sheet. Android's Web Share allowlist
+// REJECTS application/json (.json), so canShare() returns false and the share
+// silently falls back to a download. Plain text (.txt) is on the allowlist
+// everywhere, so we share the exact same JSON payload as a .txt — it still
+// re-imports fine (importFile accepts .txt and parses it as JSON).
+function backupShareFile(data) {
+  return new File([buildBackupJSON(data)], `mysync-backup-${stamp()}.txt`, {
+    type: 'text/plain',
   })
 }
 
@@ -290,7 +295,7 @@ export function downloadBackupJSON(data) {
  * should treat that as "no backup made" and stay silent.
  */
 export async function shareBackup(data) {
-  const file = backupJSONFile(data)
+  const file = backupShareFile(data)
   if (!(navigator.canShare && navigator.canShare({ files: [file] }))) {
     downloadBackupJSON(data)
     return 'downloaded'
@@ -312,7 +317,9 @@ export function exportCSV({ transactions }) {
 // CSV imports only bring transactions (categories stay as-is).
 export function importFile(file) {
   const name = file.name.toLowerCase()
-  if (name.endsWith('.json')) return importJSON(file)
+  // .txt is accepted too: cloud backups are shared as .txt (see backupShareFile),
+  // and their contents are the same JSON payload.
+  if (name.endsWith('.json') || name.endsWith('.txt')) return importJSON(file)
   if (name.endsWith('.csv')) return importCSV(file)
   if (name.endsWith('.xlsx') || name.endsWith('.xls')) return importExcel(file)
   return Promise.reject(new Error('Unsupported file type'))
