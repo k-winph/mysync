@@ -123,6 +123,41 @@ export const useStore = create(
       restoreTransaction: (tx) =>
         set((s) => ({ transactions: [tx, ...s.transactions.filter((t) => t.id !== tx.id)] })),
 
+      // Put several just-deleted transactions back (undo for a split group).
+      restoreTransactions: (txs) =>
+        set((s) => {
+          const ids = new Set(txs.map((t) => t.id))
+          return { transactions: [...txs, ...s.transactions.filter((t) => !ids.has(t.id))] }
+        }),
+
+      // --- Split transactions ----------------------------------------------
+      // A "split" is one purchase recorded across several categories. We store
+      // each portion as a normal transaction linked by a shared `splitGroupId`,
+      // so every total / chart / filter keeps working unchanged. Portions share
+      // type, date, note and tags; each has its own categoryId + amount.
+      addSplit: ({ type, date, note = '', tags = [], splits = [] }) =>
+        set((s) => {
+          const splitGroupId = uuid()
+          const created = splits.map((sp) =>
+            withStamps({ type, amount: sp.amount, categoryId: sp.categoryId, tags, note, date, splitGroupId })
+          )
+          return { transactions: [...created, ...s.transactions] }
+        }),
+
+      // Replace a split group's portions (edit). Drops the old portions and
+      // recreates the group with the same id.
+      updateSplit: (splitGroupId, { type, date, note = '', tags = [], splits = [] }) =>
+        set((s) => {
+          const others = s.transactions.filter((t) => t.splitGroupId !== splitGroupId)
+          const created = splits.map((sp) =>
+            withStamps({ type, amount: sp.amount, categoryId: sp.categoryId, tags, note, date, splitGroupId })
+          )
+          return { transactions: [...created, ...others] }
+        }),
+
+      deleteSplit: (splitGroupId) =>
+        set((s) => ({ transactions: s.transactions.filter((t) => t.splitGroupId !== splitGroupId) })),
+
       // --- Categories ------------------------------------------------------
       addCategory: (data) =>
         set((s) => ({

@@ -60,6 +60,11 @@ const en = {
     makeRecurring: 'Make this a recurring income',
     makeRecurringHint: 'We’ll log this income automatically each period, starting next cycle. Manage it under Records → recurring income.',
     recurringSaved: 'Saved · recurring income set up',
+    splitOn: 'Split across categories', splitOff: 'Back to a single entry', splitMode: 'Split',
+    splitByCategory: 'Split by category', splitAddLine: 'Add category',
+    splitNeedTwo: 'Add at least two categories with an amount.',
+    splitTitle: (n) => `Split · ${n} categories`,
+    splitBadge: (n) => `Split ${n}`,
   },
 
   filter: {
@@ -452,6 +457,11 @@ const th = {
     makeRecurring: 'ตั้งเป็นรายรับประจำ',
     makeRecurringHint: 'ระบบจะบันทึกรายรับนี้ให้อัตโนมัติทุกงวด เริ่มงวดถัดไป · จัดการได้ที่ รายการ → รายรับประจำ',
     recurringSaved: 'บันทึกแล้ว · ตั้งรายรับประจำให้แล้ว',
+    splitOn: 'แยกหลายหมวด', splitOff: 'กลับเป็นรายการเดียว', splitMode: 'แยกหมวด',
+    splitByCategory: 'แยกตามหมวด', splitAddLine: 'เพิ่มหมวด',
+    splitNeedTwo: 'ใส่อย่างน้อย 2 หมวดพร้อมจำนวนเงิน',
+    splitTitle: (n) => `แยก ${n} หมวด`,
+    splitBadge: (n) => `แยก ${n}`,
   },
 
   filter: {

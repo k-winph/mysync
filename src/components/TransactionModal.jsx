@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { addPeriod } from '../utils/date'
@@ -9,18 +10,55 @@ import { useToast } from './ui/Feedback'
 
 // Shared add/edit modal so both the Transactions page and the Dashboard
 // quick-add can reuse the same form + save/delete logic.
-// `editing` = a transaction to edit, or null/undefined to add a new one.
+// `editing` = a transaction to edit (for a split, its representative portion,
+// which carries splitGroupId), or null/undefined to add a new one.
 export default function TransactionModal({ open, editing, onClose }) {
+  const transactions = useStore((s) => s.transactions)
   const addTransaction = useStore((s) => s.addTransaction)
   const updateTransaction = useStore((s) => s.updateTransaction)
   const deleteTransaction = useStore((s) => s.deleteTransaction)
   const restoreTransaction = useStore((s) => s.restoreTransaction)
+  const restoreTransactions = useStore((s) => s.restoreTransactions)
   const addRecurringIncome = useStore((s) => s.addRecurringIncome)
+  const addSplit = useStore((s) => s.addSplit)
+  const updateSplit = useStore((s) => s.updateSplit)
+  const deleteSplit = useStore((s) => s.deleteSplit)
   const categories = useStore((s) => s.categories)
   const toast = useToast()
 
-  // `recurring` is form-only metadata — strip it before saving the transaction.
-  const handleSubmit = ({ recurring, ...data }) => {
+  // When editing a split, gather its portions and hand the form a split-shaped
+  // `initial` so it opens in split mode with every line preloaded.
+  const splitGroupId = editing?.splitGroupId || null
+  const groupParts = useMemo(
+    () => (splitGroupId ? transactions.filter((t) => t.splitGroupId === splitGroupId) : null),
+    [transactions, splitGroupId]
+  )
+  const isSplitEdit = !!(groupParts && groupParts.length > 0)
+
+  const formInitial = isSplitEdit
+    ? {
+        __splitGroupId: splitGroupId,
+        type: groupParts[0].type,
+        date: groupParts[0].date,
+        note: groupParts[0].note,
+        tags: groupParts[0].tags,
+        splits: groupParts.map((t) => ({ categoryId: t.categoryId, amount: t.amount })),
+      }
+    : editing
+
+  // `__split` / `recurring` are form-only metadata.
+  const handleSubmit = ({ __split, recurring, ...data }) => {
+    if (__split) {
+      if (isSplitEdit) {
+        updateSplit(splitGroupId, data)
+        toast(strings.toast.updated)
+      } else {
+        addSplit(data)
+        toast(strings.toast.saved)
+      }
+      onClose()
+      return
+    }
     if (editing) {
       updateTransaction(editing.id, data)
       toast(strings.toast.updated)
@@ -48,11 +86,19 @@ export default function TransactionModal({ open, editing, onClose }) {
   // Delete right away, but offer Undo — friendlier than a confirm dialog.
   const handleDelete = () => {
     if (!editing) return
-    const tx = editing
-    deleteTransaction(tx.id)
-    toast(strings.toast.deleted, {
-      action: { label: strings.toast.undo, onClick: () => restoreTransaction(tx) },
-    })
+    if (isSplitEdit) {
+      const parts = groupParts
+      deleteSplit(splitGroupId)
+      toast(strings.toast.deleted, {
+        action: { label: strings.toast.undo, onClick: () => restoreTransactions(parts) },
+      })
+    } else {
+      const tx = editing
+      deleteTransaction(tx.id)
+      toast(strings.toast.deleted, {
+        action: { label: strings.toast.undo, onClick: () => restoreTransaction(tx) },
+      })
+    }
     onClose()
   }
 
@@ -62,7 +108,7 @@ export default function TransactionModal({ open, editing, onClose }) {
       onClose={onClose}
       title={editing ? strings.tx.editTitle : strings.tx.addTitle}
     >
-      <TransactionForm initial={editing} onSubmit={handleSubmit} onCancel={onClose} />
+      <TransactionForm initial={formInitial} onSubmit={handleSubmit} onCancel={onClose} />
       {editing && (
         <Button variant="danger" className="mt-3 w-full" onClick={handleDelete}>
           <Trash2 size={18} /> {strings.common.delete}

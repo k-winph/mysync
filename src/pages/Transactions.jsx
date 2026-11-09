@@ -9,7 +9,9 @@ import { strings } from '../constants/strings'
 import { formatDate, currentMonth, monthLabel } from '../utils/date'
 import MoneyText from '../components/MoneyText'
 import TransactionItem from '../components/TransactionItem'
+import SplitRow from '../components/SplitRow'
 import TransactionModal from '../components/TransactionModal'
+import { groupDaySplits } from '../utils/txGroups'
 import CategoryManager from '../components/CategoryManager'
 import TagSummary from '../components/TagSummary'
 import PageHeader from '../components/PageHeader'
@@ -125,7 +127,8 @@ export default function Transactions() {
     )
     const groups = {}
     for (const t of sorted) (groups[t.date] ||= []).push(t)
-    return Object.entries(groups)
+    // Collapse split purchases into a single group item per day.
+    return Object.entries(groups).map(([date, items]) => [date, groupDaySplits(items)])
   }, [transactions, month, filters, catNameById])
 
   const openNew = () => {
@@ -405,9 +408,13 @@ export default function Transactions() {
               </p>
               <div className="rounded-2xl border border-slate-200 bg-white p-1
                 dark:border-slate-800 dark:bg-slate-900">
-                {items.map((tx) => (
-                  <TransactionItem key={tx.id} tx={tx} onEdit={openEdit} onDelete={handleDelete} />
-                ))}
+                {items.map((it) =>
+                  it.__group ? (
+                    <SplitRow key={it.splitGroupId} group={it} onEdit={openEdit} />
+                  ) : (
+                    <TransactionItem key={it.id} tx={it} onEdit={openEdit} onDelete={handleDelete} />
+                  )
+                )}
               </div>
             </div>
           ))}

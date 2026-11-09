@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { parseMoney, satangToInput } from '../utils/money'
+import { parseMoney, satangToInput, formatMoney } from '../utils/money'
 import { todayISO } from '../utils/date'
 import { pickableCategories } from '../utils/category'
-import { Plus, Check, Repeat } from 'lucide-react'
+import { Plus, Check, Repeat, Layers, X } from 'lucide-react'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
 import DateInput from './ui/DateInput'
@@ -16,6 +16,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
   const categories = useStore((s) => s.categories)
   const tagList = useStore((s) => s.tags)
   const addTag = useStore((s) => s.addTag)
+  const primary = useStore((s) => s.settings.primaryCurrency)
 
   const [type, setType] = useState(initial?.type || 'expense')
   const [amount, setAmount] = useState(initial ? formatMoneyInput(satangToInput(initial.amount)) : '')
@@ -29,7 +30,24 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
   // "Also make this a recurring income" — only offered when adding a new income.
   const [makeRecurring, setMakeRecurring] = useState(false)
   const [recurringFreq, setRecurringFreq] = useState('monthly')
-  const isNewIncome = type === 'income' && !initial
+
+  // Split-into-categories mode. Editing an existing split starts locked in this
+  // mode with its portions preloaded; a brand-new entry can toggle it on.
+  const isEditingSplit = !!initial?.__splitGroupId
+  const canToggleSplit = !initial
+  const [splitMode, setSplitMode] = useState(isEditingSplit)
+  const [splitLines, setSplitLines] = useState(() =>
+    isEditingSplit
+      ? initial.splits.map((sp) => ({ categoryId: sp.categoryId, amount: formatMoneyInput(satangToInput(sp.amount)) }))
+      : [{ categoryId: '', amount: '' }, { categoryId: '', amount: '' }]
+  )
+  const splitTotal = splitLines.reduce((sum, l) => sum + (parseMoney(l.amount) || 0), 0)
+
+  const isNewIncome = type === 'income' && !initial && !splitMode
+
+  const setLine = (i, patch) => setSplitLines((lines) => lines.map((l, j) => (j === i ? { ...l, ...patch } : l)))
+  const addLine = () => setSplitLines((lines) => [...lines, { categoryId: '', amount: '' }])
+  const removeLine = (i) => setSplitLines((lines) => (lines.length > 1 ? lines.filter((_, j) => j !== i) : lines))
 
   // Toggle a tag name in/out of the selection.
   const toggleTag = (name) =>
@@ -53,6 +71,24 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (splitMode) {
+      const splits = splitLines
+        .map((l) => ({ categoryId: l.categoryId, amount: parseMoney(l.amount) }))
+        .filter((l) => l.categoryId && l.amount > 0)
+      if (splits.length < 2) {
+        setError(strings.tx.splitNeedTwo)
+        return
+      }
+      onSubmit({
+        __split: true,
+        type,
+        tags: selectedTags,
+        note: note.trim(),
+        date,
+        splits,
+      })
+      return
+    }
     const satang = parseMoney(amount)
     if (satang <= 0) {
       setError(strings.tx.amount + ' > 0')
@@ -85,6 +121,8 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
               setType(t)
               setCategoryId('') // reset category when switching type
               if (t === 'expense') setMakeRecurring(false)
+              // Category sets differ by type, so clear the split picks too.
+              setSplitLines((lines) => lines.map((l) => ({ ...l, categoryId: '' })))
             }}
             className={`rounded-lg py-2 text-sm font-semibold transition ${
               type === t
@@ -99,48 +137,115 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
         ))}
       </div>
 
-      {/* Amount */}
-      <div>
-        <label className="mb-1 block text-sm font-medium">{strings.tx.amount}</label>
-        <MoneyInput
-          value={amount}
-          onChange={setAmount}
-          placeholder="0.00"
-          className="input-base text-lg font-semibold"
-          autoFocus
-        />
-      </div>
-
-      {/* Category grid */}
-      <div>
-        <label className="mb-1 block text-sm font-medium">{strings.tx.category}</label>
-        <div className="grid grid-cols-4 gap-2">
-          {options.map((c) => {
-            const active = c.id === categoryId
-            return (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setCategoryId(c.id)}
-                className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-[11px]
-                  transition ${
-                    active
-                      ? 'border-brand-500 bg-brand-50 dark:bg-brand-600/20'
-                      : 'border-slate-200 dark:border-slate-700'
-                  }`}
-              >
-                <span
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-white"
-                  style={{ backgroundColor: c.color }}
-                >
-                  <CategoryIcon name={c.icon} size={16} />
-                </span>
-                <span className="truncate w-full text-center">{c.name}</span>
-              </button>
-            )
-          })}
+      {/* Split-into-categories control */}
+      {(canToggleSplit || isEditingSplit) && (
+        <div>
+          {canToggleSplit ? (
+            <button
+              type="button"
+              onClick={() => setSplitMode((v) => !v)}
+              className="flex items-center gap-1.5 text-sm font-medium text-brand-600"
+            >
+              <Layers size={15} /> {splitMode ? strings.tx.splitOff : strings.tx.splitOn}
+            </button>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-600 dark:bg-brand-600/15">
+              <Layers size={13} /> {strings.tx.splitMode}
+            </div>
+          )}
         </div>
-      </div>
+      )}
+
+      {splitMode ? (
+        /* Split lines — one category + amount per row, with a running total */
+        <div>
+          <label className="mb-1 block text-sm font-medium">{strings.tx.splitByCategory}</label>
+          <div className="space-y-2">
+            {splitLines.map((l, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <select
+                  value={l.categoryId}
+                  onChange={(e) => setLine(i, { categoryId: e.target.value })}
+                  className="input-base min-w-0 flex-1"
+                >
+                  <option value="">{strings.tx.pickCategory}</option>
+                  {options.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+                <div className="w-28 shrink-0">
+                  <MoneyInput value={l.amount} onChange={(v) => setLine(i, { amount: v })} placeholder="0.00" className="input-base" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeLine(i)}
+                  disabled={splitLines.length <= 1}
+                  className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:text-red-600 disabled:opacity-25"
+                  aria-label={strings.common.delete}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={addLine}
+            className="mt-2 flex items-center gap-1 text-sm font-medium text-brand-600"
+          >
+            <Plus size={15} /> {strings.tx.splitAddLine}
+          </button>
+          <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 text-sm dark:border-slate-800">
+            <span className="text-slate-500">{strings.common.total}</span>
+            <span className="font-bold">{formatMoney(splitTotal, primary)}</span>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Amount */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">{strings.tx.amount}</label>
+            <MoneyInput
+              value={amount}
+              onChange={setAmount}
+              placeholder="0.00"
+              className="input-base text-lg font-semibold"
+              autoFocus
+            />
+          </div>
+
+          {/* Category grid */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">{strings.tx.category}</label>
+            <div className="grid grid-cols-4 gap-2">
+              {options.map((c) => {
+                const active = c.id === categoryId
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setCategoryId(c.id)}
+                    className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-[11px]
+                      transition ${
+                        active
+                          ? 'border-brand-500 bg-brand-50 dark:bg-brand-600/20'
+                          : 'border-slate-200 dark:border-slate-700'
+                      }`}
+                  >
+                    <span
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-white"
+                      style={{ backgroundColor: c.color }}
+                    >
+                      <CategoryIcon name={c.icon} size={16} />
+                    </span>
+                    <span className="truncate w-full text-center">{c.name}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Date */}
       <div>
