@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, CalendarClock, TrendingUp, FlaskConical, Trash2, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, CalendarClock, TrendingUp, FlaskConical, Trash2, Snowflake, PartyPopper, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { ACCENTS } from '../constants/accents'
@@ -321,6 +321,54 @@ export default function Settings() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Seasonal background effect */}
+          <div className="flex items-center gap-3 py-2">
+            <Snowflake size={20} className="shrink-0 text-slate-500" />
+            <div className="min-w-0 flex-1">
+              <div className="font-medium">{strings.settings.seasonalEffect}</div>
+              <p className="text-xs text-slate-400">{strings.settings.seasonalHint}</p>
+            </div>
+            <select
+              value={settings.seasonalEffect || 'off'}
+              onChange={(e) => updateSettings({ seasonalEffect: e.target.value })}
+              className="shrink-0 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm
+                dark:border-slate-700 dark:bg-slate-900"
+            >
+              <option value="off">{strings.settings.seasonOff}</option>
+              <option value="auto">{strings.settings.seasonAuto}</option>
+              <option value="snow">{strings.settings.seasonSnow}</option>
+              <option value="leaves">{strings.settings.seasonLeaves}</option>
+              <option value="sakura">{strings.settings.seasonSakura}</option>
+              <option value="rain">{strings.settings.seasonRain}</option>
+              <option value="sparkle">{strings.settings.seasonSparkle}</option>
+              <option value="hearts">{strings.settings.seasonHearts}</option>
+            </select>
+          </div>
+
+          {/* Celebration confetti */}
+          <div className="flex items-center gap-3 py-2">
+            <PartyPopper size={20} className="shrink-0 text-slate-500" />
+            <div className="min-w-0 flex-1">
+              <div className="font-medium">{strings.settings.celebrations}</div>
+              <p className="text-xs text-slate-400">{strings.settings.celebrationsHint}</p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={settings.celebrations !== false}
+              onClick={() => updateSettings({ celebrations: settings.celebrations === false })}
+              className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+                settings.celebrations !== false ? 'bg-brand-600' : 'bg-slate-300 dark:bg-slate-700'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition ${
+                  settings.celebrations !== false ? 'left-[22px]' : 'left-0.5'
+                }`}
+              />
+            </button>
           </div>
 
           {/* Language */}

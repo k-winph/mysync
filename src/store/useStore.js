@@ -74,6 +74,8 @@ const DEFAULT_SETTINGS = {
   showInvestments: true, // show the Investments card on the dashboard
   showSavings: true, // show the Savings goals card on the dashboard
   showTrend: true, // show the monthly trend chart on the dashboard
+  seasonalEffect: 'off', // background particles: 'off' | 'auto' | snow|leaves|sakura|rain|sparkle|hearts
+  celebrations: true, // confetti burst on goal reached / debt paid / installment complete
 }
 
 export const useStore = create(

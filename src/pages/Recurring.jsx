@@ -12,6 +12,7 @@ import DebtModal from '../components/DebtModal'
 import PageHeader from '../components/PageHeader'
 import { useToast } from '../components/ui/Feedback'
 import { haptic } from '../utils/haptics'
+import { useCelebrate } from '../components/Celebration'
 
 function RecurringCard({ item, onEdit, onPay }) {
   const days = daysUntil(item.dueDate)
@@ -56,6 +57,7 @@ export default function Recurring() {
   const payRecurring = useStore((s) => s.payRecurring)
   const primary = useStore((s) => s.settings.primaryCurrency)
   const toast = useToast()
+  const celebrate = useCelebrate()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
@@ -72,6 +74,8 @@ export default function Recurring() {
     haptic()
     payRecurring(id)
     toast(`${strings.toast.paid} · ${formatMoney(it?.amount || 0, primary)}`)
+    // A routine monthly payment — a light celebration, kept small on purpose.
+    celebrate('small')
   }
 
   const openNew = () => {

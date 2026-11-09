@@ -10,6 +10,9 @@ import LockScreen from './components/LockScreen'
 import Dashboard from './pages/Dashboard'
 import Welcome from './components/Welcome'
 import PwaUpdatePrompt from './components/PwaUpdatePrompt'
+import SeasonalEffect from './components/SeasonalEffect'
+import { resolveSeasonType } from './utils/season'
+import { useReducedMotion } from './hooks/useReducedMotion'
 
 // Dashboard is the landing screen, so it stays in the main bundle for an
 // instant first paint. Every other screen is code-split and loaded on demand —
@@ -53,6 +56,13 @@ export default function App() {
   const pinEnabled = useStore((s) => s.settings.pinEnabled)
   const accent = useStore((s) => s.settings.accent)
   const autoLockMinutes = useStore((s) => s.settings.autoLockMinutes)
+  const seasonalEffect = useStore((s) => s.settings.seasonalEffect)
+  const animSpeed = useStore((s) => s.settings.animSpeed)
+
+  // Resolve the seasonal-effect setting to an actual particle type, respecting
+  // the reduce-motion preference and the global "animations off" switch.
+  const reduceMotion = useReducedMotion()
+  const seasonType = (reduceMotion || animSpeed === 'off') ? null : resolveSeasonType(seasonalEffect)
 
   // Apply the active language before children render so `strings.x` (a live
   // Proxy) resolves to it. Subscribing to `language` re-renders the whole tree
@@ -199,6 +209,7 @@ export default function App() {
       </Suspense>
       <Welcome />
       <PwaUpdatePrompt />
+      {seasonType && <SeasonalEffect type={seasonType} />}
     </>
   )
 }

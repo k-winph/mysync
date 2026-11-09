@@ -6,6 +6,7 @@ import Modal from './ui/Modal'
 import Button from './ui/Button'
 import MoneyInput from './ui/MoneyInput'
 import { useToast } from './ui/Feedback'
+import { useCelebrate } from './Celebration'
 
 // Quick "add money" sheet for a savings goal. Adds to currentAmount (clamped
 // at 0 in the store). Corrections/withdrawals go through editing the goal.
@@ -13,6 +14,7 @@ export default function AddFundsModal({ open, goal, onClose }) {
   const addToGoal = useStore((s) => s.addToGoal)
   const primary = useStore((s) => s.settings.primaryCurrency)
   const toast = useToast()
+  const celebrate = useCelebrate()
   const [amount, setAmount] = useState('')
 
   if (!goal) return null
@@ -21,8 +23,14 @@ export default function AddFundsModal({ open, goal, onClose }) {
     e.preventDefault()
     const cents = parseMoney(amount)
     if (cents > 0) {
+      // Celebrate the moment this top-up carries the goal to (or past) its target.
+      const justReached =
+        goal.targetAmount > 0 &&
+        goal.currentAmount < goal.targetAmount &&
+        goal.currentAmount + cents >= goal.targetAmount
       addToGoal(goal.id, cents)
       toast(`${strings.toast.added} · ${formatMoney(cents, primary)}`)
+      if (justReached) celebrate('big')
     }
     setAmount('')
     onClose()

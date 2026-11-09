@@ -12,6 +12,7 @@ import NotificationBell from '../components/NotificationBell'
 import PageHeader from '../components/PageHeader'
 import { useToast } from '../components/ui/Feedback'
 import { haptic } from '../utils/haptics'
+import { useCelebrate } from '../components/Celebration'
 
 function dueStatus(dueDate) {
   const d = daysUntil(dueDate)
@@ -118,6 +119,7 @@ export default function Debt() {
   const primary = useStore((s) => s.settings.primaryCurrency)
   const toast = useToast()
   const navigate = useNavigate()
+  const celebrate = useCelebrate()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
@@ -131,6 +133,8 @@ export default function Debt() {
     toast(`${strings.toast.paid} · ${formatMoney(d?.amount || 0, primary)}`, {
       action: { label: strings.toast.undo, onClick: () => unpayDebt(id) },
     })
+    // Celebrate paying off a debt — any one counts as a big win.
+    celebrate('big')
   }
 
   const data = useMemo(() => {

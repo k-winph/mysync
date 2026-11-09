@@ -12,6 +12,7 @@ import DebtModal from '../components/DebtModal'
 import PageHeader from '../components/PageHeader'
 import { useToast } from '../components/ui/Feedback'
 import { haptic } from '../utils/haptics'
+import { useCelebrate } from '../components/Celebration'
 
 const remainingOf = (d) => d.amount * Math.max(0, (d.totalInstallments || 0) - (d.paidInstallments || 0))
 
@@ -79,6 +80,7 @@ export default function Installments() {
   const payInstallment = useStore((s) => s.payInstallment)
   const primary = useStore((s) => s.settings.primaryCurrency)
   const toast = useToast()
+  const celebrate = useCelebrate()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
@@ -96,6 +98,9 @@ export default function Installments() {
     haptic()
     payInstallment(id)
     toast(`${strings.toast.paid} · ${formatMoney(loan?.amount || 0, primary)}`)
+    // Big celebration when this payment finishes the loan; small for the rest.
+    const willFinish = loan && (loan.paidInstallments || 0) + 1 >= (loan.totalInstallments || 0)
+    celebrate(willFinish ? 'big' : 'small')
   }
 
   const openNew = () => {
