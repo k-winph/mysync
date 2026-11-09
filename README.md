@@ -55,6 +55,8 @@ to your phone's home screen like a native app.
 - Filtered totals — the Records list shows income/expense sums for whatever filter is active
 - **Share a month as an image** — a 9:16 card (accent + light/dark themed) with category %, savings rate, vs-last-month, and portfolio highlights (top gainer + top holding)
 - Spending-by-category donut on the dashboard
+- **Split one transaction across categories** — one purchase (e.g. a supermarket run) divided across several categories, shown as a single collapsible row that still counts correctly in every total
+- **Daily spending heatmap** — a calendar on the Balance page that shades each day by how much you spent that day
 
 **Debts** — three distinct kinds
 - **One-time** — a single amount you owe, mark paid / unpaid
@@ -66,6 +68,7 @@ to your phone's home screen like a native app.
 - Portfolios and stock holdings (shares, average cost, currency)
 - Live price refresh via a **swappable provider layer** (Finnhub by default, using your own free API key)
 - Multi-currency support with cached FX conversion to a primary currency
+- **Daily value heatmap** — a calendar shading each day by portfolio change; snapshots accumulate going forward (no price-history feed needed)
 
 **Savings, tax & tools**
 - Savings goals with progress and "add funds"
@@ -78,6 +81,10 @@ to your phone's home screen like a native app.
 - Custom accent color (indigo / violet / sky / emerald / rose / amber), applied app-wide via CSS variables
 - App lock with a PIN, optional biometric unlock (WebAuthn)
 - Backup reminder when you haven't backed up in a while
+- **Seasonal background effects** — optional gentle particles (snow / falling leaves / blossoms / rain / hearts, or auto-by-month) that float *behind* the content so they never cover a card
+- **Celebration confetti** — a burst when you reach a savings goal, pay off a debt, or finish installments; a lighter one for routine recurring / installment payments
+- **Daily "log your spending" reminder** — an optional nudge at a time you choose (best-effort scheduled notification where supported, plus a reliable on-open fallback)
+- All motion (seasonal + celebration) respects the OS "reduce motion" setting and the in-app animation-speed switch
 
 ---
 

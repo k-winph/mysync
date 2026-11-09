@@ -115,7 +115,7 @@ export function CelebrationProvider({ children }) {
       <canvas
         ref={canvasRef}
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[60]"
+        className="pointer-events-none fixed inset-0 z-[-1]"
       />
     </CelebrationContext.Provider>
   )

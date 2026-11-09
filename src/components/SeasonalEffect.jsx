@@ -1,16 +1,16 @@
 import { useEffect, useRef } from 'react'
 
 // Lightweight full-screen particle overlay (no dependencies). `type` is one of
-// snow | leaves | sakura | rain | sparkle | hearts. Pointer-events are off so it
-// never blocks taps; it pauses when the tab is hidden and cleans up on unmount.
-// The parent decides whether to render it (respecting reduce-motion / settings).
+// snow | leaves | sakura | rain | hearts. Pointer-events are off so it never
+// blocks taps, and it sits behind the app content so it never covers a card; it
+// pauses when the tab is hidden and cleans up on unmount. The parent decides
+// whether to render it (respecting reduce-motion / settings).
 
 const CONFIG = {
   snow:    { dir: 'fall', count: 26, kind: 'circle', color: '#ffffff', size: [1.2, 3.2], vy: [0.3, 0.9], sway: 1.0, alpha: 0.75 },
-  rain:    { dir: 'fall', count: 60, kind: 'line',   color: 'rgba(165,196,255,0.5)', size: [8, 16], vy: [5, 9], slant: -0.9, alpha: 1 },
+  rain:    { dir: 'fall', count: 24, kind: 'line',   color: 'rgba(165,196,255,0.5)', size: [8, 16], vy: [5, 9], slant: -0.9, alpha: 1 },
   leaves:  { dir: 'fall', count: 16, kind: 'glyph',  glyphs: ['🍂', '🍁'], size: [14, 26], vy: [0.6, 1.5], sway: 1.8, spin: true, alpha: 0.95 },
   sakura:  { dir: 'fall', count: 20, kind: 'glyph',  glyphs: ['🌸', '🌼'], size: [12, 22], vy: [0.5, 1.2], sway: 1.6, spin: true, alpha: 0.95 },
-  sparkle: { dir: 'rise', count: 24, kind: 'glyph',  glyphs: ['✨', '⭐', '❇️'], size: [10, 20], vy: [0.2, 0.6], sway: 0.8, twinkle: true, alpha: 0.9 },
   hearts:  { dir: 'rise', count: 18, kind: 'glyph',  glyphs: ['💗', '💕', '❤️'], size: [12, 22], vy: [0.4, 1.1], sway: 1.2, alpha: 0.9 },
 }
 
@@ -47,7 +47,6 @@ export default function SeasonalEffect({ type }) {
         angle: Math.random() * Math.PI * 2,
         spin: cfg.spin ? rand(-0.02, 0.02) : 0,
         glyph: cfg.glyphs ? pick(cfg.glyphs) : null,
-        tw: Math.random() * Math.PI * 2, // twinkle phase
       }
     }
 
@@ -70,12 +69,7 @@ export default function SeasonalEffect({ type }) {
         p.x += Math.sin(p.swayPhase) * p.swayAmp
         p.y += cfg.dir === 'fall' ? p.vy : -p.vy
         p.angle += p.spin
-        let alpha = cfg.alpha
-        if (cfg.twinkle) {
-          p.tw += 0.05
-          alpha = cfg.alpha * (0.4 + 0.6 * Math.abs(Math.sin(p.tw)))
-        }
-        ctx.globalAlpha = alpha
+        ctx.globalAlpha = cfg.alpha
 
         if (cfg.kind === 'circle') {
           ctx.fillStyle = cfg.color
@@ -133,7 +127,7 @@ export default function SeasonalEffect({ type }) {
     <canvas
       ref={ref}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-20"
+      className="pointer-events-none fixed inset-0 z-[-1]"
     />
   )
 }

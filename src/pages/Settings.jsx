@@ -342,7 +342,6 @@ export default function Settings() {
               <option value="leaves">{strings.settings.seasonLeaves}</option>
               <option value="sakura">{strings.settings.seasonSakura}</option>
               <option value="rain">{strings.settings.seasonRain}</option>
-              <option value="sparkle">{strings.settings.seasonSparkle}</option>
               <option value="hearts">{strings.settings.seasonHearts}</option>
             </select>
           </div>

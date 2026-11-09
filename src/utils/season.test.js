@@ -10,7 +10,7 @@ describe('autoSeasonType', () => {
     expect(autoSeasonType(d(2))).toBe('hearts')
     expect(autoSeasonType(d(3))).toBe('sakura')
     expect(autoSeasonType(d(4))).toBe('sakura')
-    expect(autoSeasonType(d(5))).toBe('sparkle')
+    expect(autoSeasonType(d(5))).toBe('sakura')
     expect(autoSeasonType(d(7))).toBe('rain')
     expect(autoSeasonType(d(10))).toBe('rain')
     expect(autoSeasonType(d(11))).toBe('leaves')
