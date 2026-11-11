@@ -135,6 +135,7 @@ const th = {
       'กดปุ่มรีเฟรชเพื่อดึงราคาล่าสุด',
       'เรียงหุ้นในพอร์ตได้: กำไร/มูลค่า/กำไรวันนี้ มาก↔น้อย',
       'มี "ปฏิทินการลงทุน" (heatmap) ระบายสีตามการเปลี่ยนแปลงมูลค่าพอร์ตแต่ละวัน — เก็บค่าสะสมไปข้างหน้าทุกครั้งที่เปิดดู (ย้อนหลังไม่ได้) วันหยุดตลาดจะขึ้น "-"',
+      'ถ้าถือหุ้นสหรัฐ: ตลาด US ปิดตอนเช้ามืดเวลาไทย ตั้ง "ตลาดอ้างอิงปฏิทิน" ใน Settings > หุ้น เป็น "สหรัฐ" (ค่าเริ่มต้น) เพื่อให้ราคาลงตรงวันเทรดจริง ไม่เลื่อนไปวันถัดไป · ถ้าถือหุ้นไทยให้เลือก "ตามเครื่อง (ไทย)"',
     ],
     notes: [
       'ราคาต่อหุ้นแสดงเป็นสกุลเดิม (เช่น USD) แต่มูลค่ารวมแปลงเป็นบาทให้ (โชว์ทั้งบาทและสกุลเดิม)',
@@ -339,6 +340,7 @@ Pay one installment → becomes 13/48, ฿280,000 left, and a ฿8,000 expense l
       'Tap refresh to pull the latest prices.',
       'Sort holdings: by gain / value / today’s change, high↔low.',
       'An "Investment calendar" (heatmap) shades each day by how the portfolio’s value changed — it builds up going forward each time you open it (no back-fill); market-closed days show "-".',
+      'Holding US stocks? The US session closes in the early Thai morning, so set "Calendar market" in Settings > Stocks to "US" (the default) to keep each price on its real trading day instead of slipping to the next. Choose "Device (Thai)" for Thai (SET) stocks.',
     ],
     notes: [
       'Per-share price stays in its own currency (e.g. USD), but total value is converted to THB (shows both).',

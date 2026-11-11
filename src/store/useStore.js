@@ -4,6 +4,7 @@ import { uuid } from '../utils/id'
 import { DEFAULT_CATEGORIES } from '../constants/categories'
 import { buildSampleData } from '../constants/sampleData'
 import { todayISO, addPeriod } from '../utils/date'
+import { marketDate } from '../utils/marketDate'
 import { collectDue } from '../utils/recurring'
 import { rewriteTagName, reorderTag } from './tagOps'
 import { reassignCategory, reorderCategory } from './categoryOps'
@@ -74,8 +75,9 @@ const DEFAULT_SETTINGS = {
   showInvestments: true, // show the Investments card on the dashboard
   showSavings: true, // show the Savings goals card on the dashboard
   showTrend: true, // show the monthly trend chart on the dashboard
-  seasonalEffect: 'off', // background particles: 'off' | 'auto' | snow|leaves|sakura|rain|sparkle|hearts
+  seasonalEffect: 'off', // background particles: 'off' | 'auto' | snow|leaves|sakura|rain|hearts
   celebrations: true, // confetti burst on goal reached / debt paid / installment complete
+  investMarket: 'us', // which market's calendar day a portfolio snapshot belongs to: 'us' | 'local'
 }
 
 export const useStore = create(
@@ -543,7 +545,10 @@ export const useStore = create(
       // day (last write wins) and prunes history to ~450 days.
       recordInvestmentSnapshot: ({ total, byPortfolio } = {}) =>
         set((s) => {
-          const date = todayISO()
+          // Key by the reference market's own calendar day (default US), so a
+          // price captured the next Thai morning lands on the US trading day it
+          // actually came from — not the day the app happened to be opened.
+          const date = marketDate(new Date(), s.settings.investMarket)
           const prev = s.investmentSnapshots[date] || {}
           const entry = {
             date,

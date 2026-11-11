@@ -572,6 +572,24 @@ export default function Settings() {
             {strings.settings.getFreeKey} ({PROVIDERS[settings.stockProvider || 'finnhub']?.label})
             <ExternalLink size={14} />
           </a>
+
+          {/* Which market's calendar day a portfolio snapshot belongs to */}
+          <div className="flex items-center gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
+            <Clock size={20} className="shrink-0 text-slate-500" />
+            <div className="min-w-0 flex-1">
+              <div className="font-medium">{strings.settings.investMarket}</div>
+              <p className="text-xs text-slate-400">{strings.settings.investMarketHint}</p>
+            </div>
+            <select
+              value={settings.investMarket || 'us'}
+              onChange={(e) => updateSettings({ investMarket: e.target.value })}
+              className="shrink-0 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm
+                dark:border-slate-700 dark:bg-slate-900"
+            >
+              <option value="us">{strings.settings.investMarketUs}</option>
+              <option value="local">{strings.settings.investMarketLocal}</option>
+            </select>
+          </div>
         </Card>
       </div>
 
