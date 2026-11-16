@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, CalendarClock, TrendingUp, FlaskConical, Trash2, Snowflake, PartyPopper, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, CalendarClock, TrendingUp, FlaskConical, Trash2, Snowflake, PartyPopper, CreditCard, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { ACCENTS } from '../constants/accents'
@@ -16,6 +16,7 @@ import PageHeader from '../components/PageHeader'
 import { useToast } from '../components/ui/Feedback'
 import CategoryManager from '../components/CategoryManager'
 import TagManager from '../components/TagManager'
+import PaymentMethodManager from '../components/PaymentMethodManager'
 import PinSetupModal from '../components/PinSetupModal'
 import ConfirmDialog from '../components/ConfirmDialog'
 
@@ -78,6 +79,7 @@ export default function Settings() {
   const fileRef = useRef(null)
   const [catOpen, setCatOpen] = useState(false)
   const [tagManageOpen, setTagManageOpen] = useState(false)
+  const [methodManageOpen, setMethodManageOpen] = useState(false)
   const [importMsg, setImportMsg] = useState('')
   const [pinModal, setPinModal] = useState(null) // 'set' | 'disable' | null
   const [notifMsg, setNotifMsg] = useState('')
@@ -530,6 +532,11 @@ export default function Settings() {
             label={strings.tagManage.title}
             onClick={() => setTagManageOpen(true)}
           />
+          <ActionRow
+            icon={CreditCard}
+            label={strings.methodManage.title}
+            onClick={() => setMethodManageOpen(true)}
+          />
         </Card>
       </div>
 
@@ -685,6 +692,7 @@ export default function Settings() {
 
       <CategoryManager open={catOpen} onClose={() => setCatOpen(false)} />
       <TagManager open={tagManageOpen} onClose={() => setTagManageOpen(false)} />
+      <PaymentMethodManager open={methodManageOpen} onClose={() => setMethodManageOpen(false)} />
       <PinSetupModal open={pinModal !== null} mode={pinModal} onClose={() => setPinModal(null)} />
 
       {/* Load sample data over existing real data (backs up first). */}

@@ -4,6 +4,7 @@ import { strings } from '../constants/strings'
 import { parseMoney, satangToInput, formatMoney } from '../utils/money'
 import { todayISO } from '../utils/date'
 import { pickableCategories } from '../utils/category'
+import { defaultMethodId } from '../utils/paymentMethod'
 import { Plus, Check, Repeat, Layers, X } from 'lucide-react'
 import Button from './ui/Button'
 import MoneyInput, { formatMoneyInput } from './ui/MoneyInput'
@@ -15,10 +16,16 @@ import CategoryIcon from './CategoryIcon'
 export default function TransactionForm({ initial, onSubmit, onCancel }) {
   const categories = useStore((s) => s.categories)
   const tagList = useStore((s) => s.tags)
+  const methods = useStore((s) => s.paymentMethods)
   const addTag = useStore((s) => s.addTag)
   const primary = useStore((s) => s.settings.primaryCurrency)
 
   const [type, setType] = useState(initial?.type || 'expense')
+  // Payment method (optional). New entries pre-select the default (Transfer);
+  // editing keeps whatever the entry had. Tapping the active one clears it.
+  const [methodId, setMethodId] = useState(() =>
+    initial ? (initial.methodId || '') : defaultMethodId(methods)
+  )
   const [amount, setAmount] = useState(initial ? formatMoneyInput(satangToInput(initial.amount)) : '')
   const [categoryId, setCategoryId] = useState(initial?.categoryId || '')
   const [selectedTags, setSelectedTags] = useState(initial?.tags || [])
@@ -85,6 +92,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
         tags: selectedTags,
         note: note.trim(),
         date,
+        methodId: methodId || null,
         splits,
       })
       return
@@ -105,6 +113,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
       tags: selectedTags,
       note: note.trim(),
       date,
+      methodId: methodId || null,
       recurring: type === 'income' && makeRecurring ? { frequency: recurringFreq } : null,
     })
   }
@@ -256,6 +265,36 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
           className="input-base"
         />
       </div>
+
+      {/* Payment method — optional; applies to the whole entry (or split group) */}
+      {methods.length > 0 && (
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            {strings.tx.method}{' '}
+            <span className="font-normal text-slate-400">({strings.common.optional})</span>
+          </label>
+          <div className="no-scrollbar flex items-center gap-2 overflow-x-auto py-1">
+            {methods.map((m) => {
+              const active = m.id === methodId
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setMethodId(active ? '' : m.id)}
+                  className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+                    active
+                      ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-600/20 dark:text-brand-200'
+                      : 'border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-300'
+                  }`}
+                >
+                  <CategoryIcon name={m.icon} size={15} />
+                  {m.name}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Make this a recurring income (new income only) */}
       {isNewIncome && (

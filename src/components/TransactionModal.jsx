@@ -42,6 +42,7 @@ export default function TransactionModal({ open, editing, onClose }) {
         date: groupParts[0].date,
         note: groupParts[0].note,
         tags: groupParts[0].tags,
+        methodId: groupParts[0].methodId,
         splits: groupParts.map((t) => ({ categoryId: t.categoryId, amount: t.amount })),
       }
     : editing

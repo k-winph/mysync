@@ -15,6 +15,7 @@ const ACTION_W = 144 // two 72px action buttons revealed on swipe
 // The amount is color-coded green (income) / red (expense).
 export default function TransactionItem({ tx, onEdit, onDelete }) {
   const category = useStore((s) => s.categories.find((c) => c.id === tx.categoryId))
+  const method = useStore((s) => (tx.methodId ? s.paymentMethods.find((m) => m.id === tx.methodId) : null))
   const isIncome = tx.type === 'income'
 
   // Swipe state (only used in the swipeable variant; hooks stay unconditional).
@@ -38,6 +39,7 @@ export default function TransactionItem({ tx, onEdit, onDelete }) {
         </div>
         <div className="truncate text-xs text-slate-500 dark:text-slate-400">
           {formatDateShort(tx.date)}
+          {method ? ` · ${method.name}` : ''}
           {tx.note ? ` · ${tx.note}` : ''}
           {tx.tags?.length ? ` · ${tx.tags.map((t) => '#' + t).join(' ')}` : ''}
         </div>

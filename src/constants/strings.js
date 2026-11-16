@@ -53,6 +53,7 @@ const en = {
     income: 'Income', expense: 'Expense', amount: 'Amount', category: 'Category',
     tags: 'Tags', tagsHint: 'Comma separated, e.g. trip, work', newTag: 'New tag',
     noTagsHint: 'No tags yet. Tap Add to create one.', note: 'Note', date: 'Date',
+    method: 'Payment method',
     addTitle: 'Add transaction', editTitle: 'Edit transaction', deleteConfirm: 'Delete this transaction?',
     empty: 'No transactions.', pickCategory: 'Select a category', noResults: 'No transactions match your filters.',
     emptyTitle: 'Start tracking', emptyBody: 'Your income and expenses will appear here. Tap + to add your first entry.',
@@ -87,6 +88,13 @@ const en = {
     rename: 'Name', color: 'Color', mergeInto: 'Merge into…', mergeNone: 'Don’t merge',
     used: (n) => `${n} use${n === 1 ? '' : 's'}`, edit: 'Edit tag',
     mergeHint: 'Picking another tag merges this one into it and rewrites every transaction.',
+  },
+
+  methodManage: {
+    title: 'Payment methods', name: 'New method name', empty: 'No methods yet. Create one below.',
+    deleteConfirm: 'Delete this payment method? Transactions keep their record but will no longer show it.',
+    rename: 'Name', icon: 'Icon', edit: 'Edit method',
+    used: (n) => `${n} use${n === 1 ? '' : 's'}`,
   },
 
   category: {
@@ -460,6 +468,7 @@ const th = {
     income: 'รายรับ', expense: 'รายจ่าย', amount: 'จำนวนเงิน', category: 'หมวดหมู่',
     tags: 'แท็ก', tagsHint: 'คั่นด้วยจุลภาค เช่น ทริป, งาน', newTag: 'แท็กใหม่',
     noTagsHint: 'ยังไม่มีแท็ก แตะเพิ่มเพื่อสร้าง', note: 'โน้ต', date: 'วันที่',
+    method: 'ประเภทเงิน',
     addTitle: 'เพิ่มรายการ', editTitle: 'แก้ไขรายการ', deleteConfirm: 'ลบรายการนี้?',
     empty: 'ไม่มีรายการ', pickCategory: 'เลือกหมวดหมู่', noResults: 'ไม่มีรายการตรงกับตัวกรอง',
     emptyTitle: 'เริ่มบันทึกรายการ', emptyBody: 'รายรับและรายจ่ายของคุณจะแสดงที่นี่ แตะ + เพื่อเพิ่มรายการแรก',
@@ -494,6 +503,13 @@ const th = {
     rename: 'ชื่อ', color: 'สี', mergeInto: 'รวมเข้ากับ…', mergeNone: 'ไม่รวม',
     used: (n) => `ใช้ ${n} รายการ`, edit: 'แก้ไขแท็ก',
     mergeHint: 'เลือกแท็กอื่นเพื่อรวมแท็กนี้เข้าไป แล้วเขียนทับทุกรายการให้',
+  },
+
+  methodManage: {
+    title: 'จัดการประเภทเงิน', name: 'ชื่อประเภทใหม่', empty: 'ยังไม่มีประเภทเงิน สร้างด้านล่าง',
+    deleteConfirm: 'ลบประเภทเงินนี้? รายการเดิมยังอยู่แต่จะไม่แสดงประเภทนี้แล้ว',
+    rename: 'ชื่อ', icon: 'ไอคอน', edit: 'แก้ไขประเภทเงิน',
+    used: (n) => `ใช้ ${n} รายการ`,
   },
 
   category: {

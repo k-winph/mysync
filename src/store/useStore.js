@@ -2,9 +2,11 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { uuid } from '../utils/id'
 import { DEFAULT_CATEGORIES } from '../constants/categories'
+import { DEFAULT_PAYMENT_METHODS } from '../constants/paymentMethods'
 import { buildSampleData } from '../constants/sampleData'
 import { todayISO, addPeriod } from '../utils/date'
 import { marketDate } from '../utils/marketDate'
+import { reorderMethod } from '../utils/paymentMethod'
 import { collectDue } from '../utils/recurring'
 import { rewriteTagName, reorderTag } from './tagOps'
 import { reassignCategory, reorderCategory } from './categoryOps'
@@ -98,15 +100,30 @@ export const useStore = create(
       // We store value per day and derive the % between consecutive days, so no
       // historical price feed is needed — it fills in going forward.
       investmentSnapshots: {},
+      // Managed list of payment methods (cash / transfer / credit card + custom).
+      // [{ id, name, icon, key?, isDefault?, isDefaultPick?, ... }]. Optional on a
+      // transaction via `methodId`; one list serves both income and expense.
+      paymentMethods: [],
       settings: { ...DEFAULT_SETTINGS },
 
       // --- Seeding ---------------------------------------------------------
       // Called once on app mount. Seeds default categories only if none exist,
       // so we never overwrite the user's own categories on later launches.
       seedDefaults: () => {
-        if (get().categories.length > 0) return
-        const seeded = DEFAULT_CATEGORIES.map((c) => withStamps({ ...c, isDefault: true }))
-        set({ categories: seeded })
+        const st = get()
+        const patch = {}
+        // Categories: only when the user has none (never overwrite theirs).
+        if (st.categories.length === 0) {
+          patch.categories = DEFAULT_CATEGORIES.map((c) => withStamps({ ...c, isDefault: true }))
+        }
+        // Payment methods: seeded independently so EXISTING users (who already
+        // have categories) still get them. Names are seeded in the current
+        // language; afterwards they're plain editable strings.
+        if (!st.paymentMethods || st.paymentMethods.length === 0) {
+          const lang = st.settings.language === 'th' ? 'th' : 'en'
+          patch.paymentMethods = DEFAULT_PAYMENT_METHODS[lang].map((m) => withStamps({ ...m, isDefault: true }))
+        }
+        if (Object.keys(patch).length > 0) set(patch)
       },
 
       // --- Transactions ----------------------------------------------------
@@ -139,22 +156,22 @@ export const useStore = create(
       // each portion as a normal transaction linked by a shared `splitGroupId`,
       // so every total / chart / filter keeps working unchanged. Portions share
       // type, date, note and tags; each has its own categoryId + amount.
-      addSplit: ({ type, date, note = '', tags = [], splits = [] }) =>
+      addSplit: ({ type, date, note = '', tags = [], methodId = null, splits = [] }) =>
         set((s) => {
           const splitGroupId = uuid()
           const created = splits.map((sp) =>
-            withStamps({ type, amount: sp.amount, categoryId: sp.categoryId, tags, note, date, splitGroupId })
+            withStamps({ type, amount: sp.amount, categoryId: sp.categoryId, tags, note, date, methodId, splitGroupId })
           )
           return { transactions: [...created, ...s.transactions] }
         }),
 
       // Replace a split group's portions (edit). Drops the old portions and
       // recreates the group with the same id.
-      updateSplit: (splitGroupId, { type, date, note = '', tags = [], splits = [] }) =>
+      updateSplit: (splitGroupId, { type, date, note = '', tags = [], methodId = null, splits = [] }) =>
         set((s) => {
           const others = s.transactions.filter((t) => t.splitGroupId !== splitGroupId)
           const created = splits.map((sp) =>
-            withStamps({ type, amount: sp.amount, categoryId: sp.categoryId, tags, note, date, splitGroupId })
+            withStamps({ type, amount: sp.amount, categoryId: sp.categoryId, tags, note, date, methodId, splitGroupId })
           )
           return { transactions: [...created, ...others] }
         }),
@@ -199,6 +216,33 @@ export const useStore = create(
             categories: s.categories.filter((c) => c.id !== sourceId),
           }
         }),
+
+      // --- Payment methods (managed list) ---------------------------------
+      // Add a custom method (name + icon). Blank names are ignored.
+      addPaymentMethod: ({ name, icon = 'wallet' } = {}) => {
+        const clean = (name || '').trim()
+        if (!clean) return
+        set((s) => ({ paymentMethods: [...s.paymentMethods, withStamps({ name: clean, icon, isDefault: false })] }))
+      },
+
+      // Rename / change the icon of a method (its id and any `methodId`
+      // references on transactions are untouched, so nothing drifts).
+      updatePaymentMethod: (id, patch) =>
+        set((s) => ({
+          paymentMethods: s.paymentMethods.map((m) =>
+            m.id === id ? { ...m, ...patch, name: patch.name != null ? patch.name.trim() || m.name : m.name, updatedAt: now() } : m
+          ),
+        })),
+
+      // Delete a method. Transactions keep their `methodId` but it simply
+      // resolves to nothing (shown as unlabelled) — no data is rewritten.
+      deletePaymentMethod: (id) =>
+        set((s) => ({ paymentMethods: s.paymentMethods.filter((m) => m.id !== id) })),
+
+      // Reorder a method one step (dir 'up' | 'down') — this is also the order
+      // the form selector shows them in.
+      movePaymentMethod: (id, dir) =>
+        set((s) => ({ paymentMethods: reorderMethod(s.paymentMethods, id, dir) })),
 
       // --- Tags (managed list) --------------------------------------------
       // Add a tag by name, ignoring blanks and case-insensitive duplicates.
@@ -599,6 +643,9 @@ export const useStore = create(
         set((s) => ({
           transactions: [],
           categories: DEFAULT_CATEGORIES.map((c) => withStamps({ ...c, isDefault: true })),
+          paymentMethods: DEFAULT_PAYMENT_METHODS[s.settings.language === 'th' ? 'th' : 'en'].map((m) =>
+            withStamps({ ...m, isDefault: true })
+          ),
           tags: [],
           debts: [],
           portfolios: [],
@@ -613,10 +660,11 @@ export const useStore = create(
       // --- Import / restore ------------------------------------------------
       // Replace transactions and categories from an imported backup.
       // Settings are intentionally left as-is (device-specific).
-      replaceData: ({ transactions, categories, tags, debts, portfolios, holdings, savingsGoals, recurringIncomes }) =>
+      replaceData: ({ transactions, categories, paymentMethods, tags, debts, portfolios, holdings, savingsGoals, recurringIncomes }) =>
         set((s) => ({
           transactions: Array.isArray(transactions) ? transactions : [],
           categories: Array.isArray(categories) ? categories : s.categories,
+          paymentMethods: Array.isArray(paymentMethods) ? paymentMethods : s.paymentMethods,
           tags: Array.isArray(tags) ? tags : s.tags,
           debts: Array.isArray(debts) ? debts : s.debts,
           portfolios: Array.isArray(portfolios) ? portfolios : s.portfolios,
@@ -637,6 +685,7 @@ export const useStore = create(
       partialize: (s) => ({
         transactions: s.transactions,
         categories: s.categories,
+        paymentMethods: s.paymentMethods,
         tags: s.tags,
         debts: s.debts,
         portfolios: s.portfolios,

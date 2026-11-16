@@ -11,6 +11,7 @@ import CategoryIcon from './CategoryIcon'
 // `group` is the shape produced by utils/txGroups.groupDaySplits.
 export default function SplitRow({ group, onEdit }) {
   const categories = useStore((s) => s.categories)
+  const method = useStore((s) => (group.rep?.methodId ? s.paymentMethods.find((m) => m.id === group.rep.methodId) : null))
   const [open, setOpen] = useState(false)
 
   const catOf = (id) => categories.find((c) => c.id === id)
@@ -34,7 +35,7 @@ export default function SplitRow({ group, onEdit }) {
             <span className="truncate font-medium">{group.note || strings.tx.splitTitle(group.parts.length)}</span>
           </div>
           <div className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-slate-500 dark:text-slate-400">
-            <span className="truncate">{formatDateShort(group.date)} · {names.join(', ')}</span>
+            <span className="truncate">{formatDateShort(group.date)} · {names.join(', ')}{method ? ` · ${method.name}` : ''}</span>
             <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-brand-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-brand-600 dark:text-brand-300">
               <Layers size={10} /> {strings.tx.splitBadge(group.parts.length)}
             </span>
