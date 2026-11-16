@@ -256,16 +256,6 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
         </>
       )}
 
-      {/* Date */}
-      <div>
-        <label className="mb-1 block text-sm font-medium">{strings.tx.date}</label>
-        <DateInput
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="input-base"
-        />
-      </div>
-
       {/* Payment method — optional; applies to the whole entry (or split group) */}
       {methods.length > 0 && (
         <div>
@@ -295,6 +285,16 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
           </div>
         </div>
       )}
+
+      {/* Date */}
+      <div>
+        <label className="mb-1 block text-sm font-medium">{strings.tx.date}</label>
+        <DateInput
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="input-base"
+        />
+      </div>
 
       {/* Make this a recurring income (new income only) */}
       {isNewIncome && (
