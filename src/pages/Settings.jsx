@@ -1,9 +1,10 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, CalendarClock, TrendingUp, FlaskConical, Trash2, Snowflake, PartyPopper, CreditCard, Settings as SettingsIcon } from 'lucide-react'
+import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, CalendarClock, TrendingUp, FlaskConical, Trash2, Snowflake, PartyPopper, CreditCard, Brush, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
 import { ACCENTS } from '../constants/accents'
+import { THEMES } from '../constants/themes'
 import { CURRENCIES } from '../utils/money'
 import { formatDate } from '../utils/date'
 import { usePwaInstall } from '../hooks/usePwaInstall'
@@ -257,6 +258,31 @@ export default function Settings() {
           {strings.settings.appearance}
         </h2>
         <Card className="divide-y divide-line-2 dark:divide-line-2">
+          {/* UI theme — repaints the whole app (more themes can be added) */}
+          <div className="flex items-center gap-3 py-2">
+            <Brush size={20} className="shrink-0 text-muted" />
+            <span className="flex-1 font-medium">{strings.settings.uiTheme}</span>
+            <div className="flex gap-2">
+              {THEMES.map((t) => {
+                const active = (settings.uiTheme || 'default') === t.id
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => updateSettings({ uiTheme: t.id })}
+                    className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
+                      active
+                        ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-600/20 dark:text-brand-200'
+                        : 'border-line text-muted'
+                    }`}
+                  >
+                    <span className="h-3.5 w-3.5 rounded-full border border-line-strong" style={{ backgroundColor: t.swatch }} />
+                    {t.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           <ToggleRow
             icon={Moon}
             label={strings.settings.darkMode}

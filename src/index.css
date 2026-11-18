@@ -47,6 +47,40 @@
     --c-line-3: 51 65 85;       /* slate-700 */
     --c-line-strong: 71 85 105; /* slate-600 */
   }
+
+  /* ---- Pixel theme (first draft palette; shape + pixel font added later) ----
+     A warm "arcade paper" look in light, a deep plum in dark. Borders lean on
+     the ink color to get the chunky pixel outline feel. */
+  :root[data-theme='pixel'] {
+    --c-canvas: 239 230 210;    /* cream paper */
+    --c-surface: 255 253 246;   /* near-white card */
+    --c-surface-2: 233 225 207; /* subtle fill */
+    --c-surface-3: 221 211 187;
+    --c-surface-4: 206 196 170;
+    --c-ink: 36 26 46;          /* plum-black text */
+    --c-ink-2: 74 63 87;
+    --c-muted: 122 110 134;
+    --c-faint: 160 150 172;
+    --c-line: 36 26 46;         /* ink outline */
+    --c-line-2: 214 204 182;    /* soft divider */
+    --c-line-3: 36 26 46;       /* input outline */
+    --c-line-strong: 36 26 46;
+  }
+  :root[data-theme='pixel'].dark {
+    --c-canvas: 28 21 38;       /* deep plum */
+    --c-surface: 42 32 54;
+    --c-surface-2: 53 42 68;
+    --c-surface-3: 64 51 80;
+    --c-surface-4: 77 63 94;
+    --c-ink: 243 236 255;
+    --c-ink-2: 205 191 240;
+    --c-muted: 155 143 181;
+    --c-faint: 122 110 146;
+    --c-line: 15 10 24;         /* dark outline for depth */
+    --c-line-2: 53 42 68;
+    --c-line-3: 15 10 24;
+    --c-line-strong: 15 10 24;
+  }
   html {
     -webkit-tap-highlight-color: transparent;
   }

@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import { useStore } from './store/useStore'
 import { strings, setLang } from './constants/strings'
 import { applyAccent } from './constants/accents'
+import { applyTheme } from './constants/themes'
 import { todayISO, daysUntil } from './utils/date'
 import { notificationPermission, showNotification, scheduleDailyReminder, cancelDailyReminder } from './utils/notify'
 import Layout from './components/Layout'
@@ -97,6 +98,12 @@ export default function App() {
   useLayoutEffect(() => {
     applyAccent(accent)
   }, [accent])
+
+  // Apply the whole-app UI theme (repaints surfaces/text/borders via tokens).
+  const uiTheme = useStore((s) => s.settings.uiTheme)
+  useLayoutEffect(() => {
+    applyTheme(uiTheme)
+  }, [uiTheme])
 
   // On app open: notify about due/overdue debts (once per day), if enabled.
   useEffect(() => {

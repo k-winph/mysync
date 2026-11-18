@@ -80,6 +80,7 @@ const DEFAULT_SETTINGS = {
   seasonalEffect: 'off', // background particles: 'off' | 'auto' | snow|leaves|sakura|rain|hearts
   celebrations: true, // confetti burst on goal reached / debt paid / installment complete
   investMarket: 'us', // which market's calendar day a portfolio snapshot belongs to: 'us' | 'local'
+  uiTheme: 'default', // whole-app UI theme (see constants/themes.js): 'default' | 'pixel'
 }
 
 export const useStore = create(
