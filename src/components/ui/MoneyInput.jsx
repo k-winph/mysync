@@ -64,7 +64,7 @@ export default function MoneyInput({ value, onChange, className = 'input-base', 
       inputMode="decimal"
       value={value}
       onChange={handleChange}
-      className={className}
+      className={`${className} font-num`}
       {...props}
     />
   )

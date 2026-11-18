@@ -29,6 +29,10 @@
     --c-line-2: 241 245 249;    /* slate-100 */
     --c-line-3: 203 213 225;    /* slate-300 */
     --c-line-strong: 148 163 184; /* slate-400 */
+
+    /* Font for numbers/amounts. Default = inherit (unchanged); a theme can swap
+       in a display face (e.g. the Pixel theme uses Silkscreen). */
+    --font-num: inherit;
   }
 
   /* Dark-mode defaults (mirror the old dark: slate utilities). */
@@ -65,6 +69,7 @@
     --c-line-2: 214 204 182;    /* soft divider */
     --c-line-3: 36 26 46;       /* input outline */
     --c-line-strong: 36 26 46;
+    --font-num: 'Silkscreen', ui-monospace, monospace; /* pixel numbers */
   }
   :root[data-theme='pixel'].dark {
     --c-canvas: 28 21 38;       /* deep plum */
@@ -162,6 +167,10 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  /* Number/amount font hook — a theme can swap the face via --font-num. */
+  .font-num {
+    font-family: var(--font-num);
   }
 }
 

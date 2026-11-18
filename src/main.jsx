@@ -5,6 +5,10 @@ import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary'
 import { FeedbackProvider } from './components/ui/Feedback'
 import { CelebrationProvider } from './components/Celebration'
+// Self-hosted pixel font (used by the Pixel theme for numbers; bundled so it
+// works offline). The default theme ignores it via the --font-num token.
+import '@fontsource/silkscreen/400.css'
+import '@fontsource/silkscreen/700.css'
 import './index.css'
 
 // `basename` must match `base` in vite.config.js so routing works on GitHub Pages.
