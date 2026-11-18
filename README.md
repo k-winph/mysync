@@ -39,8 +39,9 @@ to your phone's home screen like a native app.
 - 📴 **Works offline** — installable PWA with a service worker; open and use it with no connection.
 - 🆓 **Free to run** — static site, deployable free on GitHub Pages.
 - 🌗 **Light / dark mode**, 🎨 **custom accent color**, and 🇬🇧 / 🇹🇭 **bilingual** UI.
+- 🕹️ **Whole-app UI themes** — switch the entire look (e.g. a retro **Pixel** theme with the Silkscreen font and chunky borders) from a single **Appearance** panel; built to add more themes later, with accent color chosen independently.
 - 💸 **Integer-satang money** — amounts are stored as integers (minor units) to avoid floating-point rounding errors.
-- 🖼️ **Shareable summary cards** — turn any month into a 9:16 story image (themed, with category breakdown + portfolio).
+- 🖼️ **Shareable summary cards** — turn any month (or a split bill) into a 9:16 story image that follows the active UI theme, with category breakdown + portfolio.
 - 📤 **Backup & restore** — a complete JSON backup you can share to the cloud, plus Excel/CSV export and import.
 
 ---
@@ -53,7 +54,7 @@ to your phone's home screen like a native app.
 - A **running cumulative balance** that carries over across months automatically
 - Yearly income-vs-expense breakdown; tap a month for a popup (category donuts + that month's transactions)
 - Filtered totals — the Records list shows income/expense sums for whatever filter is active
-- **Share a month as an image** — a 9:16 card (accent + light/dark themed) with category %, savings rate, vs-last-month, and portfolio highlights (top gainer + top holding)
+- **Share a month as an image** — a 9:16 card that follows the active UI theme (accent + light/dark, and the Pixel theme's font/shape) with category %, savings rate, vs-last-month, and portfolio highlights (top gainer + top holding)
 - Spending-by-category donut on the dashboard
 - **Split one transaction across categories** — one purchase (e.g. a supermarket run) divided across several categories, shown as a single collapsible row that still counts correctly in every total
 - **Daily spending heatmap** — a calendar on the Balance page that shades each day by how much you spent that day
@@ -78,7 +79,9 @@ to your phone's home screen like a native app.
 
 **App & security**
 - Installable PWA (add-to-home-screen) + light haptic feedback on key actions
-- Custom accent color (indigo / violet / sky / emerald / rose / amber), applied app-wide via CSS variables
+- **Appearance panel** — one button in Settings opens a window gathering every look-and-feel control (theme, dark mode, accent, animation speed, seasonal effects, language, currency, dashboard cards)
+- **Whole-app UI themes** — `Default` plus a retro **Pixel** theme (Silkscreen pixel font, square corners, chunky borders + hard shadows) that repaints every screen, light and dark; a visual picker shows a live mini-preview of each. The engine is theme-agnostic (just add a theme), and the share images follow the chosen theme too
+- Custom accent color (indigo / violet / sky / emerald / rose / amber), applied app-wide via CSS variables and **independent of the UI theme**
 - App lock with a PIN, optional biometric unlock (WebAuthn)
 - Backup reminder when you haven't backed up in a while
 - **Seasonal background effects** — optional gentle particles (snow / falling leaves / blossoms / rain / hearts, or auto-by-month) that float *behind* the content so they never cover a card
@@ -265,6 +268,17 @@ savingsGoals, fx (cached rates), settings
 a `Proxy` that reads the active language live; `App.jsx` sets it from
 `settings.language`, so switching language re-renders everything instantly.
 
+**Theming is token-driven.** Colors are **semantic CSS variables** (`--c-*` in
+`index.css`, mapped to Tailwind classes), plus font tokens (`--font-num`,
+`--font-base`). A **UI theme** (`constants/themes.js`) is applied by setting a
+`data-theme` attribute on `<html>`; each theme overrides those tokens under
+`:root[data-theme='…']` (with a `.dark` variant), and the Pixel theme adds a
+scoped shape layer (square corners, chunky borders, hard shadows). The **accent**
+color (`--brand-*`) is a separate axis, chosen independently of the theme. Canvas
+share images read their palette/font from `utils/shareTheme.js` so they match the
+active theme. **Adding a theme** = one entry in `themes.js` (+ a preview swatch),
+one token block in `index.css`, and one case in `shareTheme.js`.
+
 **Networking is minimal.** The **only** two network calls in the whole app are
 stock prices (`services/stockApi.js`) and FX rates (`services/fx.js`).
 Everything else is local.
@@ -325,9 +339,9 @@ MySync uses [Semantic Versioning](https://semver.org/): **`MAJOR.MINOR.PATCH`**.
 | **MINOR** | New features, backward-compatible (nothing existing breaks) | `v1.0.0` → `v1.1.0` |
 | **MAJOR** | Breaking change (e.g. a data shape old backups can't restore) | `v1.x` → `v2.0.0` |
 
-> This batch of changes (share-as-image, accent themes, running balance,
-> persisted split-bill, filtered totals, JSON backup) adds features without
-> breaking anything, so it's a **MINOR** bump: `v1.0.0` → **`v1.1.0`**.
+> This batch of changes (whole-app UI themes incl. the Pixel theme, the
+> Appearance panel, theme-aware share images, and payment methods) adds features
+> without breaking existing data, so it's a **MINOR** bump: `v1.2.0` → **`v1.3.0`**.
 
 ### Tagging a new version
 
@@ -338,21 +352,21 @@ one step. Pass the exact version so `package.json` and the tag line up:
 ```bash
 # 1. Commit the feature work first
 git add -A
-git commit -m "feat: share images, accent themes, running balance, JSON backup"
+git commit -m "feat(theme): multi-theme UI with a Pixel theme, Appearance panel, and themed share images"
 
-# 2. Set the version + create an annotated tag v1.1.0 (one command)
-npm version 1.1.0 -m "Release v%s"
+# 2. Set the version + create an annotated tag v1.3.0 (one command)
+npm version 1.3.0 -m "Release v%s"
 
 # 3. Push the commits and the tag to GitHub
 git push origin main        # or your default branch
-git push origin v1.1.0      # push just this tag (or: git push --tags)
+git push origin v1.3.0      # push just this tag (or: git push --tags)
 ```
 
 Prefer to tag by hand instead of `npm version`? Do it directly:
 
 ```bash
-git tag -a v1.1.0 -m "MySync v1.1.0 — share images, accent themes, JSON backup"
-git push origin v1.1.0
+git tag -a v1.3.0 -m "MySync v1.3.0 — multi-theme UI (Pixel theme), Appearance panel, themed share images"
+git push origin v1.3.0
 ```
 
 ### Handy tag commands
@@ -360,22 +374,22 @@ git push origin v1.1.0
 ```bash
 git tag                       # list all tags
 git describe --tags           # show the current/nearest tag
-git show v1.1.0               # see what a tag points at
-git tag -d v1.1.0            # delete a tag locally (if you tagged by mistake)
-git push origin :v1.1.0      # delete that tag on GitHub too
+git show v1.3.0               # see what a tag points at
+git tag -d v1.3.0            # delete a tag locally (if you tagged by mistake)
+git push origin :v1.3.0      # delete that tag on GitHub too
 ```
 
 ### Turning a tag into a GitHub Release (optional)
 
 A tag is enough for versioning, but a **Release** gives it a changelog page and
 downloadable archives. On GitHub: **Releases → Draft a new release → choose tag
-`v1.1.0` → add notes → Publish release.** (Re-running `npm run deploy` is still
+`v1.3.0` → add notes → Publish release.** (Re-running `npm run deploy` is still
 what updates the live GitHub Pages site — tags and releases don't deploy by
 themselves.)
 
 > Note: `package.json` currently reads `0.1.0` while your git history is tagged
-> `v1.0.0`. Running `npm version 1.1.0` as above realigns them — afterwards both
-> the file and the tag say `1.1.0`.
+> up to `v1.2.0`. Running `npm version 1.3.0` as above realigns them — afterwards
+> both the file and the tag say `1.3.0`.
 
 ---
 
