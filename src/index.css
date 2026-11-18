@@ -33,6 +33,10 @@
     /* Font for numbers/amounts. Default = inherit (unchanged); a theme can swap
        in a display face (e.g. the Pixel theme uses Silkscreen). */
     --font-num: inherit;
+    /* Base font for ALL app text. Default = the normal sans stack. A theme can
+       put a display face first; non-Latin glyphs (e.g. Thai) fall back per-glyph
+       to the next font in the stack automatically. */
+    --font-base: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   }
 
   /* Dark-mode defaults (mirror the old dark: slate utilities). */
@@ -70,6 +74,9 @@
     --c-line-3: 36 26 46;       /* input outline */
     --c-line-strong: 36 26 46;
     --font-num: 'Silkscreen', ui-monospace, monospace; /* pixel numbers */
+    /* All Latin text pixel; Thai & other scripts fall back per-glyph to the
+       readable sans fonts after Silkscreen in the stack. */
+    --font-base: 'Silkscreen', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   }
   :root[data-theme='pixel'].dark {
     --c-canvas: 28 21 38;       /* deep plum */
@@ -102,6 +109,7 @@
   }
   body {
     @apply bg-canvas text-ink antialiased;
+    font-family: var(--font-base);
     /* Respect iOS safe areas when installed as PWA */
     padding-bottom: env(safe-area-inset-bottom);
   }
