@@ -1,11 +1,8 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, Languages, Coins, BookOpen, Vibrate, Palette, Check, Download, ShieldAlert, Zap, PiggyBank, Clock, CalendarClock, TrendingUp, FlaskConical, Trash2, Snowflake, PartyPopper, CreditCard, Brush, Settings as SettingsIcon } from 'lucide-react'
+import { Eye, EyeOff, FileSpreadsheet, FileText, Upload, Share2, Tags, Tag, LineChart, ExternalLink, Lock, Bell, Fingerprint, BookOpen, Download, ShieldAlert, Clock, CalendarClock, FlaskConical, Trash2, CreditCard, Brush, Settings as SettingsIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { strings } from '../constants/strings'
-import { ACCENTS } from '../constants/accents'
-import { THEMES } from '../constants/themes'
-import { CURRENCIES } from '../utils/money'
 import { formatDate } from '../utils/date'
 import { usePwaInstall } from '../hooks/usePwaInstall'
 import { exportExcel, exportCSV, importFile, shareBackup, canShareFiles, downloadBackupJSON } from '../services/exportImport'
@@ -20,6 +17,7 @@ import TagManager from '../components/TagManager'
 import PaymentMethodManager from '../components/PaymentMethodManager'
 import PinSetupModal from '../components/PinSetupModal'
 import ConfirmDialog from '../components/ConfirmDialog'
+import AppearanceModal from '../components/AppearanceModal'
 
 // A row with a label and a right-aligned toggle switch.
 function ToggleRow({ icon: Icon, label, checked, onChange }) {
@@ -81,6 +79,7 @@ export default function Settings() {
   const [catOpen, setCatOpen] = useState(false)
   const [tagManageOpen, setTagManageOpen] = useState(false)
   const [methodManageOpen, setMethodManageOpen] = useState(false)
+  const [appearanceOpen, setAppearanceOpen] = useState(false)
   const [importMsg, setImportMsg] = useState('')
   const [pinModal, setPinModal] = useState(null) // 'set' | 'disable' | null
   const [notifMsg, setNotifMsg] = useState('')
@@ -252,219 +251,23 @@ export default function Settings() {
         </button>
       )}
 
-      {/* Appearance */}
+      {/* Appearance — opens a dedicated window with every UI/look setting */}
       <div>
         <h2 className="mb-2 text-sm font-semibold text-muted">
           {strings.settings.appearance}
         </h2>
-        <Card className="divide-y divide-line-2 dark:divide-line-2">
-          {/* UI theme — repaints the whole app (more themes can be added) */}
-          <div className="flex items-center gap-3 py-2">
+        <Card>
+          <button
+            onClick={() => setAppearanceOpen(true)}
+            className="flex w-full items-center gap-3 py-1 text-left hover:opacity-80"
+          >
             <Brush size={20} className="shrink-0 text-muted" />
-            <span className="flex-1 font-medium">{strings.settings.uiTheme}</span>
-            <div className="flex gap-2">
-              {THEMES.map((t) => {
-                const active = (settings.uiTheme || 'default') === t.id
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => updateSettings({ uiTheme: t.id })}
-                    className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
-                      active
-                        ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-600/20 dark:text-brand-200'
-                        : 'border-line text-muted'
-                    }`}
-                  >
-                    <span className="h-3.5 w-3.5 rounded-full border border-line-strong" style={{ backgroundColor: t.swatch }} />
-                    {t.label}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <ToggleRow
-            icon={Moon}
-            label={strings.settings.darkMode}
-            checked={settings.theme === 'dark'}
-            onChange={(v) => updateSettings({ theme: v ? 'dark' : 'light' })}
-          />
-          <ToggleRow
-            icon={EyeOff}
-            label={strings.settings.hideBalances}
-            checked={settings.hideBalances}
-            onChange={(v) => updateSettings({ hideBalances: v })}
-          />
-          <ToggleRow
-            icon={Vibrate}
-            label={strings.settings.haptics}
-            checked={settings.haptics !== false}
-            onChange={(v) => updateSettings({ haptics: v })}
-          />
-
-          {/* Accent color */}
-          <div className="flex items-center gap-3 py-2">
-            <Palette size={20} className="shrink-0 text-muted" />
-            <span className="flex-1 font-medium">{strings.settings.accentColor}</span>
-            <div className="flex gap-2">
-              {ACCENTS.map((a) => {
-                const active = (settings.accent || 'indigo') === a.id
-                return (
-                  <button
-                    key={a.id}
-                    onClick={() => updateSettings({ accent: a.id })}
-                    className={`flex h-7 w-7 items-center justify-center rounded-full transition ${
-                      active ? 'ring-2 ring-offset-2 ring-line-strong dark:ring-offset-surface' : ''
-                    }`}
-                    style={{ backgroundColor: a.swatch }}
-                    aria-label={a.label}
-                  >
-                    {active && <Check size={14} className="text-white" />}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Animation speed */}
-          <div className="flex items-center gap-3 py-2">
-            <Zap size={20} className="text-muted" />
-            <span className="flex-1 font-medium">{strings.settings.animSpeed}</span>
-            <div className="flex rounded-lg bg-surface-2 p-0.5 dark:bg-surface-2">
-              {[
-                ['off', strings.settings.animOff],
-                ['normal', strings.settings.animNormal],
-                ['fast', strings.settings.animFast],
-              ].map(([val, label]) => (
-                <button
-                  key={val}
-                  onClick={() => updateSettings({ animSpeed: val })}
-                  className={`rounded-md px-3 py-1 text-sm font-semibold transition ${
-                    (settings.animSpeed || 'fast') === val
-                      ? 'bg-surface text-brand-600 shadow-sm dark:bg-surface-3'
-                      : 'text-muted'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Seasonal background effect */}
-          <div className="flex items-center gap-3 py-2">
-            <Snowflake size={20} className="shrink-0 text-muted" />
             <div className="min-w-0 flex-1">
-              <div className="font-medium">{strings.settings.seasonalEffect}</div>
-              <p className="text-xs text-faint">{strings.settings.seasonalHint}</p>
+              <div className="font-medium">{strings.settings.appearance}</div>
+              <p className="text-xs text-faint">{strings.settings.appearanceHint}</p>
             </div>
-            <select
-              value={settings.seasonalEffect || 'off'}
-              onChange={(e) => updateSettings({ seasonalEffect: e.target.value })}
-              className="shrink-0 rounded-lg border border-line-3 bg-surface px-2 py-1.5 text-sm
-                dark:border-line dark:bg-surface"
-            >
-              <option value="off">{strings.settings.seasonOff}</option>
-              <option value="auto">{strings.settings.seasonAuto}</option>
-              <option value="snow">{strings.settings.seasonSnow}</option>
-              <option value="leaves">{strings.settings.seasonLeaves}</option>
-              <option value="sakura">{strings.settings.seasonSakura}</option>
-              <option value="rain">{strings.settings.seasonRain}</option>
-              <option value="hearts">{strings.settings.seasonHearts}</option>
-            </select>
-          </div>
-
-          {/* Celebration confetti */}
-          <div className="flex items-center gap-3 py-2">
-            <PartyPopper size={20} className="shrink-0 text-muted" />
-            <div className="min-w-0 flex-1">
-              <div className="font-medium">{strings.settings.celebrations}</div>
-              <p className="text-xs text-faint">{strings.settings.celebrationsHint}</p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={settings.celebrations !== false}
-              onClick={() => updateSettings({ celebrations: settings.celebrations === false })}
-              className={`relative h-6 w-11 shrink-0 rounded-full transition ${
-                settings.celebrations !== false ? 'bg-brand-600' : 'bg-surface-4 dark:bg-surface-3'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition ${
-                  settings.celebrations !== false ? 'left-[22px]' : 'left-0.5'
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Language */}
-          <div className="flex items-center gap-3 py-2">
-            <Languages size={20} className="text-muted" />
-            <span className="flex-1 font-medium">{strings.settings.language}</span>
-            <div className="flex rounded-lg bg-surface-2 p-0.5 dark:bg-surface-2">
-              {[
-                ['en', 'EN'],
-                ['th', 'ไทย'],
-              ].map(([val, label]) => (
-                <button
-                  key={val}
-                  onClick={() => updateSettings({ language: val })}
-                  className={`rounded-md px-3 py-1 text-sm font-semibold transition ${
-                    settings.language === val
-                      ? 'bg-surface text-brand-600 shadow-sm dark:bg-surface-3'
-                      : 'text-muted'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Primary currency */}
-          <div className="flex items-center gap-3 py-2">
-            <Coins size={20} className="text-muted" />
-            <span className="flex-1 font-medium">{strings.settings.currency}</span>
-            <select
-              value={settings.primaryCurrency}
-              onChange={(e) => updateSettings({ primaryCurrency: e.target.value })}
-              className="rounded-lg border border-line-3 bg-surface px-2 py-1.5 text-sm
-                dark:border-line dark:bg-surface"
-            >
-              {CURRENCIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-        </Card>
-        <p className="mt-1 px-1 text-xs text-muted">{strings.settings.currencyNote}</p>
-      </div>
-
-      {/* Home screen cards — let people hide features they don't use */}
-      <div>
-        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.settings.homeCards}</h2>
-        <Card className="divide-y divide-line-2 dark:divide-line-2">
-          <ToggleRow
-            icon={LineChart}
-            label={strings.settings.showInvestments}
-            checked={settings.showInvestments !== false}
-            onChange={(v) => updateSettings({ showInvestments: v })}
-          />
-          <ToggleRow
-            icon={PiggyBank}
-            label={strings.settings.showSavings}
-            checked={settings.showSavings !== false}
-            onChange={(v) => updateSettings({ showSavings: v })}
-          />
-          <ToggleRow
-            icon={TrendingUp}
-            label={strings.settings.showTrend}
-            checked={settings.showTrend !== false}
-            onChange={(v) => updateSettings({ showTrend: v })}
-          />
+            <ExternalLink size={18} className="shrink-0 text-faint" />
+          </button>
         </Card>
       </div>
 
@@ -716,6 +519,7 @@ export default function Settings() {
         <Card className="text-sm text-muted">{strings.settings.aboutText}</Card>
       </div>
 
+      <AppearanceModal open={appearanceOpen} onClose={() => setAppearanceOpen(false)} />
       <CategoryManager open={catOpen} onClose={() => setCatOpen(false)} />
       <TagManager open={tagManageOpen} onClose={() => setTagManageOpen(false)} />
       <PaymentMethodManager open={methodManageOpen} onClose={() => setMethodManageOpen(false)} />

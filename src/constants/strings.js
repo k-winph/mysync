@@ -354,7 +354,7 @@ const en = {
   },
 
   settings: {
-    title: 'Settings', appearance: 'Appearance', uiTheme: 'Theme', darkMode: 'Dark mode', hideBalances: 'Hide balances',
+    title: 'Settings', appearance: 'Appearance', appearanceHint: 'Theme, colors, language & more', uiTheme: 'Theme', darkMode: 'Dark mode', hideBalances: 'Hide balances',
     haptics: 'Vibration feedback',
     accentColor: 'Accent color',
     animSpeed: 'Animation speed',
@@ -769,7 +769,7 @@ const th = {
   },
 
   settings: {
-    title: 'ตั้งค่า', appearance: 'การแสดงผล', uiTheme: 'ธีม', darkMode: 'โหมดมืด', hideBalances: 'ซ่อนยอดเงิน',
+    title: 'ตั้งค่า', appearance: 'การแสดงผล', appearanceHint: 'ธีม สี ภาษา และอื่นๆ', uiTheme: 'ธีม', darkMode: 'โหมดมืด', hideBalances: 'ซ่อนยอดเงิน',
     haptics: 'สั่นเมื่อกดปุ่ม',
     accentColor: 'สีธีม',
     animSpeed: 'ความเร็วอนิเมชัน',
