@@ -11,7 +11,7 @@ export default function PageHeader({ icon: Icon, title, subtitle, onBack, right 
         <button
           onClick={onBack}
           aria-label="Back"
-          className="-ml-2 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+          className="-ml-2 rounded-full p-2 text-muted hover:bg-surface-2 dark:hover:bg-surface-2"
         >
           <ChevronLeft size={22} />
         </button>
@@ -23,7 +23,7 @@ export default function PageHeader({ icon: Icon, title, subtitle, onBack, right 
       )}
       <div className="min-w-0 flex-1">
         <h1 className="truncate text-2xl font-bold leading-tight">{title}</h1>
-        {subtitle && <p className="truncate text-sm text-slate-500">{subtitle}</p>}
+        {subtitle && <p className="truncate text-sm text-muted">{subtitle}</p>}
       </div>
       {right}
     </div>

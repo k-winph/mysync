@@ -64,7 +64,7 @@ export default function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="relative rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+        className="relative rounded-full p-2 text-muted hover:bg-surface-2 dark:hover:bg-surface-2"
         aria-label={strings.notifCenter.aria}
       >
         <Bell size={22} />
@@ -84,34 +84,34 @@ export default function NotificationBell() {
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div
             className="absolute right-0 top-full z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden
-              rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900"
+              rounded-2xl border border-line bg-surface shadow-xl dark:border-line-2 dark:bg-surface"
           >
-            <div className="border-b border-slate-100 px-4 py-3 text-sm font-bold dark:border-slate-800">
+            <div className="border-b border-line-2 px-4 py-3 text-sm font-bold dark:border-line-2">
               {strings.notifCenter.title}
             </div>
 
             {notifs.length === 0 ? (
-              <p className="px-4 py-6 text-center text-sm text-slate-500">{strings.notifCenter.empty}</p>
+              <p className="px-4 py-6 text-center text-sm text-muted">{strings.notifCenter.empty}</p>
             ) : (
-              <div className="max-h-96 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-800">
+              <div className="max-h-96 divide-y divide-line-2 overflow-y-auto dark:divide-line-2">
                 {notifs.map((n) =>
                   n.type === 'backup' ? (
                     <button
                       key={n.id}
                       onClick={() => go(n.route)}
-                      className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800"
+                      className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-canvas dark:hover:bg-surface-2"
                     >
                       <Save size={16} className="mt-0.5 shrink-0 text-amber-600" />
                       <div className="min-w-0">
                         <div className="text-sm font-medium">{strings.reminder.backupTitle}</div>
-                        <div className="text-xs text-slate-500">{strings.reminder.backupBody}</div>
+                        <div className="text-xs text-muted">{strings.reminder.backupBody}</div>
                       </div>
                     </button>
                   ) : (
                     <button
                       key={n.id}
                       onClick={() => go(n.route)}
-                      className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800"
+                      className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-canvas dark:hover:bg-surface-2"
                     >
                       {n.overdue ? (
                         <CircleAlert size={16} className="mt-0.5 shrink-0 text-red-600" />
@@ -124,7 +124,7 @@ export default function NotificationBell() {
                           <span className={n.overdue ? 'text-red-600' : 'text-amber-600'}>
                             {n.overdue ? strings.debt.overdue : strings.debt.dueInDays(n.dd)}
                           </span>
-                          <span className="text-slate-400"> · {formatDate(n.dueDate)}</span>
+                          <span className="text-faint"> · {formatDate(n.dueDate)}</span>
                         </div>
                       </div>
                       <MoneyText satang={n.amount} className="shrink-0 text-sm font-semibold" />

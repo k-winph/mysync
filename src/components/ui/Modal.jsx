@@ -47,15 +47,15 @@ export default function Modal({ open, onClose, title, children }) {
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="sheet-in relative z-10 w-full max-h-[92vh] overflow-y-auto rounded-t-3xl bg-white
-          p-5 shadow-xl outline-none sm:max-w-md sm:rounded-3xl dark:bg-slate-900"
+        className="sheet-in relative z-10 w-full max-h-[92vh] overflow-y-auto rounded-t-3xl bg-surface
+          p-5 shadow-xl outline-none sm:max-w-md sm:rounded-3xl dark:bg-surface"
         style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 id={titleId} className="text-lg font-bold">{title}</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="rounded-full p-1.5 text-muted hover:bg-surface-2 dark:hover:bg-surface-2"
             aria-label={strings.common.close}
           >
             <X size={20} />

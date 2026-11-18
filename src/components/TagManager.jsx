@@ -79,25 +79,25 @@ export default function TagManager({ open, onClose }) {
 
   return (
     <Modal open={open} onClose={onClose} title={strings.tagManage.title}>
-      {tags.length === 0 && <p className="mb-3 text-sm text-slate-500">{strings.tagManage.empty}</p>}
+      {tags.length === 0 && <p className="mb-3 text-sm text-muted">{strings.tagManage.empty}</p>}
 
       {/* Tag list */}
       <div className="mb-4 space-y-1">
         {tags.map((t, i) => {
           const editing = editingId === t.id
           return (
-            <div key={t.id} className="rounded-xl border border-slate-200 dark:border-slate-700">
+            <div key={t.id} className="rounded-xl border border-line dark:border-line">
               {/* Row */}
               <div className="flex items-center gap-2 px-3 py-2.5">
                 <span className="h-3.5 w-3.5 shrink-0 rounded-full" style={{ backgroundColor: t.color || '#64748b' }} />
                 <span className="flex-1 truncate font-medium">{t.name}</span>
-                <span className="text-xs text-slate-400">{strings.tagManage.used(usage[t.name] || 0)}</span>
+                <span className="text-xs text-faint">{strings.tagManage.used(usage[t.name] || 0)}</span>
                 {/* Reorder */}
                 <div className="flex flex-col">
                   <button
                     onClick={() => moveTag(t.id, 'up')}
                     disabled={i === 0}
-                    className="text-slate-400 hover:text-brand-600 disabled:opacity-25"
+                    className="text-faint hover:text-brand-600 disabled:opacity-25"
                     aria-label={strings.common.moveUp}
                   >
                     <ChevronUp size={16} />
@@ -105,7 +105,7 @@ export default function TagManager({ open, onClose }) {
                   <button
                     onClick={() => moveTag(t.id, 'down')}
                     disabled={i === tags.length - 1}
-                    className="text-slate-400 hover:text-brand-600 disabled:opacity-25"
+                    className="text-faint hover:text-brand-600 disabled:opacity-25"
                     aria-label={strings.common.moveDown}
                   >
                     <ChevronDown size={16} />
@@ -113,7 +113,7 @@ export default function TagManager({ open, onClose }) {
                 </div>
                 <button
                   onClick={() => (editing ? closeEdit() : startEdit(t))}
-                  className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-slate-800"
+                  className="rounded-lg p-1.5 text-faint hover:bg-surface-2 hover:text-brand-600 dark:hover:bg-surface-2"
                   aria-label={strings.tagManage.edit}
                 >
                   <Pencil size={15} />
@@ -122,10 +122,10 @@ export default function TagManager({ open, onClose }) {
 
               {/* Edit panel */}
               {editing && (
-                <div className="space-y-3 border-t border-slate-100 px-3 py-3 dark:border-slate-800">
+                <div className="space-y-3 border-t border-line-2 px-3 py-3 dark:border-line-2">
                   {/* Rename */}
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-slate-500">{strings.tagManage.rename}</label>
+                    <label className="mb-1 block text-xs font-semibold text-muted">{strings.tagManage.rename}</label>
                     <div className="flex gap-2">
                       <input
                         type="text"
@@ -148,15 +148,15 @@ export default function TagManager({ open, onClose }) {
 
                   {/* Color */}
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-slate-500">{strings.tagManage.color}</label>
+                    <label className="mb-1 block text-xs font-semibold text-muted">{strings.tagManage.color}</label>
                     <div className="flex flex-wrap gap-2">
                       {COLORS.map((col) => (
                         <button
                           key={col}
                           type="button"
                           onClick={() => setTagColor(t.id, col)}
-                          className={`h-7 w-7 rounded-full ring-offset-2 transition dark:ring-offset-slate-900 ${
-                            (t.color || '#64748b') === col ? 'ring-2 ring-slate-900 dark:ring-white' : ''
+                          className={`h-7 w-7 rounded-full ring-offset-2 transition dark:ring-offset-surface ${
+                            (t.color || '#64748b') === col ? 'ring-2 ring-ink dark:ring-white' : ''
                           }`}
                           style={{ backgroundColor: col }}
                           aria-label={col}
@@ -168,7 +168,7 @@ export default function TagManager({ open, onClose }) {
                   {/* Merge */}
                   {tags.length > 1 && (
                     <div>
-                      <label className="mb-1 block text-xs font-semibold text-slate-500">{strings.tagManage.mergeInto}</label>
+                      <label className="mb-1 block text-xs font-semibold text-muted">{strings.tagManage.mergeInto}</label>
                       <select
                         value=""
                         onChange={(e) => handleMerge(t.id, e.target.value)}
@@ -179,7 +179,7 @@ export default function TagManager({ open, onClose }) {
                           <option key={x.id} value={x.id}>{x.name}</option>
                         ))}
                       </select>
-                      <p className="mt-1 text-xs text-slate-400">{strings.tagManage.mergeHint}</p>
+                      <p className="mt-1 text-xs text-faint">{strings.tagManage.mergeHint}</p>
                     </div>
                   )}
 
@@ -199,7 +199,7 @@ export default function TagManager({ open, onClose }) {
       {/* Add new */}
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Tag size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Tag size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
           <input
             type="text"
             value={name}

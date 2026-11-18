@@ -73,7 +73,7 @@ export default function PinSetupModal({ open, mode, onClose }) {
 
   return (
     <Modal open={open} onClose={onClose} title={strings.lock.setTitle}>
-      <p className="text-center text-sm text-slate-500">{title}</p>
+      <p className="text-center text-sm text-muted">{title}</p>
       <div className="h-5 text-center text-sm font-medium text-red-600">{error}</div>
       <PinPad value={value} onChange={(v) => { setValue(v); setError('') }} />
     </Modal>

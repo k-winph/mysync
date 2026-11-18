@@ -95,7 +95,7 @@ export default function Balance() {
         <button
           onClick={() => setYear(years[yearIdx + 1])}
           disabled={yearIdx >= years.length - 1}
-          className="rounded-full p-2 text-slate-500 hover:bg-slate-100 disabled:opacity-30 dark:hover:bg-slate-800"
+          className="rounded-full p-2 text-muted hover:bg-surface-2 disabled:opacity-30 dark:hover:bg-surface-2"
           aria-label="Previous year"
         >
           <ChevronLeft size={20} />
@@ -104,7 +104,7 @@ export default function Balance() {
         <button
           onClick={() => setYear(years[yearIdx - 1])}
           disabled={yearIdx <= 0}
-          className="rounded-full p-2 text-slate-500 hover:bg-slate-100 disabled:opacity-30 dark:hover:bg-slate-800"
+          className="rounded-full p-2 text-muted hover:bg-surface-2 disabled:opacity-30 dark:hover:bg-surface-2"
           aria-label="Next year"
         >
           <ChevronRight size={20} />
@@ -112,7 +112,7 @@ export default function Balance() {
       </div>
 
       {!hasData ? (
-        <Card className="text-center text-sm text-slate-500">{strings.balance.noData}</Card>
+        <Card className="text-center text-sm text-muted">{strings.balance.noData}</Card>
       ) : (
         <>
           {/* Compact year summary — deliberately flat (no gradient) so this page
@@ -124,15 +124,15 @@ export default function Balance() {
               <Card className="space-y-2.5">
                 <div className="flex items-end justify-between">
                   <div>
-                    <p className="text-xs text-slate-500">{strings.balance.netThisYear}</p>
+                    <p className="text-xs text-muted">{strings.balance.netThisYear}</p>
                     <MoneyText
                       satang={stats.net}
                       currency={currency}
-                      className={`text-2xl font-extrabold ${stats.net >= 0 ? 'text-slate-900 dark:text-white' : 'text-red-600'}`}
+                      className={`text-2xl font-extrabold ${stats.net >= 0 ? 'text-ink dark:text-white' : 'text-red-600'}`}
                     />
                   </div>
                   <div className="text-right">
-                    <p className="text-[11px] text-slate-400">{strings.balance.savingsRate}</p>
+                    <p className="text-[11px] text-faint">{strings.balance.savingsRate}</p>
                     <p className={`text-base font-bold ${stats.savingsRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {stats.savingsRate === null ? '—' : `${stats.savingsRate}%`}
                     </p>
@@ -140,7 +140,7 @@ export default function Balance() {
                 </div>
 
                 {/* Income vs expense split bar */}
-                <div className="flex h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                <div className="flex h-2 overflow-hidden rounded-full bg-surface-2 dark:bg-surface-2">
                   <div className="h-full bg-emerald-500" style={{ width: `${incPct}%` }} />
                   <div className="h-full bg-rose-500" style={{ width: `${100 - incPct}%` }} />
                 </div>
@@ -148,19 +148,19 @@ export default function Balance() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                    <span className="text-slate-500">{strings.balance.income}</span>
+                    <span className="text-muted">{strings.balance.income}</span>
                     <MoneyText satang={stats.income} currency={currency} className="font-semibold" />
                   </span>
                   <span className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-rose-500" />
-                    <span className="text-slate-500">{strings.balance.expense}</span>
+                    <span className="text-muted">{strings.balance.expense}</span>
                     <MoneyText satang={stats.expense} currency={currency} className="font-semibold" />
                   </span>
                 </div>
 
-                <p className="border-t border-slate-100 pt-2 text-xs text-slate-400 dark:border-slate-800">
+                <p className="border-t border-line-2 pt-2 text-xs text-faint dark:border-line-2">
                   {strings.balance.avgPerMonth}:{' '}
-                  <MoneyText satang={stats.avgPerMonth} currency={currency} className="font-semibold text-slate-500" />
+                  <MoneyText satang={stats.avgPerMonth} currency={currency} className="font-semibold text-muted" />
                 </p>
               </Card>
             )
@@ -168,7 +168,7 @@ export default function Balance() {
 
           {/* Grouped bar chart — all 12 months fit the width (thin bars) */}
           <Card>
-            <p className="mb-2 text-xs font-semibold text-slate-500">{strings.balance.chartTitle}</p>
+            <p className="mb-2 text-xs font-semibold text-muted">{strings.balance.chartTitle}</p>
             <div style={{ height: 230 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 8, right: 4, left: 4, bottom: 0 }} barCategoryGap="20%" barGap={1}>
@@ -196,7 +196,7 @@ export default function Balance() {
 
           {/* Daily spending heatmap (its own month nav; tap a day for its list) */}
           <div>
-            <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-500">
+            <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-muted">
               <CalendarDays size={15} /> {strings.spendCal.title}
             </h2>
             <SpendingCalendar
@@ -209,7 +209,7 @@ export default function Balance() {
 
           {/* Per-month cards with comparison bars (tap to see that month) */}
           <div>
-            <p className="mb-2 px-1 text-xs text-slate-400">{strings.balance.tapMonthHint}</p>
+            <p className="mb-2 px-1 text-xs text-faint">{strings.balance.tapMonthHint}</p>
             <div className="space-y-1.5">
               {months.map((r) => {
                 const net = r.income - r.expense
@@ -235,22 +235,22 @@ export default function Balance() {
                       </div>
                       {/* Comparison bars */}
                       <div className="flex min-w-0 flex-1 flex-col gap-1">
-                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-surface-2 dark:bg-surface-2">
                           <div className="h-full rounded-full bg-emerald-500" style={{ width: `${incW}%` }} />
                         </div>
-                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-surface-2 dark:bg-surface-2">
                           <div className="h-full rounded-full bg-rose-500" style={{ width: `${expW}%` }} />
                         </div>
                       </div>
                       <div className="shrink-0 text-right">
-                        <p className="text-[10px] text-slate-400">{strings.balance.net}</p>
+                        <p className="text-[10px] text-faint">{strings.balance.net}</p>
                         <MoneyText
                           satang={net}
                           currency={currency}
                           className={`text-sm font-bold ${net >= 0 ? 'text-green-600' : 'text-red-600'}`}
                         />
                       </div>
-                      {!empty && <ChevronRight size={15} className="shrink-0 text-slate-400" />}
+                      {!empty && <ChevronRight size={15} className="shrink-0 text-faint" />}
                     </Card>
                   </button>
                 )

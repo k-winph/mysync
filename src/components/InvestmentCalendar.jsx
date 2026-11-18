@@ -58,14 +58,14 @@ export default function InvestmentCalendar({ snapshots, scope, language }) {
         <button
           onClick={() => canPrev && setView((v) => v.subtract(1, 'month'))}
           disabled={!canPrev}
-          className="rounded-full p-1.5 text-slate-500 hover:bg-slate-100 disabled:opacity-30 dark:hover:bg-slate-800"
+          className="rounded-full p-1.5 text-muted hover:bg-surface-2 disabled:opacity-30 dark:hover:bg-surface-2"
           aria-label={strings.invest.prevMonth}
         >
           <ChevronLeft size={18} />
         </button>
         <div className="text-center">
           <div className="text-sm font-bold">{monthLabel(ym, language)}</div>
-          <div className="text-[11px] text-slate-400">
+          <div className="text-[11px] text-faint">
             {strings.invest.monthReturn}:{' '}
             {monthPct == null ? (
               <span>—</span>
@@ -77,7 +77,7 @@ export default function InvestmentCalendar({ snapshots, scope, language }) {
         <button
           onClick={() => canNext && setView((v) => v.add(1, 'month'))}
           disabled={!canNext}
-          className="rounded-full p-1.5 text-slate-500 hover:bg-slate-100 disabled:opacity-30 dark:hover:bg-slate-800"
+          className="rounded-full p-1.5 text-muted hover:bg-surface-2 disabled:opacity-30 dark:hover:bg-surface-2"
           aria-label={strings.invest.nextMonth}
         >
           <ChevronRight size={18} />
@@ -87,7 +87,7 @@ export default function InvestmentCalendar({ snapshots, scope, language }) {
       {/* Weekday header */}
       <div className="mb-1 grid grid-cols-7 gap-1">
         {dow.map((w, i) => (
-          <div key={i} className="text-center text-[10px] font-semibold text-slate-400">{w}</div>
+          <div key={i} className="text-center text-[10px] font-semibold text-faint">{w}</div>
         ))}
       </div>
 
@@ -103,15 +103,15 @@ export default function InvestmentCalendar({ snapshots, scope, language }) {
               className={`flex aspect-square flex-col justify-between overflow-hidden rounded-lg p-1
                 ${c.pct != null && !c.isWeekend && !c.isFuture
                   ? 'border border-white/5'
-                  : 'border border-slate-200/70 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40'}
+                  : 'border border-line/70 bg-canvas dark:border-line-2 dark:bg-surface-2/40'}
                 ${c.isToday ? 'outline outline-2 -outline-offset-1 outline-brand-500' : ''}`}
             >
               <span className={`text-[9px] font-semibold leading-none ${
-                c.pct != null && !c.isWeekend && !c.isFuture ? 'text-white/80' : 'text-slate-400'
+                c.pct != null && !c.isWeekend && !c.isFuture ? 'text-white/80' : 'text-faint'
               }`}>{c.d}</span>
               <span className={`text-center text-[9px] font-bold leading-none sm:text-[10px] ${
-                c.isWeekend || c.isFuture ? 'text-slate-300 dark:text-slate-600'
-                  : c.pct != null ? 'text-white' : 'text-slate-300 dark:text-slate-600'
+                c.isWeekend || c.isFuture ? 'text-faint dark:text-muted'
+                  : c.pct != null ? 'text-white' : 'text-faint dark:text-muted'
               }`}>
                 {c.isFuture ? '' : c.pct != null ? fmtPct(c.pct) : '-'}
               </span>
@@ -121,18 +121,18 @@ export default function InvestmentCalendar({ snapshots, scope, language }) {
       </div>
 
       {/* Legend */}
-      <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-slate-400">
+      <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-faint">
         <span>{strings.invest.down}</span>
         <span className="h-2.5 w-4 rounded-sm" style={{ backgroundColor: 'rgba(244,63,94,0.8)' }} />
         <span className="h-2.5 w-4 rounded-sm" style={{ backgroundColor: 'rgba(244,63,94,0.32)' }} />
-        <span className="h-2.5 w-4 rounded-sm bg-slate-200 dark:bg-slate-800" />
+        <span className="h-2.5 w-4 rounded-sm bg-surface-3 dark:bg-surface-2" />
         <span className="h-2.5 w-4 rounded-sm" style={{ backgroundColor: 'rgba(34,197,94,0.32)' }} />
         <span className="h-2.5 w-4 rounded-sm" style={{ backgroundColor: 'rgba(34,197,94,0.8)' }} />
         <span>{strings.invest.up}</span>
       </div>
 
       {!hasAnyData && (
-        <p className="mt-2 text-center text-[11px] leading-relaxed text-slate-400">{strings.invest.noData}</p>
+        <p className="mt-2 text-center text-[11px] leading-relaxed text-faint">{strings.invest.noData}</p>
       )}
     </Card>
   )

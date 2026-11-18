@@ -28,14 +28,14 @@ export default function Welcome() {
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-6" role="dialog" aria-modal="true">
       <div className="fade-in absolute inset-0 bg-black/50 backdrop-blur-sm" />
-      <div className="dialog-in relative z-10 w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-xl dark:bg-slate-900">
+      <div className="dialog-in relative z-10 w-full max-w-sm rounded-2xl bg-surface p-6 text-center shadow-xl dark:bg-surface">
         <img
           src={`${import.meta.env.BASE_URL}icon-192.png`}
           alt="MySync"
           className="mx-auto h-16 w-16 rounded-2xl shadow-sm"
         />
         <h2 className="mt-4 text-xl font-bold">{strings.welcome.title}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-slate-500">{strings.welcome.body}</p>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{strings.welcome.body}</p>
         <div className="mt-5 space-y-2">
           <Button className="w-full" onClick={done}>
             {strings.welcome.start}

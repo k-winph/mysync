@@ -83,7 +83,7 @@ export default function HoldingModal({ open, portfolioId, editing, onClose }) {
             className="input-base font-mono"
             autoFocus
           />
-          <p className="mt-1 text-xs text-slate-400">{strings.stock.thaiHint}</p>
+          <p className="mt-1 text-xs text-faint">{strings.stock.thaiHint}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">

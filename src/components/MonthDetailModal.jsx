@@ -69,7 +69,7 @@ function MiniDonut({ rows, currency }) {
       className="relative mx-auto"
       style={{ width: 116, height: 116, borderRadius: '9999px', background: `conic-gradient(${stops.join(',')})` }}
     >
-      <div className="absolute inset-[24%] flex items-center justify-center rounded-full bg-white dark:bg-slate-900">
+      <div className="absolute inset-[24%] flex items-center justify-center rounded-full bg-white dark:bg-surface">
         <MoneyText satang={total} currency={currency} className="text-[11px] font-bold" />
       </div>
     </div>
@@ -81,9 +81,9 @@ function DonutSide({ label, rows, currency, emptyText }) {
   const total = rows.reduce((s, r) => s + r.value, 0)
   return (
     <div className="min-w-0 flex-1">
-      <p className="mb-2 text-center text-xs font-semibold text-slate-500">{label}</p>
+      <p className="mb-2 text-center text-xs font-semibold text-muted">{label}</p>
       {total === 0 ? (
-        <div className="flex h-[116px] items-center justify-center text-xs text-slate-400">{emptyText}</div>
+        <div className="flex h-[116px] items-center justify-center text-xs text-faint">{emptyText}</div>
       ) : (
         <>
           <MiniDonut rows={rows} currency={currency} />
@@ -92,7 +92,7 @@ function DonutSide({ label, rows, currency, emptyText }) {
               <div key={r.id} className="flex items-center gap-1.5 text-[11px]">
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: r.color }} />
                 <span className="min-w-0 flex-1 truncate">{r.name}</span>
-                <span className="shrink-0 text-slate-400">{Math.round((r.value / total) * 100)}%</span>
+                <span className="shrink-0 text-faint">{Math.round((r.value / total) * 100)}%</span>
               </div>
             ))}
           </div>
@@ -235,16 +235,16 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
     <Modal open={open} onClose={onClose} title={title}>
       {/* Summary */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-slate-50 p-2.5 text-center dark:bg-slate-800/50">
+        <div className="rounded-xl bg-canvas p-2.5 text-center dark:bg-surface-2/50">
           <p className="text-[11px] text-green-600">{strings.balance.income}</p>
           <MoneyText satang={data.income} currency={currency} className="text-sm font-bold" />
         </div>
-        <div className="rounded-xl bg-slate-50 p-2.5 text-center dark:bg-slate-800/50">
+        <div className="rounded-xl bg-canvas p-2.5 text-center dark:bg-surface-2/50">
           <p className="text-[11px] text-red-600">{strings.balance.expense}</p>
           <MoneyText satang={data.expense} currency={currency} className="text-sm font-bold" />
         </div>
-        <div className="rounded-xl bg-slate-50 p-2.5 text-center dark:bg-slate-800/50">
-          <p className="text-[11px] text-slate-500">{strings.balance.net}</p>
+        <div className="rounded-xl bg-canvas p-2.5 text-center dark:bg-surface-2/50">
+          <p className="text-[11px] text-muted">{strings.balance.net}</p>
           <MoneyText
             satang={data.net}
             currency={currency}
@@ -271,7 +271,7 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
           currency={currency}
           emptyText={strings.month.noIncome}
         />
-        <div className="w-px bg-slate-100 dark:bg-slate-800" />
+        <div className="w-px bg-surface-2 dark:bg-surface-2" />
         <DonutSide
           label={strings.month.expenseByCat}
           rows={data.expenseRows}
@@ -281,17 +281,17 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
       </div>
 
       {/* Full transaction list (read-only) */}
-      <h3 className="mb-2 mt-5 text-sm font-semibold text-slate-500">{strings.month.transactions}</h3>
+      <h3 className="mb-2 mt-5 text-sm font-semibold text-muted">{strings.month.transactions}</h3>
       {data.grouped.length === 0 ? (
-        <p className="py-6 text-center text-sm text-slate-400">{strings.month.noTx}</p>
+        <p className="py-6 text-center text-sm text-faint">{strings.month.noTx}</p>
       ) : (
         <div className="space-y-4">
           {data.grouped.map(([date, items]) => (
             <div key={date}>
-              <p className="mb-1 px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <p className="mb-1 px-2 text-xs font-semibold uppercase tracking-wide text-faint">
                 {formatDate(date)}
               </p>
-              <div className="rounded-2xl border border-slate-200 bg-white p-1 dark:border-slate-800 dark:bg-slate-900">
+              <div className="rounded-2xl border border-line bg-surface p-1 dark:border-line-2 dark:bg-surface">
                 {items.map((tx) => (
                   <TransactionItem key={tx.id} tx={tx} />
                 ))}

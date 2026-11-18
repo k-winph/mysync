@@ -13,8 +13,8 @@ export default function PinPad({ value, onChange }) {
       disabled={disabled}
       aria-label={label}
       className="flex h-16 items-center justify-center rounded-2xl text-2xl font-semibold
-        text-slate-800 transition hover:bg-slate-100 active:scale-95 disabled:opacity-30
-        dark:text-slate-100 dark:hover:bg-slate-800"
+        text-ink transition hover:bg-surface-2 active:scale-95 disabled:opacity-30
+        dark:text-ink dark:hover:bg-surface-2"
     >
       {children}
     </button>
@@ -28,7 +28,7 @@ export default function PinPad({ value, onChange }) {
           <span
             key={i}
             className={`h-3.5 w-3.5 rounded-full transition ${
-              i < value.length ? 'bg-brand-600' : 'bg-slate-300 dark:bg-slate-700'
+              i < value.length ? 'bg-brand-600' : 'bg-surface-4 dark:bg-surface-3'
             }`}
           />
         ))}

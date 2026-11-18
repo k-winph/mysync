@@ -37,13 +37,13 @@ const Settings = lazy(() => import('./pages/Settings'))
 function RouteFallback() {
   return (
     <div className="space-y-4" role="status" aria-live="polite">
-      <div className="h-8 w-40 animate-pulse rounded-lg bg-slate-200/70 dark:bg-slate-800" />
-      <div className="h-24 animate-pulse rounded-2xl bg-slate-200/70 dark:bg-slate-800" />
-      <div className="h-11 animate-pulse rounded-xl bg-slate-200/70 dark:bg-slate-800" />
+      <div className="h-8 w-40 animate-pulse rounded-lg bg-surface-3/70 dark:bg-surface-2" />
+      <div className="h-24 animate-pulse rounded-2xl bg-surface-3/70 dark:bg-surface-2" />
+      <div className="h-11 animate-pulse rounded-xl bg-surface-3/70 dark:bg-surface-2" />
       <div className="space-y-2">
-        <div className="h-16 animate-pulse rounded-2xl bg-slate-200/60 dark:bg-slate-800/70" />
-        <div className="h-16 animate-pulse rounded-2xl bg-slate-200/60 dark:bg-slate-800/70" />
-        <div className="h-16 animate-pulse rounded-2xl bg-slate-200/60 dark:bg-slate-800/70" />
+        <div className="h-16 animate-pulse rounded-2xl bg-surface-3/60 dark:bg-surface-2/70" />
+        <div className="h-16 animate-pulse rounded-2xl bg-surface-3/60 dark:bg-surface-2/70" />
+        <div className="h-16 animate-pulse rounded-2xl bg-surface-3/60 dark:bg-surface-2/70" />
       </div>
       <span className="sr-only">Loading…</span>
     </div>

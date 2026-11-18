@@ -74,7 +74,7 @@ export default function Stocks() {
           <div className="flex items-center gap-1">
             <button
               onClick={() => updateSettings({ hideBalances: !settings.hideBalances })}
-              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="rounded-full p-2 text-muted hover:bg-surface-2 dark:hover:bg-surface-2"
               aria-label={strings.settings.hideBalances}
             >
               {settings.hideBalances ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -82,7 +82,7 @@ export default function Stocks() {
             <button
               onClick={refresh}
               disabled={loading || !hasKey}
-              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 disabled:opacity-40 dark:hover:bg-slate-800"
+              className="rounded-full p-2 text-muted hover:bg-surface-2 disabled:opacity-40 dark:hover:bg-surface-2"
               aria-label={strings.stock.refresh}
             >
               <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
@@ -122,7 +122,7 @@ export default function Stocks() {
 
       {/* Portfolios */}
       {portfolios.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+        <div className="rounded-2xl border border-dashed border-line-3 dark:border-line">
           <EmptyState
             illustration={<StocksArt />}
             title={strings.stock.emptyTitle}
@@ -145,14 +145,14 @@ export default function Stocks() {
                 <Card className="flex items-center gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-semibold">{pf.name}</div>
-                    <div className="text-xs text-slate-500">{strings.stock.positions(pfHoldings.length)}</div>
+                    <div className="text-xs text-muted">{strings.stock.positions(pfHoldings.length)}</div>
                   </div>
                   <div className="text-right">
                     {totals.length === 0 ? (
                       <MoneyText satang={0} currency={primary} className="font-bold" />
                     ) : (
                       <>
-                        <DualMoney combined={pv} primary={primary} className="font-bold" nativeClassName="text-slate-400" />
+                        <DualMoney combined={pv} primary={primary} className="font-bold" nativeClassName="text-faint" />
                         {pfHasToday && (
                           <div className="text-xs">
                             <FxChange combined={pt} pct={ptPct} primary={primary} />
@@ -161,7 +161,7 @@ export default function Stocks() {
                       </>
                     )}
                   </div>
-                  <ChevronRight size={18} className="shrink-0 text-slate-400" />
+                  <ChevronRight size={18} className="shrink-0 text-faint" />
                 </Card>
               </button>
             )
@@ -172,7 +172,7 @@ export default function Stocks() {
       {/* Daily-change calendar — all portfolios combined (primary currency) */}
       {holdings.length > 0 && (
         <div>
-          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-500">
+          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-muted">
             <CalendarDays size={15} /> {strings.invest.calendarAll}
           </h2>
           <InvestmentCalendar snapshots={investmentSnapshots} scope="total" language={settings.language} />

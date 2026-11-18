@@ -61,7 +61,7 @@ export default function ExpenseDonut({ data, currency, onSelect }) {
         </ResponsiveContainer>
         {/* Center total overlay */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xs text-slate-500">{strings.common.total}</span>
+          <span className="text-xs text-muted">{strings.common.total}</span>
           <AnimatedMoney satang={total} currency={currency} trackKey="donutTotal" className="text-lg font-bold" />
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function ExpenseDonut({ data, currency, onSelect }) {
                 <CategoryIcon name={d.icon} size={12} />
               </span>
               <span className="flex-1 truncate font-medium">{d.name}</span>
-              <span className="text-xs text-slate-400">{pct}%</span>
+              <span className="text-xs text-faint">{pct}%</span>
               <MoneyText satang={d.value} currency={currency} className="w-24 text-right font-semibold" />
             </Row>
           )

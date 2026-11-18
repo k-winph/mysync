@@ -12,6 +12,40 @@
     --brand-500: 99 102 241;
     --brand-600: 79 70 229;
     --brand-700: 67 56 202;
+
+    /* Semantic neutral tokens (light). A UI theme can override all of these;
+       these defaults equal the old slate palette so the look is unchanged.
+       Values are space-separated RGB channels for Tailwind's alpha syntax. */
+    --c-canvas: 248 250 252;    /* slate-50  */
+    --c-surface: 255 255 255;   /* white     */
+    --c-surface-2: 241 245 249; /* slate-100 */
+    --c-surface-3: 226 232 240; /* slate-200 */
+    --c-surface-4: 203 213 225; /* slate-300 */
+    --c-ink: 15 23 42;          /* slate-900 */
+    --c-ink-2: 71 85 105;       /* slate-600 */
+    --c-muted: 100 116 139;     /* slate-500 */
+    --c-faint: 148 163 184;     /* slate-400 */
+    --c-line: 226 232 240;      /* slate-200 */
+    --c-line-2: 241 245 249;    /* slate-100 */
+    --c-line-3: 203 213 225;    /* slate-300 */
+    --c-line-strong: 148 163 184; /* slate-400 */
+  }
+
+  /* Dark-mode defaults (mirror the old dark: slate utilities). */
+  .dark {
+    --c-canvas: 2 6 23;         /* slate-950 */
+    --c-surface: 15 23 42;      /* slate-900 */
+    --c-surface-2: 30 41 59;    /* slate-800 */
+    --c-surface-3: 51 65 85;    /* slate-700 */
+    --c-surface-4: 71 85 105;   /* slate-600 */
+    --c-ink: 241 245 249;       /* slate-100 */
+    --c-ink-2: 203 213 225;     /* slate-300 */
+    --c-muted: 100 116 139;     /* slate-500 */
+    --c-faint: 148 163 184;     /* slate-400 */
+    --c-line: 51 65 85;         /* slate-700 */
+    --c-line-2: 30 41 59;       /* slate-800 */
+    --c-line-3: 51 65 85;       /* slate-700 */
+    --c-line-strong: 71 85 105; /* slate-600 */
   }
   html {
     -webkit-tap-highlight-color: transparent;
@@ -28,8 +62,7 @@
     outline-color: rgb(var(--brand-500));
   }
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
-    @apply dark:bg-slate-950 dark:text-slate-100;
+    @apply bg-canvas text-ink antialiased;
     /* Respect iOS safe areas when installed as PWA */
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -82,9 +115,8 @@
 
 @layer components {
   .input-base {
-    @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base
-      outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30
-      dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100;
+    @apply w-full rounded-xl border border-line-3 bg-surface px-3 py-2.5 text-base text-ink
+      outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30;
   }
 }
 

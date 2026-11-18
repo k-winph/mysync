@@ -18,7 +18,7 @@ function RecurringCard({ item, onEdit, onPay }) {
   const days = daysUntil(item.dueDate)
   const overdue = days < 0
   const soon = days >= 0 && days <= 7
-  const tone = overdue ? 'text-red-600' : soon ? 'text-amber-600' : 'text-slate-500'
+  const tone = overdue ? 'text-red-600' : soon ? 'text-amber-600' : 'text-muted'
   return (
     <Card className="space-y-3">
       <button onClick={() => onEdit(item)} className="block w-full text-left">
@@ -34,7 +34,7 @@ function RecurringCard({ item, onEdit, onPay }) {
         <div className={`mt-2 flex items-center gap-1 text-xs ${tone}`}>
           {overdue ? <CircleAlert size={13} /> : <CalendarClock size={13} />}
           {strings.debt.nextDue}: {formatDate(item.dueDate)}
-          <span className="text-slate-400">
+          <span className="text-faint">
             · {overdue ? strings.debt.overdue : strings.debt.dueInDays(days)}
           </span>
         </div>

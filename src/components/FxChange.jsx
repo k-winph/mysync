@@ -12,7 +12,7 @@ export default function FxChange({ combined, pct, primary, onGradient = false, l
   const color = onGradient
     ? up ? 'text-emerald-300' : 'text-rose-300'
     : up ? 'text-green-600' : 'text-red-600'
-  const labelColor = onGradient ? 'text-white/70' : 'text-slate-400'
+  const labelColor = onGradient ? 'text-white/70' : 'text-faint'
   return (
     <span className={`inline-flex items-center gap-1 text-sm font-medium ${color}`}>
       {up ? '▲' : '▼'}

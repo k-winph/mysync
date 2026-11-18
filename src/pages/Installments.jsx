@@ -24,7 +24,7 @@ function LoanCard({ loan, onEdit, onPay }) {
   const days = daysUntil(loan.dueDate)
   const overdue = days < 0
   const soon = days >= 0 && days <= 7
-  const tone = overdue ? 'text-red-600' : soon ? 'text-amber-600' : 'text-slate-500'
+  const tone = overdue ? 'text-red-600' : soon ? 'text-amber-600' : 'text-muted'
 
   return (
     <Card className="space-y-3">
@@ -32,12 +32,12 @@ function LoanCard({ loan, onEdit, onPay }) {
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <div className="truncate font-semibold">{loan.creditor}</div>
-            <div className="mt-0.5 text-xs text-slate-500">
+            <div className="mt-0.5 text-xs text-muted">
               <MoneyText satang={loan.amount} /> · {strings.debt.freq[loan.frequency] || strings.debt.freq.monthly}
             </div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-slate-400">{strings.debt.remainingBalance}</div>
+            <div className="text-xs text-faint">{strings.debt.remainingBalance}</div>
             <MoneyText satang={remaining} className="font-bold" />
           </div>
         </div>
@@ -46,9 +46,9 @@ function LoanCard({ loan, onEdit, onPay }) {
         <div className="mt-2">
           <div className="mb-1 flex items-center justify-between text-xs">
             <span className="font-medium text-brand-600">{strings.debt.installmentOf(paid, total)}</span>
-            <span className="text-slate-400">{pct.toFixed(0)}%</span>
+            <span className="text-faint">{pct.toFixed(0)}%</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-surface-3 dark:bg-surface-2">
             <div className="h-full rounded-full bg-brand-600 transition-all duration-500" style={{ width: `${Math.min(100, pct)}%` }} />
           </div>
         </div>
@@ -56,7 +56,7 @@ function LoanCard({ loan, onEdit, onPay }) {
         <div className={`mt-2 flex items-center gap-1 text-xs ${tone}`}>
           {overdue ? <CircleAlert size={13} /> : <CalendarClock size={13} />}
           {strings.debt.nextDue}: {formatDate(loan.dueDate)}
-          <span className="text-slate-400">
+          <span className="text-faint">
             · {overdue ? strings.debt.overdue : strings.debt.dueInDays(days)}
           </span>
         </div>
@@ -150,8 +150,8 @@ export default function Installments() {
           {/* Paid-off loans (kept as history) */}
           {done.length > 0 && (
             <div>
-              <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.debt.finishedTitle}</h2>
-              <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+              <h2 className="mb-2 text-sm font-semibold text-muted">{strings.debt.finishedTitle}</h2>
+              <Card className="divide-y divide-line-2 dark:divide-line-2">
                 {done.map((loan) => (
                   <button
                     key={loan.id}
@@ -159,7 +159,7 @@ export default function Installments() {
                     className="flex w-full items-center gap-3 px-2 py-2.5 text-left"
                   >
                     <Check size={16} className="shrink-0 text-green-600" />
-                    <span className="flex-1 truncate font-medium text-slate-400 line-through">
+                    <span className="flex-1 truncate font-medium text-faint line-through">
                       {loan.creditor}
                     </span>
                     <span className="text-xs font-medium text-green-600">{strings.debt.paidOff}</span>

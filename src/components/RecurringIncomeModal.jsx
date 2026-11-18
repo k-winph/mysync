@@ -121,14 +121,14 @@ export default function RecurringIncomeModal({ open, editing, onClose }) {
         {/* Frequency */}
         <div>
           <label className="mb-1 block text-sm font-medium">{strings.recIncome.frequency}</label>
-          <div className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+          <div className="grid grid-cols-3 gap-1 rounded-xl bg-surface-2 p-1 dark:bg-surface-2">
             {FREQS.map((f) => (
               <button
                 key={f}
                 type="button"
                 onClick={() => setFrequency(f)}
                 className={`rounded-lg py-1.5 text-xs font-semibold transition ${
-                  frequency === f ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700' : 'text-slate-500'
+                  frequency === f ? 'bg-surface text-brand-600 shadow-sm dark:bg-surface-3' : 'text-muted'
                 }`}
               >
                 {strings.debt.freq[f]}
@@ -140,14 +140,14 @@ export default function RecurringIncomeModal({ open, editing, onClose }) {
         <div>
           <label className="mb-1 block text-sm font-medium">{strings.recIncome.nextDate}</label>
           <DateInput value={nextDate} onChange={(e) => setNextDate(e.target.value)} className="input-base" />
-          <p className="mt-1 text-xs text-slate-400">{strings.recIncome.nextDateHint}</p>
+          <p className="mt-1 text-xs text-faint">{strings.recIncome.nextDateHint}</p>
         </div>
 
         {/* Category (income) */}
         <div>
           <label className="mb-1 block text-sm font-medium">
             {strings.recIncome.category}{' '}
-            <span className="font-normal text-slate-400">({strings.common.optional})</span>
+            <span className="font-normal text-faint">({strings.common.optional})</span>
           </label>
           <div className="grid grid-cols-4 gap-2">
             {incomeCategories.map((c) => {
@@ -158,7 +158,7 @@ export default function RecurringIncomeModal({ open, editing, onClose }) {
                   type="button"
                   onClick={() => setCategoryId(active ? '' : c.id)}
                   className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-[11px] transition ${
-                    active ? 'border-brand-500 bg-brand-50 dark:bg-brand-600/20' : 'border-slate-200 dark:border-slate-700'
+                    active ? 'border-brand-500 bg-brand-50 dark:bg-brand-600/20' : 'border-line dark:border-line'
                   }`}
                 >
                   <span
@@ -178,7 +178,7 @@ export default function RecurringIncomeModal({ open, editing, onClose }) {
         <div>
           <label className="mb-1 block text-sm font-medium">
             {strings.tx.tags}{' '}
-            <span className="font-normal text-slate-400">({strings.common.optional})</span>
+            <span className="font-normal text-faint">({strings.common.optional})</span>
           </label>
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto py-1">
             {tagList.map((t) => {
@@ -189,7 +189,7 @@ export default function RecurringIncomeModal({ open, editing, onClose }) {
                   type="button"
                   onClick={() => toggleTag(t.name)}
                   className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition ${
-                    active ? 'border-brand-600 bg-brand-600 text-white' : 'border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-300'
+                    active ? 'border-brand-600 bg-brand-600 text-white' : 'border-line-3 text-ink-2 dark:border-line-strong dark:text-ink-2'
                   }`}
                   style={!active && t.color ? { borderColor: t.color, color: t.color } : undefined}
                 >
@@ -212,13 +212,13 @@ export default function RecurringIncomeModal({ open, editing, onClose }) {
                 placeholder={strings.tx.newTag}
                 autoFocus
                 list="recinc-tag-suggest"
-                className="w-28 shrink-0 rounded-full border border-brand-500 bg-white px-3 py-1.5 text-sm outline-none dark:bg-slate-900"
+                className="w-28 shrink-0 rounded-full border border-brand-500 bg-surface px-3 py-1.5 text-sm outline-none dark:bg-surface"
               />
             ) : (
               <button
                 type="button"
                 onClick={() => setAddingTag(true)}
-                className="flex shrink-0 items-center gap-1 rounded-full border border-dashed border-slate-400 px-3 py-1.5 text-sm font-medium text-slate-500 dark:border-slate-600"
+                className="flex shrink-0 items-center gap-1 rounded-full border border-dashed border-line-strong px-3 py-1.5 text-sm font-medium text-muted dark:border-line-strong"
               >
                 <Plus size={14} /> {strings.common.add}
               </button>
@@ -232,7 +232,7 @@ export default function RecurringIncomeModal({ open, editing, onClose }) {
         <div>
           <label className="mb-1 block text-sm font-medium">
             {strings.tx.note}{' '}
-            <span className="font-normal text-slate-400">({strings.common.optional})</span>
+            <span className="font-normal text-faint">({strings.common.optional})</span>
           </label>
           <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} className="input-base resize-none" />
         </div>

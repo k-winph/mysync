@@ -106,11 +106,11 @@ export default function MonthlyTrend({ transactions, currency }) {
       </div>
 
       {insight && (
-        <div className="mt-3 flex items-center gap-2 border-t border-slate-100 pt-3 text-sm dark:border-slate-800">
+        <div className="mt-3 flex items-center gap-2 border-t border-line-2 pt-3 text-sm dark:border-line-2">
           {insight.dir === 'up' && <TrendingUp size={18} className="shrink-0 text-red-500" />}
           {insight.dir === 'down' && <TrendingDown size={18} className="shrink-0 text-green-600" />}
-          {insight.dir === 'same' && <Minus size={18} className="shrink-0 text-slate-400" />}
-          <span className="text-slate-600 dark:text-slate-300">
+          {insight.dir === 'same' && <Minus size={18} className="shrink-0 text-faint" />}
+          <span className="text-ink-2 dark:text-ink-2">
             {insight.dir === 'up' && strings.dashboard.trendUp(insight.pct)}
             {insight.dir === 'down' && strings.dashboard.trendDown(Math.abs(insight.pct))}
             {insight.dir === 'same' && strings.dashboard.trendSame}

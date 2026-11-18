@@ -15,7 +15,7 @@ import PageHeader from '../components/PageHeader'
 // Progress bar with a color that turns green once the goal is reached.
 function ProgressBar({ pct, done }) {
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+    <div className="h-2 w-full overflow-hidden rounded-full bg-surface-3 dark:bg-surface-2">
       <div
         className={`h-full rounded-full transition-all ${done ? 'bg-emerald-500' : 'bg-brand-600'}`}
         style={{ width: `${Math.min(100, pct)}%` }}
@@ -41,15 +41,15 @@ function GoalCard({ goal, onEdit, onAddFunds }) {
         </div>
         <div className="mt-2 flex items-center justify-between text-sm">
           <MoneyText satang={goal.currentAmount} className="font-semibold" />
-          <span className="text-slate-400">
-            / <MoneyText satang={goal.targetAmount} className="text-slate-400" />
+          <span className="text-faint">
+            / <MoneyText satang={goal.targetAmount} className="text-faint" />
           </span>
         </div>
         {done ? (
           <p className="mt-1 text-xs font-medium text-emerald-600">{strings.savings.reached}</p>
         ) : (
           goal.deadline && (
-            <p className="mt-1 flex items-center gap-1 text-xs text-slate-400">
+            <p className="mt-1 flex items-center gap-1 text-xs text-faint">
               <CalendarClock size={12} />
               {strings.savings.daysLeft(days)}
             </p>

@@ -188,7 +188,7 @@ export default function SplitBill() {
           placeholder={placeholder}
           className="input-base w-20 text-right"
         />
-        <span className="text-sm text-slate-400">%</span>
+        <span className="text-sm text-faint">%</span>
       </div>
     </div>
   )
@@ -202,7 +202,7 @@ export default function SplitBill() {
         subtitle={strings.pageSub.split}
         right={
           (people.length > 0 || items.length > 0) && (
-            <button onClick={clearAll} className="text-sm font-medium text-slate-500 hover:text-red-600">
+            <button onClick={clearAll} className="text-sm font-medium text-muted hover:text-red-600">
               {strings.split.clear}
             </button>
           )
@@ -211,7 +211,7 @@ export default function SplitBill() {
 
       {/* People */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.split.people}</h2>
+        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.split.people}</h2>
         <Card className="space-y-3">
           <div className="flex gap-2">
             <input
@@ -240,14 +240,14 @@ export default function SplitBill() {
               {people.map((p) => (
                 <span
                   key={p.id}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 py-1 pl-1 pr-2.5
-                    text-sm font-medium dark:bg-slate-800"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 py-1 pl-1 pr-2.5
+                    text-sm font-medium dark:bg-surface-2"
                 >
                   <Avatar person={p} size={24} />
                   {p.name}
                   <button
                     onClick={() => removePerson(p.id)}
-                    className="text-slate-400 hover:text-red-600"
+                    className="text-faint hover:text-red-600"
                     aria-label={`Remove ${p.name}`}
                   >
                     <X size={14} />
@@ -261,7 +261,7 @@ export default function SplitBill() {
 
       {/* Items */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.split.items}</h2>
+        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.split.items}</h2>
         {people.length === 0 ? (
           <Card>
             <EmptyState icon={Users} message={strings.split.needPeople} />
@@ -288,14 +288,14 @@ export default function SplitBill() {
                   </div>
                   <button
                     onClick={() => removeItem(it.id)}
-                    className="shrink-0 rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-red-600 dark:hover:bg-slate-800"
+                    className="shrink-0 rounded-full p-1.5 text-faint hover:bg-surface-2 hover:text-red-600 dark:hover:bg-surface-2"
                     aria-label="Remove item"
                   >
                     <Trash2 size={18} />
                   </button>
                 </div>
                 <div>
-                  <p className="mb-1 text-xs text-slate-400">{strings.split.whoShared}</p>
+                  <p className="mb-1 text-xs text-faint">{strings.split.whoShared}</p>
                   <div className="flex flex-wrap gap-2">
                     {people.map((p) => {
                       const active = it.members.includes(p.id)
@@ -306,7 +306,7 @@ export default function SplitBill() {
                           className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm font-medium transition ${
                             active
                               ? 'border-transparent text-white'
-                              : 'border-slate-300 text-slate-500 dark:border-slate-600'
+                              : 'border-line-3 text-muted dark:border-line-strong'
                           }`}
                           style={active ? { backgroundColor: avatarColor(p.id) } : undefined}
                         >
@@ -322,8 +322,8 @@ export default function SplitBill() {
             <button
               onClick={addItem}
               className="flex w-full items-center justify-center gap-1.5 rounded-2xl border-2
-                border-dashed border-slate-300 py-3 text-sm font-semibold text-slate-500
-                hover:border-brand-400 hover:text-brand-600 dark:border-slate-700"
+                border-dashed border-line-3 py-3 text-sm font-semibold text-muted
+                hover:border-brand-400 hover:text-brand-600 dark:border-line"
             >
               <Plus size={18} /> {strings.split.addItem}
             </button>
@@ -334,8 +334,8 @@ export default function SplitBill() {
       {/* Service charge / VAT / tip */}
       {people.length > 0 && subtotal > 0 && (
         <div>
-          <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.split.charges}</h2>
-          <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+          <h2 className="mb-2 text-sm font-semibold text-muted">{strings.split.charges}</h2>
+          <Card className="divide-y divide-line-2 dark:divide-line-2">
             {chargeRow('service', strings.split.service, '10')}
             {chargeRow('vat', strings.split.vat, '7')}
             {chargeRow('tip', strings.split.tip, '0')}
@@ -368,7 +368,7 @@ export default function SplitBill() {
           </div>
 
           <div className="mb-2 mt-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-500">{strings.split.perPerson}</h2>
+            <h2 className="text-sm font-semibold text-muted">{strings.split.perPerson}</h2>
             <button
               onClick={shareImage}
               className="flex items-center gap-1.5 rounded-full border border-brand-500 px-3 py-1
@@ -391,7 +391,7 @@ export default function SplitBill() {
                       <span className="truncate font-medium">{p.name}</span>
                       <span className="ml-2 shrink-0 font-semibold">{formatMoney(amt, primary)}</span>
                     </div>
-                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-2 dark:bg-surface-2">
                       <div
                         className="h-full rounded-full"
                         style={{ width: `${pct}%`, backgroundColor: avatarColor(p.id) }}

@@ -99,7 +99,7 @@ export default function CategoryManager({ open, onClose }) {
       <div className="mb-3 space-y-3">
         {groups.map((g) => (
           <div key={g.type} className="space-y-1">
-            <p className="px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">{typeLabel(g.type)}</p>
+            <p className="px-1 text-xs font-semibold uppercase tracking-wide text-faint">{typeLabel(g.type)}</p>
             {g.items.map((c) => {
               const editing = editingId === c.id
               const peers = g.items.filter((x) => !x.archived && !!x.pinned === !!c.pinned)
@@ -110,8 +110,8 @@ export default function CategoryManager({ open, onClose }) {
                 (x) => x.id !== c.id && !x.archived && (x.type === c.type || x.type === 'both' || c.type === 'both')
               )
               return (
-                <div key={c.id} className={`rounded-xl border dark:border-slate-700 ${editing ? 'border-slate-300 dark:border-slate-600' : 'border-transparent'}`}>
-                  <div className="flex items-center gap-2 rounded-xl px-2 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">
+                <div key={c.id} className={`rounded-xl border dark:border-line ${editing ? 'border-line-3 dark:border-line-strong' : 'border-transparent'}`}>
+                  <div className="flex items-center gap-2 rounded-xl px-2 py-2 hover:bg-surface-2 dark:hover:bg-surface-2">
                     <span
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white ${c.archived ? 'opacity-40' : ''}`}
                       style={{ backgroundColor: c.color }}
@@ -119,14 +119,14 @@ export default function CategoryManager({ open, onClose }) {
                       <CategoryIcon name={c.icon} size={16} />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <span className={`font-medium ${c.archived ? 'text-slate-400' : ''}`}>{c.name}</span>
+                      <span className={`font-medium ${c.archived ? 'text-faint' : ''}`}>{c.name}</span>
                       {c.pinned && !c.archived && (
                         <span className="ml-1.5 text-[10px] font-semibold uppercase text-brand-600">{strings.category.pinnedBadge}</span>
                       )}
                       {c.archived && (
-                        <span className="ml-1.5 text-[10px] font-semibold uppercase text-slate-400">{strings.category.archivedBadge}</span>
+                        <span className="ml-1.5 text-[10px] font-semibold uppercase text-faint">{strings.category.archivedBadge}</span>
                       )}
-                      <span className="ml-2 text-xs text-slate-400">{strings.category.used(usage[c.id] || 0)}</span>
+                      <span className="ml-2 text-xs text-faint">{strings.category.used(usage[c.id] || 0)}</span>
                     </div>
                     {/* Reorder (active categories only) */}
                     {!c.archived && (
@@ -134,7 +134,7 @@ export default function CategoryManager({ open, onClose }) {
                         <button
                           onClick={() => moveCategory(c.id, 'up')}
                           disabled={!canUp}
-                          className="text-slate-400 hover:text-brand-600 disabled:opacity-25"
+                          className="text-faint hover:text-brand-600 disabled:opacity-25"
                           aria-label={strings.common.moveUp}
                         >
                           <ChevronUp size={16} />
@@ -142,7 +142,7 @@ export default function CategoryManager({ open, onClose }) {
                         <button
                           onClick={() => moveCategory(c.id, 'down')}
                           disabled={!canDown}
-                          className="text-slate-400 hover:text-brand-600 disabled:opacity-25"
+                          className="text-faint hover:text-brand-600 disabled:opacity-25"
                           aria-label={strings.common.moveDown}
                         >
                           <ChevronDown size={16} />
@@ -153,7 +153,7 @@ export default function CategoryManager({ open, onClose }) {
                     {!c.archived && (
                       <button
                         onClick={() => updateCategory(c.id, { pinned: !c.pinned })}
-                        className={`rounded-lg p-1.5 transition hover:bg-slate-200 dark:hover:bg-slate-700 ${c.pinned ? 'text-brand-600' : 'text-slate-400'}`}
+                        className={`rounded-lg p-1.5 transition hover:bg-surface-3 dark:hover:bg-surface-3 ${c.pinned ? 'text-brand-600' : 'text-faint'}`}
                         aria-label={c.pinned ? strings.category.unpin : strings.category.pin}
                       >
                         {c.pinned ? <Pin size={15} /> : <PinOff size={15} />}
@@ -161,7 +161,7 @@ export default function CategoryManager({ open, onClose }) {
                     )}
                     <button
                       onClick={() => setEditingId(editing ? null : c.id)}
-                      className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-200 hover:text-brand-600 dark:hover:bg-slate-700"
+                      className="rounded-lg p-1.5 text-faint transition hover:bg-surface-3 hover:text-brand-600 dark:hover:bg-surface-3"
                       aria-label={strings.category.edit}
                     >
                       <Pencil size={15} />
@@ -170,30 +170,30 @@ export default function CategoryManager({ open, onClose }) {
 
                   {/* Edit panel */}
                   {editing && (
-                    <div className="space-y-3 border-t border-slate-100 px-3 py-3 dark:border-slate-800">
+                    <div className="space-y-3 border-t border-line-2 px-3 py-3 dark:border-line-2">
                       {/* Archive toggle */}
                       <div>
                         <button
                           onClick={() => updateCategory(c.id, { archived: !c.archived, pinned: c.archived ? c.pinned : false })}
-                          className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300"
+                          className="flex items-center gap-2 text-sm font-medium text-ink-2 dark:text-ink-2"
                         >
                           {c.archived ? <Eye size={16} /> : <EyeOff size={16} />}
                           {c.archived ? strings.category.unarchive : strings.category.archive}
                         </button>
-                        <p className="mt-1 text-xs text-slate-400">{strings.category.archiveHint}</p>
+                        <p className="mt-1 text-xs text-faint">{strings.category.archiveHint}</p>
                       </div>
 
                       {/* Merge */}
                       {mergeTargets.length > 0 && (
                         <div>
-                          <label className="mb-1 block text-xs font-semibold text-slate-500">{strings.category.mergeInto}</label>
+                          <label className="mb-1 block text-xs font-semibold text-muted">{strings.category.mergeInto}</label>
                           <select value="" onChange={(e) => handleMerge(c.id, e.target.value)} className="input-base">
                             <option value="">{strings.category.mergeNone}</option>
                             {mergeTargets.map((x) => (
                               <option key={x.id} value={x.id}>{x.name}</option>
                             ))}
                           </select>
-                          <p className="mt-1 text-xs text-slate-400">{strings.category.mergeHint}</p>
+                          <p className="mt-1 text-xs text-faint">{strings.category.mergeHint}</p>
                         </div>
                       )}
 
@@ -221,7 +221,7 @@ export default function CategoryManager({ open, onClose }) {
 
       {/* Add form / toggle */}
       {adding ? (
-        <div className="space-y-3 rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
+        <div className="space-y-3 rounded-2xl border border-line p-3 dark:border-line">
           <input
             type="text"
             value={name}
@@ -231,14 +231,14 @@ export default function CategoryManager({ open, onClose }) {
             autoFocus
           />
 
-          <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+          <div className="grid grid-cols-3 gap-2 rounded-xl bg-surface-2 p-1 dark:bg-surface-2">
             {['expense', 'income', 'both'].map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setType(t)}
                 className={`rounded-lg py-1.5 text-xs font-semibold capitalize transition ${
-                  type === t ? 'bg-brand-600 text-white' : 'text-slate-600 dark:text-slate-300'
+                  type === t ? 'bg-brand-600 text-white' : 'text-ink-2 dark:text-ink-2'
                 }`}
               >
                 {t === 'both' ? strings.category.both : t === 'income' ? strings.tx.income : strings.tx.expense}
@@ -254,7 +254,7 @@ export default function CategoryManager({ open, onClose }) {
                 type="button"
                 onClick={() => setIcon(ic)}
                 className={`flex h-9 w-9 items-center justify-center rounded-lg border transition ${
-                  icon === ic ? 'border-brand-500 bg-brand-50 dark:bg-brand-600/20' : 'border-slate-200 dark:border-slate-700'
+                  icon === ic ? 'border-brand-500 bg-brand-50 dark:bg-brand-600/20' : 'border-line dark:border-line'
                 }`}
               >
                 <CategoryIcon name={ic} size={16} />
@@ -269,8 +269,8 @@ export default function CategoryManager({ open, onClose }) {
                 key={col}
                 type="button"
                 onClick={() => setColor(col)}
-                className={`h-8 w-8 rounded-full ring-offset-2 transition dark:ring-offset-slate-900 ${
-                  color === col ? 'ring-2 ring-slate-900 dark:ring-white' : ''
+                className={`h-8 w-8 rounded-full ring-offset-2 transition dark:ring-offset-surface ${
+                  color === col ? 'ring-2 ring-ink dark:ring-white' : ''
                 }`}
                 style={{ backgroundColor: col }}
                 aria-label={col}

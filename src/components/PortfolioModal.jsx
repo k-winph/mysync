@@ -68,7 +68,7 @@ export default function PortfolioModal({ open, editing, onClose, onDeleted }) {
         <div>
           <label className="mb-1 block text-sm font-medium">
             {strings.stock.note}{' '}
-            <span className="font-normal text-slate-400">({strings.common.optional})</span>
+            <span className="font-normal text-faint">({strings.common.optional})</span>
           </label>
           <textarea
             value={note}

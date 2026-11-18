@@ -5,10 +5,10 @@ const VARIANTS = {
   primary:
     'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-700 disabled:opacity-50',
   secondary:
-    'bg-slate-200 text-slate-800 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700',
+    'bg-surface-3 text-ink hover:bg-surface-4 dark:bg-surface-2 dark:text-ink dark:hover:bg-surface-3',
   danger: 'bg-red-600 text-white hover:bg-red-700',
   ghost:
-    'bg-transparent text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+    'bg-transparent text-ink-2 hover:bg-surface-2 dark:text-ink-2 dark:hover:bg-surface-2',
 }
 
 export default function Button({

@@ -28,7 +28,7 @@ function IncomeCard({ item, onEdit }) {
           </div>
           <MoneyText satang={item.amount} className="shrink-0 font-bold text-green-600" />
         </div>
-        <div className="flex items-center gap-1 border-t border-slate-100 pt-2 text-xs text-slate-500 dark:border-slate-800">
+        <div className="flex items-center gap-1 border-t border-line-2 pt-2 text-xs text-muted dark:border-line-2">
           <CalendarClock size={13} /> {strings.recIncome.next}: {formatDate(item.nextDate)}
         </div>
       </Card>
@@ -94,7 +94,7 @@ export default function RecurringIncome() {
               </div>
             )}
           </div>
-          <p className="px-1 text-xs text-slate-400">{strings.recIncome.autoNote}</p>
+          <p className="px-1 text-xs text-faint">{strings.recIncome.autoNote}</p>
           <div className="space-y-3">
             {items.map((it) => (
               <IncomeCard key={it.id} item={it} onEdit={openEdit} />

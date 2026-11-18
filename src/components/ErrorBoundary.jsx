@@ -36,7 +36,7 @@ export default class ErrorBoundary extends Component {
           <AlertTriangle size={30} />
         </div>
         <h1 className="text-xl font-bold">{strings.error.title}</h1>
-        <p className="max-w-xs text-sm leading-relaxed text-slate-500">{strings.error.body}</p>
+        <p className="max-w-xs text-sm leading-relaxed text-muted">{strings.error.body}</p>
         <button
           onClick={() => window.location.reload()}
           className="mt-1 flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm

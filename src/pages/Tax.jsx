@@ -41,7 +41,7 @@ function formatThousands(text) {
 function Line({ label, value, strong }) {
   return (
     <div className="flex items-center justify-between py-1 text-sm">
-      <span className={strong ? 'font-semibold' : 'text-slate-600 dark:text-slate-300'}>
+      <span className={strong ? 'font-semibold' : 'text-ink-2 dark:text-ink-2'}>
         {label}
       </span>
       <span className={strong ? 'font-bold' : 'font-medium'}>{value}</span>
@@ -72,7 +72,7 @@ export default function Tax() {
         right={
           <button
             onClick={() => setInfoOpen(true)}
-            className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="rounded-full p-2 text-muted hover:bg-surface-2 dark:hover:bg-surface-2"
             aria-label={strings.tax.infoAria}
           >
             <Info size={22} />
@@ -85,7 +85,7 @@ export default function Tax() {
         <div>
           <label className="mb-1 block text-sm font-medium">
             {strings.tax.annualIncome}{' '}
-            <span className="font-normal text-slate-400">({strings.tax.perYear})</span>
+            <span className="font-normal text-faint">({strings.tax.perYear})</span>
           </label>
           <input
             type="text"
@@ -106,7 +106,7 @@ export default function Tax() {
             placeholder="0"
             className="input-base"
           />
-          <p className="mt-1 text-xs text-slate-400">{strings.tax.extraHint}</p>
+          <p className="mt-1 text-xs text-faint">{strings.tax.extraHint}</p>
         </div>
       </Card>
 
@@ -126,12 +126,12 @@ export default function Tax() {
 
       {/* Deductions breakdown */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.tax.breakdownTitle}</h2>
+        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.tax.breakdownTitle}</h2>
         <Card>
           <Line label={strings.tax.personal} value={baht(r.personal, currency)} />
           <Line label={strings.tax.expense} value={baht(r.expense, currency)} />
           <Line label={strings.tax.extra} value={baht(r.extra, currency)} />
-          <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
+          <div className="my-1 border-t border-line-2 dark:border-line-2" />
           <Line label={strings.tax.totalDeductions} value={baht(r.deductions, currency)} strong />
           <Line label={strings.tax.taxableIncome} value={baht(r.taxable, currency)} strong />
         </Card>
@@ -139,15 +139,15 @@ export default function Tax() {
 
       {/* Per-bracket breakdown */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.tax.bracketsTitle}</h2>
+        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.tax.bracketsTitle}</h2>
         <Card>
           {r.breakdown.length === 0 ? (
-            <p className="py-4 text-center text-sm text-slate-500">{strings.tax.noTax}</p>
+            <p className="py-4 text-center text-sm text-muted">{strings.tax.noTax}</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-slate-400">
+                  <tr className="text-left text-xs text-faint">
                     <th className="pb-2 font-medium">{strings.tax.band}</th>
                     <th className="pb-2 text-center font-medium">{strings.tax.rate}</th>
                     <th className="pb-2 text-right font-medium">{strings.tax.taxedAmount}</th>
@@ -156,8 +156,8 @@ export default function Tax() {
                 </thead>
                 <tbody>
                   {r.breakdown.map((b, i) => (
-                    <tr key={i} className="border-t border-slate-100 dark:border-slate-800">
-                      <td className="py-1.5 text-xs text-slate-500">
+                    <tr key={i} className="border-t border-line-2 dark:border-line-2">
+                      <td className="py-1.5 text-xs text-muted">
                         {b.from.toLocaleString()}–
                         {b.to === Infinity ? '∞' : b.to.toLocaleString()}
                       </td>
@@ -185,16 +185,16 @@ export default function Tax() {
         <div className="space-y-4 text-sm leading-relaxed">
           <section>
             <h3 className="mb-1 font-semibold">{strings.taxInfo.formulaTitle}</h3>
-            <p className="text-slate-600 dark:text-slate-300">{strings.taxInfo.formula}</p>
-            <p className="mt-1 rounded-lg bg-slate-100 px-3 py-2 text-center text-xs font-medium
-              dark:bg-slate-800">
+            <p className="text-ink-2 dark:text-ink-2">{strings.taxInfo.formula}</p>
+            <p className="mt-1 rounded-lg bg-surface-2 px-3 py-2 text-center text-xs font-medium
+              dark:bg-surface-2">
               {strings.taxInfo.formulaLine}
             </p>
           </section>
 
           <section>
             <h3 className="mb-1 font-semibold">{strings.taxInfo.bracketsTitle}</h3>
-            <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+            <div className="overflow-hidden rounded-lg border border-line dark:border-line">
               <table className="w-full text-xs">
                 <tbody>
                   {TAX_BRACKETS.map((b, i) => {
@@ -204,8 +204,8 @@ export default function Tax() {
                         ? `${prev.toLocaleString()}+`
                         : `${prev.toLocaleString()}–${b.limit.toLocaleString()}`
                     return (
-                      <tr key={i} className="border-b border-slate-100 last:border-0 dark:border-slate-800">
-                        <td className="px-3 py-1.5 text-slate-600 dark:text-slate-300">{range}</td>
+                      <tr key={i} className="border-b border-line-2 last:border-0 dark:border-line-2">
+                        <td className="px-3 py-1.5 text-ink-2 dark:text-ink-2">{range}</td>
                         <td className="px-3 py-1.5 text-right font-semibold">
                           {b.rate === 0 ? 'ยกเว้น' : `${Math.round(b.rate * 100)}%`}
                         </td>
@@ -219,22 +219,22 @@ export default function Tax() {
 
           <section>
             <h3 className="mb-1 font-semibold">{strings.taxInfo.thresholdTitle}</h3>
-            <p className="text-slate-600 dark:text-slate-300">{strings.taxInfo.threshold}</p>
+            <p className="text-ink-2 dark:text-ink-2">{strings.taxInfo.threshold}</p>
           </section>
 
           <section>
             <h3 className="mb-1 font-semibold">{strings.taxInfo.deductionsTitle}</h3>
-            <p className="text-slate-600 dark:text-slate-300">{strings.taxInfo.deductions}</p>
+            <p className="text-ink-2 dark:text-ink-2">{strings.taxInfo.deductions}</p>
           </section>
 
           <section>
             <h3 className="mb-1 font-semibold">{strings.taxInfo.otherIncomeTitle}</h3>
-            <p className="text-slate-600 dark:text-slate-300">{strings.taxInfo.otherIncome}</p>
+            <p className="text-ink-2 dark:text-ink-2">{strings.taxInfo.otherIncome}</p>
           </section>
 
           <section>
             <h3 className="mb-1 font-semibold">{strings.taxInfo.usageTitle}</h3>
-            <p className="text-slate-600 dark:text-slate-300">{strings.taxInfo.usage}</p>
+            <p className="text-ink-2 dark:text-ink-2">{strings.taxInfo.usage}</p>
           </section>
 
           <div className="flex gap-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-800

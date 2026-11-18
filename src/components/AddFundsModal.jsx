@@ -41,7 +41,7 @@ export default function AddFundsModal({ open, goal, onClose }) {
   return (
     <Modal open={open} onClose={onClose} title={strings.savings.addFundsTitle}>
       <form onSubmit={submit} className="space-y-4">
-        <p className="text-sm text-slate-500">{goal.name}</p>
+        <p className="text-sm text-muted">{goal.name}</p>
         <div>
           <label className="mb-1 block text-sm font-medium">{strings.savings.addFunds}</label>
           <MoneyInput
@@ -52,7 +52,7 @@ export default function AddFundsModal({ open, goal, onClose }) {
             autoFocus
           />
           {remaining > 0 && (
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs text-faint">
               {formatMoney(remaining, primary)} {strings.savings.toGo}
             </p>
           )}

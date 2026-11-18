@@ -25,11 +25,11 @@ function HoldingRow({ holding, quote, onEdit, convert, primary }) {
     <button onClick={() => onEdit(holding)} className="flex w-full items-center gap-3 px-2 py-3 text-left">
       <div className="min-w-0 flex-1">
         <div className="font-mono font-semibold">{holding.symbol}</div>
-        <div className="truncate text-xs text-slate-500">
+        <div className="truncate text-xs text-muted">
           {holding.shares} × {formatMoney(holding.avgCost, holding.currency)}
         </div>
         {m.hasPrice && (
-          <div className="text-xs text-slate-400">
+          <div className="text-xs text-faint">
             {strings.stock.price}: {formatMoney(m.priceCents, holding.currency)}
             {m.changePct != null && (
               <span className={todayUp ? 'text-green-600' : 'text-red-600'}>
@@ -46,7 +46,7 @@ function HoldingRow({ holding, quote, onEdit, convert, primary }) {
               combined={singleToPrimary(m.value, holding.currency, convert, primary)}
               primary={primary}
               className="font-semibold"
-              nativeClassName="text-slate-400"
+              nativeClassName="text-faint"
               stacked
             />
             <div className="mt-0.5 flex justify-end">
@@ -58,7 +58,7 @@ function HoldingRow({ holding, quote, onEdit, convert, primary }) {
             </div>
           </>
         ) : (
-          <span className="text-xs text-slate-400">{strings.stock.notFetched}</span>
+          <span className="text-xs text-faint">{strings.stock.notFetched}</span>
         )}
       </div>
     </button>
@@ -142,7 +142,7 @@ export default function PortfolioDetail() {
         <button onClick={() => navigate('/stocks')} className="text-brand-600">
           ← {strings.stock.title}
         </button>
-        <p className="text-sm text-slate-500">—</p>
+        <p className="text-sm text-muted">—</p>
       </div>
     )
   }
@@ -174,7 +174,7 @@ export default function PortfolioDetail() {
           <div className="flex items-center gap-1">
             <button
               onClick={() => setEditPf(true)}
-              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="rounded-full p-2 text-muted hover:bg-surface-2 dark:hover:bg-surface-2"
               aria-label={strings.stock.editPortfolio}
             >
               <Pencil size={18} />
@@ -182,7 +182,7 @@ export default function PortfolioDetail() {
             <button
               onClick={refresh}
               disabled={loading || !hasKey}
-              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 disabled:opacity-40 dark:hover:bg-slate-800"
+              className="rounded-full p-2 text-muted hover:bg-surface-2 disabled:opacity-40 dark:hover:bg-surface-2"
               aria-label={strings.stock.refresh}
             >
               <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
@@ -223,7 +223,7 @@ export default function PortfolioDetail() {
       {/* Daily-change calendar for this portfolio */}
       {holdings.length > 0 && (
         <div>
-          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-500">
+          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-muted">
             <CalendarDays size={15} /> {strings.invest.calendarOne}
           </h2>
           <InvestmentCalendar snapshots={investmentSnapshots} scope={portfolioId} language={language} />
@@ -233,13 +233,13 @@ export default function PortfolioDetail() {
       {/* Holdings */}
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-500">{strings.stock.holdings}</h2>
+          <h2 className="text-sm font-semibold text-muted">{strings.stock.holdings}</h2>
           {holdings.length > 1 && (
             <select
               value={sortKey}
               onChange={(e) => setSortKey(e.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs
-                dark:border-slate-700 dark:bg-slate-900"
+              className="rounded-lg border border-line-3 bg-surface px-2 py-1 text-xs
+                dark:border-line dark:bg-surface"
               aria-label={strings.stock.sortLabel}
             >
               <option value="default">{strings.stock.sortLabel}</option>
@@ -253,12 +253,12 @@ export default function PortfolioDetail() {
           )}
         </div>
         {holdings.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center
-            text-sm text-slate-500 dark:border-slate-700">
+          <div className="rounded-2xl border border-dashed border-line-3 p-8 text-center
+            text-sm text-muted dark:border-line">
             {strings.stock.emptyHoldings}
           </div>
         ) : (
-          <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+          <Card className="divide-y divide-line-2 dark:divide-line-2">
             {sortedHoldings.map((h) => (
               <HoldingRow
                 key={h.id}

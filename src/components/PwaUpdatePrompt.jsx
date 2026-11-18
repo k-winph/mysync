@@ -16,8 +16,8 @@ export default function PwaUpdatePrompt() {
   return (
     <div
       className="fixed inset-x-0 bottom-20 z-50 mx-auto flex max-w-md items-center gap-3 rounded-2xl
-        border border-slate-200 bg-white px-4 py-3 shadow-lg
-        dark:border-slate-700 dark:bg-slate-900"
+        border border-line bg-surface px-4 py-3 shadow-lg
+        dark:border-line dark:bg-surface"
       style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
       role="status"
     >
@@ -31,7 +31,7 @@ export default function PwaUpdatePrompt() {
       </button>
       <button
         onClick={() => setNeedRefresh(false)}
-        className="rounded-full p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+        className="rounded-full p-1 text-faint hover:bg-surface-2 dark:hover:bg-surface-2"
         aria-label={strings.pwa.dismiss}
       >
         <X size={18} />

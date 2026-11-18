@@ -31,16 +31,16 @@ export default function DayDetailModal({ open, date, onClose }) {
   return (
     <Modal open={open} onClose={onClose} title={date ? formatDate(date) : ''}>
       <div className="grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-slate-50 p-2.5 text-center dark:bg-slate-800/50">
+        <div className="rounded-xl bg-canvas p-2.5 text-center dark:bg-surface-2/50">
           <p className="text-[11px] text-green-600">{strings.balance.income}</p>
           <MoneyText satang={income} currency={currency} className="text-sm font-bold" />
         </div>
-        <div className="rounded-xl bg-slate-50 p-2.5 text-center dark:bg-slate-800/50">
+        <div className="rounded-xl bg-canvas p-2.5 text-center dark:bg-surface-2/50">
           <p className="text-[11px] text-red-600">{strings.balance.expense}</p>
           <MoneyText satang={expense} currency={currency} className="text-sm font-bold" />
         </div>
-        <div className="rounded-xl bg-slate-50 p-2.5 text-center dark:bg-slate-800/50">
-          <p className="text-[11px] text-slate-500">{strings.balance.net}</p>
+        <div className="rounded-xl bg-canvas p-2.5 text-center dark:bg-surface-2/50">
+          <p className="text-[11px] text-muted">{strings.balance.net}</p>
           <MoneyText
             satang={net}
             currency={currency}
@@ -51,9 +51,9 @@ export default function DayDetailModal({ open, date, onClose }) {
 
       <div className="mt-4">
         {items.length === 0 ? (
-          <p className="py-6 text-center text-sm text-slate-400">{strings.spendCal.dayNoTx}</p>
+          <p className="py-6 text-center text-sm text-faint">{strings.spendCal.dayNoTx}</p>
         ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white p-1 dark:border-slate-800 dark:bg-slate-900">
+          <div className="rounded-2xl border border-line bg-surface p-1 dark:border-line-2 dark:bg-surface">
             {items.map((tx) => (
               <TransactionItem key={tx.id} tx={tx} />
             ))}

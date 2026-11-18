@@ -121,7 +121,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Income / Expense toggle */}
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+      <div className="grid grid-cols-2 gap-2 rounded-xl bg-surface-2 p-1 dark:bg-surface-2">
         {['expense', 'income'].map((t) => (
           <button
             key={t}
@@ -138,7 +138,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
                 ? t === 'expense'
                   ? 'bg-red-600 text-white'
                   : 'bg-green-600 text-white'
-                : 'text-slate-600 dark:text-slate-300'
+                : 'text-ink-2 dark:text-ink-2'
             }`}
           >
             {t === 'expense' ? strings.tx.expense : strings.tx.income}
@@ -189,7 +189,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
                   type="button"
                   onClick={() => removeLine(i)}
                   disabled={splitLines.length <= 1}
-                  className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:text-red-600 disabled:opacity-25"
+                  className="shrink-0 rounded-lg p-1.5 text-faint hover:text-red-600 disabled:opacity-25"
                   aria-label={strings.common.delete}
                 >
                   <X size={16} />
@@ -204,8 +204,8 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
           >
             <Plus size={15} /> {strings.tx.splitAddLine}
           </button>
-          <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 text-sm dark:border-slate-800">
-            <span className="text-slate-500">{strings.common.total}</span>
+          <div className="mt-2 flex items-center justify-between border-t border-line-2 pt-2 text-sm dark:border-line-2">
+            <span className="text-muted">{strings.common.total}</span>
             <span className="font-bold">{formatMoney(splitTotal, primary)}</span>
           </div>
         </div>
@@ -239,7 +239,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
                       transition ${
                         active
                           ? 'border-brand-500 bg-brand-50 dark:bg-brand-600/20'
-                          : 'border-slate-200 dark:border-slate-700'
+                          : 'border-line dark:border-line'
                       }`}
                   >
                     <span
@@ -262,7 +262,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
         <div>
           <label className="mb-1 block text-sm font-medium">
             {strings.tx.method}{' '}
-            <span className="font-normal text-slate-400">({strings.common.optional})</span>
+            <span className="font-normal text-faint">({strings.common.optional})</span>
           </label>
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto py-1">
             {methods.map((m) => {
@@ -275,7 +275,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
                   className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition ${
                     active
                       ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-600/20 dark:text-brand-200'
-                      : 'border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-300'
+                      : 'border-line-3 text-ink-2 dark:border-line-strong dark:text-ink-2'
                   }`}
                 >
                   <CategoryIcon name={m.icon} size={15} />
@@ -299,7 +299,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
 
       {/* Make this a recurring income (new income only) */}
       {isNewIncome && (
-        <div className="rounded-xl border border-slate-200 p-3 dark:border-slate-700">
+        <div className="rounded-xl border border-line p-3 dark:border-line">
           <button
             type="button"
             onClick={() => setMakeRecurring((v) => !v)}
@@ -307,7 +307,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
           >
             <span
               className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
-                makeRecurring ? 'border-brand-600 bg-brand-600 text-white' : 'border-slate-300 dark:border-slate-600'
+                makeRecurring ? 'border-brand-600 bg-brand-600 text-white' : 'border-line-3 dark:border-line-strong'
               }`}
             >
               {makeRecurring && <Check size={14} />}
@@ -317,21 +317,21 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
           </button>
           {makeRecurring && (
             <div className="mt-3">
-              <div className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+              <div className="grid grid-cols-3 gap-1 rounded-xl bg-surface-2 p-1 dark:bg-surface-2">
                 {['weekly', 'monthly', 'yearly'].map((f) => (
                   <button
                     key={f}
                     type="button"
                     onClick={() => setRecurringFreq(f)}
                     className={`rounded-lg py-1.5 text-xs font-semibold transition ${
-                      recurringFreq === f ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700' : 'text-slate-500'
+                      recurringFreq === f ? 'bg-surface text-brand-600 shadow-sm dark:bg-surface-3' : 'text-muted'
                     }`}
                   >
                     {strings.debt.freq[f]}
                   </button>
                 ))}
               </div>
-              <p className="mt-1.5 text-xs text-slate-400">{strings.tx.makeRecurringHint}</p>
+              <p className="mt-1.5 text-xs text-faint">{strings.tx.makeRecurringHint}</p>
             </div>
           )}
         </div>
@@ -341,7 +341,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
       <div>
         <label className="mb-1 block text-sm font-medium">
           {strings.tx.tags}{' '}
-          <span className="font-normal text-slate-400">({strings.common.optional})</span>
+          <span className="font-normal text-faint">({strings.common.optional})</span>
         </label>
 
         <div className="no-scrollbar flex items-center gap-2 overflow-x-auto py-1">
@@ -355,7 +355,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
                 className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition ${
                   active
                     ? 'border-transparent text-white'
-                    : 'border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-300'
+                    : 'border-line-3 text-ink-2 dark:border-line-strong dark:text-ink-2'
                 }`}
                 style={
                   active
@@ -386,16 +386,16 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
               placeholder={strings.tx.newTag}
               autoFocus
               list="tx-tag-suggest"
-              className="w-28 shrink-0 rounded-full border border-brand-500 bg-white px-3 py-1.5
-                text-sm outline-none dark:bg-slate-900"
+              className="w-28 shrink-0 rounded-full border border-brand-500 bg-surface px-3 py-1.5
+                text-sm outline-none dark:bg-surface"
             />
           ) : (
             <button
               type="button"
               onClick={() => setAddingTag(true)}
               className="flex shrink-0 items-center gap-1 rounded-full border border-dashed
-                border-slate-400 px-3 py-1.5 text-sm font-medium text-slate-500
-                dark:border-slate-600"
+                border-line-strong px-3 py-1.5 text-sm font-medium text-muted
+                dark:border-line-strong"
             >
               <Plus size={14} /> {strings.common.add}
             </button>
@@ -405,7 +405,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
           </datalist>
         </div>
         {tagList.length === 0 && !addingTag && (
-          <p className="mt-1 text-xs text-slate-400">{strings.tx.noTagsHint}</p>
+          <p className="mt-1 text-xs text-faint">{strings.tx.noTagsHint}</p>
         )}
       </div>
 
@@ -413,7 +413,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
       <div>
         <label className="mb-1 block text-sm font-medium">
           {strings.tx.note}{' '}
-          <span className="font-normal text-slate-400">({strings.common.optional})</span>
+          <span className="font-normal text-faint">({strings.common.optional})</span>
         </label>
         <textarea
           value={note}

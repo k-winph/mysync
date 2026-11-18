@@ -37,7 +37,7 @@ export default function TransactionItem({ tx, onEdit, onDelete }) {
         <div className="flex items-center gap-2">
           <span className="truncate font-medium">{category?.name || 'Uncategorized'}</span>
         </div>
-        <div className="truncate text-xs text-slate-500 dark:text-slate-400">
+        <div className="truncate text-xs text-muted dark:text-faint">
           {formatDateShort(tx.date)}
           {method ? ` · ${method.name}` : ''}
           {tx.note ? ` · ${tx.note}` : ''}
@@ -62,7 +62,7 @@ export default function TransactionItem({ tx, onEdit, onDelete }) {
       <button
         onClick={() => onEdit(tx)}
         className="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left
-          transition hover:bg-slate-100 active:scale-[0.99] dark:hover:bg-slate-800"
+          transition hover:bg-surface-2 active:scale-[0.99] dark:hover:bg-surface-2"
       >
         {inner}
       </button>
@@ -123,7 +123,7 @@ export default function TransactionItem({ tx, onEdit, onDelete }) {
             close()
             onEdit(tx)
           }}
-          className="flex w-[72px] flex-col items-center justify-center gap-0.5 bg-slate-500 text-[11px]
+          className="flex w-[72px] flex-col items-center justify-center gap-0.5 bg-muted text-[11px]
             font-semibold text-white transition active:opacity-80"
           aria-label={strings.common.edit}
         >
@@ -154,8 +154,8 @@ export default function TransactionItem({ tx, onEdit, onDelete }) {
           transition: axis.current === 'h' ? 'none' : 'transform .2s ease',
           touchAction: 'pan-y',
         }}
-        className="relative flex w-full items-center gap-3 rounded-xl bg-white px-2 py-2.5 text-left
-          transition-colors hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800"
+        className="relative flex w-full items-center gap-3 rounded-xl bg-surface px-2 py-2.5 text-left
+          transition-colors hover:bg-surface-2 dark:bg-surface dark:hover:bg-surface-2"
       >
         {inner}
       </button>

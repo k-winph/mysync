@@ -43,22 +43,22 @@ export default function TagSummary({ open, onClose }) {
   return (
     <Modal open={open} onClose={onClose} title={strings.tag.title}>
       {rows.length === 0 ? (
-        <p className="py-6 text-center text-sm text-slate-500">{strings.tag.empty}</p>
+        <p className="py-6 text-center text-sm text-muted">{strings.tag.empty}</p>
       ) : (
         <>
-          <p className="mb-2 text-xs text-slate-400">{strings.tag.tapHint}</p>
+          <p className="mb-2 text-xs text-faint">{strings.tag.tapHint}</p>
           <div className="space-y-2">
             {rows.map((r) => (
               <button
                 key={r.tag}
                 onClick={() => drill(r.tag)}
-                className="block w-full rounded-xl border border-slate-200 p-3 text-left transition hover:border-brand-400 dark:border-slate-700"
+                className="block w-full rounded-xl border border-line p-3 text-left transition hover:border-brand-400 dark:border-line"
               >
                 <div className="mb-1 flex items-center gap-1.5">
                   <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: colorByName[r.tag] || '#64748b' }} />
                   <span className="font-semibold">{r.tag}</span>
-                  <span className="ml-auto text-xs text-slate-400">{strings.tag.count(r.count)}</span>
-                  <ChevronRight size={15} className="text-slate-400" />
+                  <span className="ml-auto text-xs text-faint">{strings.tag.count(r.count)}</span>
+                  <ChevronRight size={15} className="text-faint" />
                 </div>
                 <div className="flex gap-4 text-sm">
                   {r.expense > 0 && (

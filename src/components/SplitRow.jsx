@@ -34,7 +34,7 @@ export default function SplitRow({ group, onEdit }) {
           <div className="flex items-center gap-2">
             <span className="truncate font-medium">{group.note || strings.tx.splitTitle(group.parts.length)}</span>
           </div>
-          <div className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-slate-500 dark:text-slate-400">
+          <div className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-muted dark:text-faint">
             <span className="truncate">{formatDateShort(group.date)} · {names.join(', ')}{method ? ` · ${method.name}` : ''}</span>
             <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-brand-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-brand-600 dark:text-brand-300">
               <Layers size={10} /> {strings.tx.splitBadge(group.parts.length)}
@@ -45,11 +45,11 @@ export default function SplitRow({ group, onEdit }) {
           satang={group.total}
           className={`shrink-0 font-semibold ${isIncome ? 'text-green-600' : 'text-red-600'}`}
         />
-        <ChevronDown size={16} className={`shrink-0 text-slate-400 transition ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={16} className={`shrink-0 text-faint transition ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
-        <div className="mb-1 ml-4 space-y-1 border-l-2 border-slate-100 pl-3 dark:border-slate-800">
+        <div className="mb-1 ml-4 space-y-1 border-l-2 border-line-2 pl-3 dark:border-line-2">
           {group.parts.map((p) => {
             const c = catOf(p.categoryId)
             return (

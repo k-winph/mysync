@@ -22,7 +22,7 @@ function dueStatus(dueDate) {
   return { label: strings.debt.dueInDays(d), tone: 'slate', urgent: false }
 }
 
-const TONE = { red: 'text-red-600', amber: 'text-amber-600', slate: 'text-slate-500' }
+const TONE = { red: 'text-red-600', amber: 'text-amber-600', slate: 'text-muted' }
 
 const SORTS = {
   dueSoon: (a, b) => (a.dueDate < b.dueDate ? -1 : 1),
@@ -41,7 +41,7 @@ function DebtRow({ debt, onEdit, onPay, onUnpay }) {
       <button
         onClick={() => (debt.isPaid ? onUnpay(debt.id) : onPay(debt.id))}
         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition ${
-          debt.isPaid ? 'border-green-600 bg-green-600 text-white' : 'border-slate-300 dark:border-slate-600'
+          debt.isPaid ? 'border-green-600 bg-green-600 text-white' : 'border-line-3 dark:border-line-strong'
         }`}
         aria-label={debt.isPaid ? strings.debt.markUnpaid : strings.debt.markPaid}
       >
@@ -49,7 +49,7 @@ function DebtRow({ debt, onEdit, onPay, onUnpay }) {
       </button>
 
       <button onClick={() => onEdit(debt)} className="min-w-0 flex-1 text-left">
-        <div className={`truncate font-medium ${debt.isPaid ? 'text-slate-400 line-through' : ''}`}>
+        <div className={`truncate font-medium ${debt.isPaid ? 'text-faint line-through' : ''}`}>
           {debt.creditor}
         </div>
         <div className="text-xs">
@@ -62,13 +62,13 @@ function DebtRow({ debt, onEdit, onPay, onUnpay }) {
               {status.label} · {formatDate(debt.dueDate)}
             </span>
           )}
-          {debt.note ? <span className="text-slate-400"> · {debt.note}</span> : ''}
+          {debt.note ? <span className="text-faint"> · {debt.note}</span> : ''}
         </div>
       </button>
 
       <MoneyText
         satang={debt.amount}
-        className={`shrink-0 whitespace-nowrap font-semibold ${debt.isPaid ? 'text-slate-400 line-through' : ''}`}
+        className={`shrink-0 whitespace-nowrap font-semibold ${debt.isPaid ? 'text-faint line-through' : ''}`}
       />
     </div>
   )
@@ -83,21 +83,21 @@ function SummaryCard({ icon: Icon, title, count, totalLabel, total, next, emptyT
       <Card className="space-y-2">
         <div className="flex items-center gap-2">
           <Icon size={18} className="text-brand-600" />
-          <span className="flex-1 text-sm font-semibold text-slate-500">{title}</span>
-          {!empty && <span className="text-xs text-slate-400">{strings.debt.countItems(count)}</span>}
-          <ChevronRight size={16} className="text-slate-400" />
+          <span className="flex-1 text-sm font-semibold text-muted">{title}</span>
+          {!empty && <span className="text-xs text-faint">{strings.debt.countItems(count)}</span>}
+          <ChevronRight size={16} className="text-faint" />
         </div>
         {empty ? (
-          <p className="text-sm text-slate-400">{emptyText}</p>
+          <p className="text-sm text-faint">{emptyText}</p>
         ) : (
           <>
             <div className="flex items-baseline justify-between">
-              <span className="text-xs text-slate-500">{totalLabel}</span>
+              <span className="text-xs text-muted">{totalLabel}</span>
               <MoneyText satang={total} className="text-xl font-bold" />
             </div>
             {next && (
-              <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-sm dark:border-slate-800">
-                <span className="flex items-center gap-1 text-slate-500">
+              <div className="flex items-center justify-between border-t border-line-2 pt-2 text-sm dark:border-line-2">
+                <span className="flex items-center gap-1 text-muted">
                   <CalendarClock size={13} /> {strings.debt.nextDue}: {next.creditor}
                 </span>
                 <span className="font-medium">
@@ -225,13 +225,13 @@ export default function Debt() {
       {/* One-time debts */}
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-500">{strings.debt.kindOnce}</h2>
+          <h2 className="text-sm font-semibold text-muted">{strings.debt.kindOnce}</h2>
           {data.unpaid.length > 1 && (
             <select
               value={sortKey}
               onChange={(e) => setSortKey(e.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm
-                dark:border-slate-700 dark:bg-slate-900"
+              className="rounded-lg border border-line-3 bg-surface px-2 py-1 text-sm
+                dark:border-line dark:bg-surface"
             >
               <option value="dueSoon">{strings.debt.sortDueSoon}</option>
               <option value="dueLate">{strings.debt.sortDueLate}</option>
@@ -242,14 +242,14 @@ export default function Debt() {
         </div>
 
         {data.once.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-center
-            text-sm text-slate-500 dark:border-slate-700">
+          <div className="rounded-2xl border border-dashed border-line-3 p-6 text-center
+            text-sm text-muted dark:border-line">
             {strings.debt.onceEmpty}
           </div>
         ) : (
           <div className="space-y-4">
             {data.unpaid.length > 0 ? (
-              <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+              <Card className="divide-y divide-line-2 dark:divide-line-2">
                 {data.unpaid.map((d) => (
                   <DebtRow key={d.id} debt={d} onEdit={openEdit} onPay={handlePay} onUnpay={unpayDebt} />
                 ))}
@@ -262,10 +262,10 @@ export default function Debt() {
 
             {data.paid.length > 0 && (
               <div>
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-faint">
                   {strings.debt.paid}
                 </h3>
-                <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+                <Card className="divide-y divide-line-2 dark:divide-line-2">
                   {data.paid.map((d) => (
                     <DebtRow key={d.id} debt={d} onEdit={openEdit} onPay={handlePay} onUnpay={unpayDebt} />
                   ))}

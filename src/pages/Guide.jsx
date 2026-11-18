@@ -11,7 +11,7 @@ import PageHeader from '../components/PageHeader'
 function Section({ label, children }) {
   return (
     <div>
-      <h2 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</h2>
+      <h2 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-faint">{label}</h2>
       <Card>{children}</Card>
     </div>
   )
@@ -50,7 +50,7 @@ export default function Guide() {
 
         {e.example && (
           <Section label={g.example}>
-            <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            <p className="whitespace-pre-line text-sm leading-relaxed text-ink-2 dark:text-ink-2">
               {e.example}
             </p>
           </Section>
@@ -58,7 +58,7 @@ export default function Guide() {
 
         {e.notes?.length > 0 && (
           <Section label={g.notes}>
-            <ul className="list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            <ul className="list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-ink-2 dark:text-ink-2">
               {e.notes.map((n, i) => (
                 <li key={i}>{n}</li>
               ))}
@@ -79,7 +79,7 @@ export default function Guide() {
         onBack={() => navigate('/settings')}
       />
 
-      <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+      <Card className="divide-y divide-line-2 dark:divide-line-2">
         {GUIDE_META.map((m) => {
           const e = content[m.id]
           const Icon = m.icon
@@ -94,9 +94,9 @@ export default function Guide() {
               </span>
               <div className="min-w-0 flex-1">
                 <div className="font-medium">{e.title}</div>
-                <div className="truncate text-xs text-slate-500">{e.whatFor}</div>
+                <div className="truncate text-xs text-muted">{e.whatFor}</div>
               </div>
-              <ChevronRight size={16} className="shrink-0 text-slate-400" />
+              <ChevronRight size={16} className="shrink-0 text-faint" />
             </button>
           )
         })}

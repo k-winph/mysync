@@ -24,7 +24,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 function ToggleRow({ icon: Icon, label, checked, onChange }) {
   return (
     <label className="flex cursor-pointer items-center gap-3 py-2">
-      <Icon size={20} className="text-slate-500" />
+      <Icon size={20} className="text-muted" />
       <span className="flex-1 font-medium">{label}</span>
       <button
         type="button"
@@ -32,7 +32,7 @@ function ToggleRow({ icon: Icon, label, checked, onChange }) {
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative h-6 w-11 rounded-full transition ${
-          checked ? 'bg-brand-600' : 'bg-slate-300 dark:bg-slate-700'
+          checked ? 'bg-brand-600' : 'bg-surface-4 dark:bg-surface-3'
         }`}
       >
         <span
@@ -52,7 +52,7 @@ function ActionRow({ icon: Icon, label, onClick }) {
       onClick={onClick}
       className="flex w-full items-center gap-3 py-2.5 text-left hover:opacity-80"
     >
-      <Icon size={20} className="text-slate-500" />
+      <Icon size={20} className="text-muted" />
       <span className="flex-1 font-medium">{label}</span>
     </button>
   )
@@ -253,10 +253,10 @@ export default function Settings() {
 
       {/* Appearance */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">
+        <h2 className="mb-2 text-sm font-semibold text-muted">
           {strings.settings.appearance}
         </h2>
-        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+        <Card className="divide-y divide-line-2 dark:divide-line-2">
           <ToggleRow
             icon={Moon}
             label={strings.settings.darkMode}
@@ -278,7 +278,7 @@ export default function Settings() {
 
           {/* Accent color */}
           <div className="flex items-center gap-3 py-2">
-            <Palette size={20} className="shrink-0 text-slate-500" />
+            <Palette size={20} className="shrink-0 text-muted" />
             <span className="flex-1 font-medium">{strings.settings.accentColor}</span>
             <div className="flex gap-2">
               {ACCENTS.map((a) => {
@@ -288,7 +288,7 @@ export default function Settings() {
                     key={a.id}
                     onClick={() => updateSettings({ accent: a.id })}
                     className={`flex h-7 w-7 items-center justify-center rounded-full transition ${
-                      active ? 'ring-2 ring-offset-2 ring-slate-400 dark:ring-offset-slate-900' : ''
+                      active ? 'ring-2 ring-offset-2 ring-line-strong dark:ring-offset-surface' : ''
                     }`}
                     style={{ backgroundColor: a.swatch }}
                     aria-label={a.label}
@@ -302,9 +302,9 @@ export default function Settings() {
 
           {/* Animation speed */}
           <div className="flex items-center gap-3 py-2">
-            <Zap size={20} className="text-slate-500" />
+            <Zap size={20} className="text-muted" />
             <span className="flex-1 font-medium">{strings.settings.animSpeed}</span>
-            <div className="flex rounded-lg bg-slate-100 p-0.5 dark:bg-slate-800">
+            <div className="flex rounded-lg bg-surface-2 p-0.5 dark:bg-surface-2">
               {[
                 ['off', strings.settings.animOff],
                 ['normal', strings.settings.animNormal],
@@ -315,8 +315,8 @@ export default function Settings() {
                   onClick={() => updateSettings({ animSpeed: val })}
                   className={`rounded-md px-3 py-1 text-sm font-semibold transition ${
                     (settings.animSpeed || 'fast') === val
-                      ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700'
-                      : 'text-slate-500'
+                      ? 'bg-surface text-brand-600 shadow-sm dark:bg-surface-3'
+                      : 'text-muted'
                   }`}
                 >
                   {label}
@@ -327,16 +327,16 @@ export default function Settings() {
 
           {/* Seasonal background effect */}
           <div className="flex items-center gap-3 py-2">
-            <Snowflake size={20} className="shrink-0 text-slate-500" />
+            <Snowflake size={20} className="shrink-0 text-muted" />
             <div className="min-w-0 flex-1">
               <div className="font-medium">{strings.settings.seasonalEffect}</div>
-              <p className="text-xs text-slate-400">{strings.settings.seasonalHint}</p>
+              <p className="text-xs text-faint">{strings.settings.seasonalHint}</p>
             </div>
             <select
               value={settings.seasonalEffect || 'off'}
               onChange={(e) => updateSettings({ seasonalEffect: e.target.value })}
-              className="shrink-0 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm
-                dark:border-slate-700 dark:bg-slate-900"
+              className="shrink-0 rounded-lg border border-line-3 bg-surface px-2 py-1.5 text-sm
+                dark:border-line dark:bg-surface"
             >
               <option value="off">{strings.settings.seasonOff}</option>
               <option value="auto">{strings.settings.seasonAuto}</option>
@@ -350,10 +350,10 @@ export default function Settings() {
 
           {/* Celebration confetti */}
           <div className="flex items-center gap-3 py-2">
-            <PartyPopper size={20} className="shrink-0 text-slate-500" />
+            <PartyPopper size={20} className="shrink-0 text-muted" />
             <div className="min-w-0 flex-1">
               <div className="font-medium">{strings.settings.celebrations}</div>
-              <p className="text-xs text-slate-400">{strings.settings.celebrationsHint}</p>
+              <p className="text-xs text-faint">{strings.settings.celebrationsHint}</p>
             </div>
             <button
               type="button"
@@ -361,7 +361,7 @@ export default function Settings() {
               aria-checked={settings.celebrations !== false}
               onClick={() => updateSettings({ celebrations: settings.celebrations === false })}
               className={`relative h-6 w-11 shrink-0 rounded-full transition ${
-                settings.celebrations !== false ? 'bg-brand-600' : 'bg-slate-300 dark:bg-slate-700'
+                settings.celebrations !== false ? 'bg-brand-600' : 'bg-surface-4 dark:bg-surface-3'
               }`}
             >
               <span
@@ -374,9 +374,9 @@ export default function Settings() {
 
           {/* Language */}
           <div className="flex items-center gap-3 py-2">
-            <Languages size={20} className="text-slate-500" />
+            <Languages size={20} className="text-muted" />
             <span className="flex-1 font-medium">{strings.settings.language}</span>
-            <div className="flex rounded-lg bg-slate-100 p-0.5 dark:bg-slate-800">
+            <div className="flex rounded-lg bg-surface-2 p-0.5 dark:bg-surface-2">
               {[
                 ['en', 'EN'],
                 ['th', 'ไทย'],
@@ -386,8 +386,8 @@ export default function Settings() {
                   onClick={() => updateSettings({ language: val })}
                   className={`rounded-md px-3 py-1 text-sm font-semibold transition ${
                     settings.language === val
-                      ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700'
-                      : 'text-slate-500'
+                      ? 'bg-surface text-brand-600 shadow-sm dark:bg-surface-3'
+                      : 'text-muted'
                   }`}
                 >
                   {label}
@@ -398,13 +398,13 @@ export default function Settings() {
 
           {/* Primary currency */}
           <div className="flex items-center gap-3 py-2">
-            <Coins size={20} className="text-slate-500" />
+            <Coins size={20} className="text-muted" />
             <span className="flex-1 font-medium">{strings.settings.currency}</span>
             <select
               value={settings.primaryCurrency}
               onChange={(e) => updateSettings({ primaryCurrency: e.target.value })}
-              className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm
-                dark:border-slate-700 dark:bg-slate-900"
+              className="rounded-lg border border-line-3 bg-surface px-2 py-1.5 text-sm
+                dark:border-line dark:bg-surface"
             >
               {CURRENCIES.map((c) => (
                 <option key={c} value={c}>
@@ -414,13 +414,13 @@ export default function Settings() {
             </select>
           </div>
         </Card>
-        <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.currencyNote}</p>
+        <p className="mt-1 px-1 text-xs text-muted">{strings.settings.currencyNote}</p>
       </div>
 
       {/* Home screen cards — let people hide features they don't use */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.settings.homeCards}</h2>
-        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.settings.homeCards}</h2>
+        <Card className="divide-y divide-line-2 dark:divide-line-2">
           <ToggleRow
             icon={LineChart}
             label={strings.settings.showInvestments}
@@ -444,8 +444,8 @@ export default function Settings() {
 
       {/* Security & alerts */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.settings.security}</h2>
-        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.settings.security}</h2>
+        <Card className="divide-y divide-line-2 dark:divide-line-2">
           <ToggleRow
             icon={Lock}
             label={strings.settings.appLock}
@@ -462,17 +462,17 @@ export default function Settings() {
           )}
           {settings.pinEnabled && (
             <div className="flex items-center gap-3 py-2">
-              <Clock size={20} className="text-slate-500" />
+              <Clock size={20} className="text-muted" />
               <span className="flex-1 font-medium">{strings.settings.autoLock}</span>
-              <div className="flex rounded-lg bg-slate-100 p-0.5 dark:bg-slate-800">
+              <div className="flex rounded-lg bg-surface-2 p-0.5 dark:bg-surface-2">
                 {[0, 1, 5, 15].map((m) => (
                   <button
                     key={m}
                     onClick={() => updateSettings({ autoLockMinutes: m })}
                     className={`rounded-md px-2.5 py-1 text-xs font-semibold transition ${
                       (settings.autoLockMinutes || 0) === m
-                        ? 'bg-white text-brand-600 shadow-sm dark:bg-slate-700'
-                        : 'text-slate-500'
+                        ? 'bg-surface text-brand-600 shadow-sm dark:bg-surface-3'
+                        : 'text-muted'
                     }`}
                   >
                     {m === 0 ? strings.settings.autoLockOff : `${m} ${strings.settings.minuteShort}`}
@@ -496,32 +496,32 @@ export default function Settings() {
           {settings.dailyReminder && (
             <div className="flex items-center gap-3 py-2.5">
               <CalendarClock size={20} className="text-transparent" />
-              <span className="flex-1 font-medium text-slate-600 dark:text-slate-300">
+              <span className="flex-1 font-medium text-ink-2 dark:text-ink-2">
                 {strings.settings.dailyReminderTime}
               </span>
               <input
                 type="time"
                 value={settings.dailyReminderTime || '21:00'}
                 onChange={(e) => updateSettings({ dailyReminderTime: e.target.value || '21:00' })}
-                className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900"
+                className="rounded-lg border border-line-3 bg-surface px-2 py-1 text-sm dark:border-line dark:bg-surface"
               />
             </div>
           )}
         </Card>
         {settings.pinEnabled && bioAvailable && (
-          <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.biometricHint}</p>
+          <p className="mt-1 px-1 text-xs text-muted">{strings.settings.biometricHint}</p>
         )}
         {bioMsg && <p className="mt-1 px-1 text-xs font-medium text-amber-600">{bioMsg}</p>}
-        <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.debtRemindersHint}</p>
+        <p className="mt-1 px-1 text-xs text-muted">{strings.settings.debtRemindersHint}</p>
         {settings.dailyReminder && (
-          <p className="mt-1 px-1 text-xs text-slate-500">{strings.settings.dailyReminderHint}</p>
+          <p className="mt-1 px-1 text-xs text-muted">{strings.settings.dailyReminderHint}</p>
         )}
         {notifMsg && <p className="mt-1 px-1 text-xs font-medium text-amber-600">{notifMsg}</p>}
       </div>
 
       {/* Categories & tags */}
       <div>
-        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+        <Card className="divide-y divide-line-2 dark:divide-line-2">
           <ActionRow
             icon={Tags}
             label={strings.category.manage}
@@ -542,10 +542,10 @@ export default function Settings() {
 
       {/* Stocks */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.settings.stocks}</h2>
+        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.settings.stocks}</h2>
         <Card className="space-y-3">
           <div className="flex items-center gap-3">
-            <LineChart size={20} className="text-slate-500" />
+            <LineChart size={20} className="text-muted" />
             <span className="flex-1 font-medium">{strings.settings.stockApiKey}</span>
           </div>
           <div className="relative">
@@ -562,14 +562,14 @@ export default function Settings() {
             <button
               type="button"
               onClick={() => setShowKey((v) => !v)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-slate-500
-                hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted
+                hover:bg-surface-2 dark:hover:bg-surface-2"
               aria-label={showKey ? strings.stock.hideKey : strings.stock.showKey}
             >
               {showKey ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          <p className="text-xs text-slate-500">{strings.settings.stockApiKeyHint}</p>
+          <p className="text-xs text-muted">{strings.settings.stockApiKeyHint}</p>
           <a
             href={PROVIDERS[settings.stockProvider || 'finnhub']?.keyUrl || PROVIDERS.finnhub.keyUrl}
             target="_blank"
@@ -581,17 +581,17 @@ export default function Settings() {
           </a>
 
           {/* Which market's calendar day a portfolio snapshot belongs to */}
-          <div className="flex items-center gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
-            <Clock size={20} className="shrink-0 text-slate-500" />
+          <div className="flex items-center gap-3 border-t border-line-2 pt-3 dark:border-line-2">
+            <Clock size={20} className="shrink-0 text-muted" />
             <div className="min-w-0 flex-1">
               <div className="font-medium">{strings.settings.investMarket}</div>
-              <p className="text-xs text-slate-400">{strings.settings.investMarketHint}</p>
+              <p className="text-xs text-faint">{strings.settings.investMarketHint}</p>
             </div>
             <select
               value={settings.investMarket || 'us'}
               onChange={(e) => updateSettings({ investMarket: e.target.value })}
-              className="shrink-0 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm
-                dark:border-slate-700 dark:bg-slate-900"
+              className="shrink-0 rounded-lg border border-line-3 bg-surface px-2 py-1.5 text-sm
+                dark:border-line dark:bg-surface"
             >
               <option value="us">{strings.settings.investMarketUs}</option>
               <option value="local">{strings.settings.investMarketLocal}</option>
@@ -602,7 +602,7 @@ export default function Settings() {
 
       {/* Data */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.settings.data}</h2>
+        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.settings.data}</h2>
         {backupStale && (
           <div className="mb-2 flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-3
             text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
@@ -620,7 +620,7 @@ export default function Settings() {
             </div>
           </div>
         )}
-        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+        <Card className="divide-y divide-line-2 dark:divide-line-2">
           {canShare && (
             <ActionRow
               icon={Share2}
@@ -640,9 +640,9 @@ export default function Settings() {
             onClick={() => fileRef.current?.click()}
           />
         </Card>
-        <p className="mt-2 px-1 text-xs text-slate-500">{strings.settings.importHint}</p>
+        <p className="mt-2 px-1 text-xs text-muted">{strings.settings.importHint}</p>
         {importMsg && <p className="mt-1 px-1 text-xs font-medium text-brand-600">{importMsg}</p>}
-        <p className="mt-1 px-1 text-xs text-slate-400">
+        <p className="mt-1 px-1 text-xs text-faint">
           {strings.settings.lastBackup}:{' '}
           {settings.lastBackupAt ? formatDate(settings.lastBackupAt) : strings.settings.never}
         </p>
@@ -657,14 +657,14 @@ export default function Settings() {
 
       {/* Demo / reset */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.demo.title}</h2>
+        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.demo.title}</h2>
         {settings.demoMode && (
           <div className="mb-2 flex items-center gap-2 rounded-xl bg-amber-100 px-3 py-2 text-sm font-medium text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
             <FlaskConical size={16} className="shrink-0" />
             <span>{strings.demo.banner}</span>
           </div>
         )}
-        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+        <Card className="divide-y divide-line-2 dark:divide-line-2">
           <ActionRow icon={FlaskConical} label={strings.demo.load} onClick={onLoadSample} />
           <button
             onClick={onClearData}
@@ -674,20 +674,20 @@ export default function Settings() {
             <span className="flex-1 font-medium">{strings.demo.clear}</span>
           </button>
         </Card>
-        <p className="mt-2 px-1 text-xs text-slate-500">{strings.demo.loadHint}</p>
+        <p className="mt-2 px-1 text-xs text-muted">{strings.demo.loadHint}</p>
       </div>
 
       {/* Help */}
       <div>
-        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
+        <Card className="divide-y divide-line-2 dark:divide-line-2">
           <ActionRow icon={BookOpen} label={strings.guide.title} onClick={() => navigate('/guide')} />
         </Card>
       </div>
 
       {/* About */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">{strings.settings.about}</h2>
-        <Card className="text-sm text-slate-500">{strings.settings.aboutText}</Card>
+        <h2 className="mb-2 text-sm font-semibold text-muted">{strings.settings.about}</h2>
+        <Card className="text-sm text-muted">{strings.settings.aboutText}</Card>
       </div>
 
       <CategoryManager open={catOpen} onClose={() => setCatOpen(false)} />

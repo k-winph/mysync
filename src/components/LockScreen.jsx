@@ -45,12 +45,12 @@ export default function LockScreen({ onUnlock }) {
   }, [])
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 px-8 dark:bg-slate-950">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-canvas px-8 dark:bg-canvas">
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-600 text-white">
         <Lock size={30} />
       </div>
       <h1 className="mt-4 text-xl font-bold">{strings.appName}</h1>
-      <p className="mt-1 text-sm text-slate-500">{strings.lock.unlockTitle}</p>
+      <p className="mt-1 text-sm text-muted">{strings.lock.unlockTitle}</p>
       <div className="mt-2 h-5 text-sm font-medium text-red-600">{error}</div>
       <div className="w-full max-w-xs">
         <PinPad value={value} onChange={(v) => { setValue(v); setError('') }} />

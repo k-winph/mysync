@@ -121,13 +121,13 @@ export default function Dashboard() {
           />
           <div>
             <h1 className="text-2xl font-bold leading-tight">{strings.appName}</h1>
-            <p className="text-sm text-slate-500">{todayLong()}</p>
+            <p className="text-sm text-muted">{todayLong()}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={() => updateSettings({ hideBalances: !settings.hideBalances })}
-            className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="rounded-full p-2 text-muted hover:bg-surface-2 dark:hover:bg-surface-2"
             aria-label={strings.settings.hideBalances}
           >
             {settings.hideBalances ? <EyeOff size={22} /> : <Eye size={22} />}
@@ -161,7 +161,7 @@ export default function Dashboard() {
               <span className="text-xs font-medium text-emerald-300">{strings.dashboard.income}</span>
               <AnimatedMoney satang={cur.income} trackKey="income" className="ml-auto text-sm font-bold" />
             </div>
-            <div className="mx-3 my-0.5 w-px bg-white/20" />
+            <div className="mx-3 my-0.5 w-px bg-surface/20" />
             <div className="flex flex-1 items-center gap-1">
               <ArrowDownRight size={16} className="shrink-0 text-rose-300" />
               <span className="text-xs font-medium text-rose-300">{strings.dashboard.expense}</span>
@@ -185,7 +185,7 @@ export default function Dashboard() {
 
       {/* Spending by category (donut) */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">
+        <h2 className="mb-2 text-sm font-semibold text-muted">
           {strings.dashboard.spendingByCategory}
         </h2>
         <Card>
@@ -208,7 +208,7 @@ export default function Dashboard() {
       {/* Monthly trend (rolling last 6 months + a one-line insight) */}
       {settings.showTrend !== false && (
         <div>
-          <h2 className="mb-2 text-sm font-semibold text-slate-500">
+          <h2 className="mb-2 text-sm font-semibold text-muted">
             {strings.dashboard.trend}
           </h2>
           <Card>
@@ -223,7 +223,7 @@ export default function Dashboard() {
 
       {/* Recent */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-slate-500">
+        <h2 className="mb-2 text-sm font-semibold text-muted">
           {strings.dashboard.recent}
         </h2>
         {recent.length === 0 ? (
@@ -250,7 +250,7 @@ export default function Dashboard() {
       <button
         onClick={() => navigate('/tax')}
         className="flex w-full items-center justify-center gap-1.5 py-1 text-sm font-medium
-          text-slate-400 hover:text-brand-600"
+          text-faint hover:text-brand-600"
       >
         <Calculator size={15} /> {strings.tax.cta}
       </button>
@@ -300,7 +300,7 @@ function Ring({ segments, size = 68 }) {
       className="relative shrink-0"
       style={{ width: size, height: size, borderRadius: '9999px', background: `conic-gradient(${stops.join(',')})` }}
     >
-      <div className="absolute inset-[26%] rounded-full bg-white dark:bg-slate-900" />
+      <div className="absolute inset-[26%] rounded-full bg-white dark:bg-surface" />
     </div>
   )
 }
@@ -316,9 +316,9 @@ function SavingsCard({ goals, onOpen }) {
           <PiggyBank size={22} className="text-brand-600" />
           <div className="flex-1">
             <div className="font-semibold">{strings.savings.title}</div>
-            <div className="text-sm text-slate-500">{strings.savings.trackSavings}</div>
+            <div className="text-sm text-muted">{strings.savings.trackSavings}</div>
           </div>
-          <ChevronRight size={18} className="text-slate-400" />
+          <ChevronRight size={18} className="text-faint" />
         </Card>
       </button>
     )
@@ -333,14 +333,14 @@ function SavingsCard({ goals, onOpen }) {
       <Card className="space-y-2">
         <div className="flex items-center gap-2">
           <PiggyBank size={18} className="text-brand-600" />
-          <span className="flex-1 text-sm font-semibold text-slate-500">{strings.savings.title}</span>
-          <ChevronRight size={16} className="text-slate-400" />
+          <span className="flex-1 text-sm font-semibold text-muted">{strings.savings.title}</span>
+          <ChevronRight size={16} className="text-faint" />
         </div>
         <div className="flex items-baseline justify-between">
           <MoneyText satang={totalSaved} className="text-xl font-bold" />
           <span className="text-sm font-bold tabular-nums text-brand-600">{pct.toFixed(0)}%</span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-surface-3 dark:bg-surface-2">
           <div
             className={`h-full rounded-full transition-all duration-500 ${pct >= 100 ? 'bg-emerald-500' : 'bg-brand-600'}`}
             style={{ width: `${Math.min(100, pct)}%` }}
@@ -404,7 +404,7 @@ function InvestmentsCard({ portfolios, holdings, onOpen }) {
 
   return (
     <button onClick={onOpen} className="block w-full text-left">
-      <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800">
+      <div className="overflow-hidden rounded-2xl border border-line shadow-sm dark:border-line-2">
         {/* Top: value + today's change */}
         <div className="bg-gradient-to-br from-brand-600 to-brand-700 p-4 text-white">
           <div className="mb-1 flex items-center justify-between">
@@ -421,7 +421,7 @@ function InvestmentsCard({ portfolios, holdings, onOpen }) {
 
         {/* Bottom: donut on the far left, portfolio shares flowing right (scrolls) */}
         {shares.length > 0 && (
-          <div className="flex items-center gap-3 bg-white px-4 py-2.5 dark:bg-slate-900">
+          <div className="flex items-center gap-3 bg-surface px-4 py-2.5 dark:bg-surface">
             <Ring segments={segments} size={40} />
             <div className="no-scrollbar flex flex-1 items-center gap-6 overflow-x-auto">
               {shares.map((s) => (
@@ -432,7 +432,7 @@ function InvestmentsCard({ portfolios, holdings, onOpen }) {
                       {total > 0 ? ((s.value / total) * 100).toFixed(1) : '0'}%
                     </span>
                   </div>
-                  <div className="mt-0.5 max-w-[140px] truncate text-[11px] text-slate-500">{s.name}</div>
+                  <div className="mt-0.5 max-w-[140px] truncate text-[11px] text-muted">{s.name}</div>
                 </div>
               ))}
             </div>

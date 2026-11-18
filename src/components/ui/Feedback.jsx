@@ -69,7 +69,7 @@ export function FeedbackProvider({ children }) {
             <div
               key={t.id}
               className="toast-in pointer-events-auto flex w-full max-w-sm items-center gap-2 rounded-xl
-                bg-slate-900 px-4 py-3 text-sm text-white shadow-lg dark:bg-slate-700"
+                bg-ink px-4 py-3 text-sm text-white shadow-lg dark:bg-surface-3"
             >
               {TOAST_ICON[t.type]}
               <span className="flex-1">{t.message}</span>
@@ -92,10 +92,10 @@ export function FeedbackProvider({ children }) {
         {confirmState && (
           <div className="fixed inset-0 z-[70] flex items-center justify-center p-6" role="dialog" aria-modal="true">
             <div className="fade-in absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => closeConfirm(false)} />
-            <div className="dialog-in relative z-10 w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
+            <div className="dialog-in relative z-10 w-full max-w-sm rounded-2xl bg-surface p-5 shadow-xl dark:bg-surface">
               {confirmState.title && <h2 className="text-lg font-bold">{confirmState.title}</h2>}
               {confirmState.message && (
-                <p className="mt-1 text-sm text-slate-500">{confirmState.message}</p>
+                <p className="mt-1 text-sm text-muted">{confirmState.message}</p>
               )}
               <div className="mt-4 flex gap-2">
                 <Button variant="secondary" className="flex-1" onClick={() => closeConfirm(false)}>

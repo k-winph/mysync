@@ -88,7 +88,7 @@ export default function GoalModal({ open, editing, onClose }) {
         <div>
           <label className="mb-1 block text-sm font-medium">
             {strings.savings.deadline}{' '}
-            <span className="font-normal text-slate-400">({strings.common.optional})</span>
+            <span className="font-normal text-faint">({strings.common.optional})</span>
           </label>
           <DateInput
             value={deadline} onChange={(e) => setDeadline(e.target.value)}
