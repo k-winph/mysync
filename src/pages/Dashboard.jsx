@@ -155,14 +155,17 @@ export default function Dashboard() {
             {strings.dashboard.title}
           </p>
           {/* Income | Expense — split by a short floating vertical line */}
+          {/* flex-wrap + min-w-0 lets a wide amount (e.g. the Pixel theme's font)
+              drop below its label instead of spilling past the card edge; with
+              the default font everything still fits on one line unchanged. */}
           <div className="flex items-stretch">
-            <div className="flex flex-1 items-center gap-1">
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1">
               <ArrowUpRight size={16} className="shrink-0 text-emerald-300" />
               <span className="text-xs font-medium text-emerald-300">{strings.dashboard.income}</span>
               <AnimatedMoney satang={cur.income} trackKey="income" className="ml-auto text-sm font-bold" />
             </div>
             <div className="mx-3 my-0.5 w-px bg-surface/20" />
-            <div className="flex flex-1 items-center gap-1">
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1">
               <ArrowDownRight size={16} className="shrink-0 text-rose-300" />
               <span className="text-xs font-medium text-rose-300">{strings.dashboard.expense}</span>
               <AnimatedMoney satang={cur.expense} trackKey="expense" className="ml-auto text-sm font-bold" />

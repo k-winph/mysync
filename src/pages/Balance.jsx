@@ -145,7 +145,9 @@ export default function Balance() {
                   <div className="h-full bg-rose-500" style={{ width: `${100 - incPct}%` }} />
                 </div>
 
-                <div className="flex items-center justify-between text-sm">
+                {/* flex-wrap so a wide amount (Pixel theme font) can drop to the
+                    next line instead of overflowing; unchanged with the default font. */}
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm">
                   <span className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-emerald-500" />
                     <span className="text-muted">{strings.balance.income}</span>

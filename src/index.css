@@ -230,6 +230,11 @@
 [data-theme='pixel'] [class*='rounded'] {
   border-radius: 0;
 }
+/* Component classes that bake in their radius via @apply (so the element's class
+   attribute has no literal "rounded-*" for the selector above to match). */
+[data-theme='pixel'] .input-base {
+  border-radius: 0;
+}
 [data-theme='pixel'] .border {
   border-width: 2px;
 }
