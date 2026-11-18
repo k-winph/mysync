@@ -220,3 +220,22 @@
 @media (prefers-reduced-motion: reduce) {
   .toast-in, .dialog-in, .fade-in, .page-in, .sheet-in { animation: none; }
 }
+
+/* ===================================================================== */
+/* Pixel theme — SHAPE (C2): square corners, chunky borders, hard shadows */
+/* Scoped to [data-theme='pixel'] so every other theme is untouched. The  */
+/* [class*='…'] selectors (specificity 0,2,0) override Tailwind's single- */
+/* class utilities without !important. Default theme ships zero of these. */
+/* ===================================================================== */
+[data-theme='pixel'] [class*='rounded'] {
+  border-radius: 0;
+}
+[data-theme='pixel'] .border {
+  border-width: 2px;
+}
+[data-theme='pixel'] .border-2 {
+  border-width: 3px;
+}
+[data-theme='pixel'] [class*='shadow'] {
+  box-shadow: 3px 3px 0 rgb(var(--c-line));
+}
