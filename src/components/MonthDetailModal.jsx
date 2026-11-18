@@ -112,6 +112,7 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
   const accent = useStore((s) => s.settings.accent)
   const language = useStore((s) => s.settings.language)
   const dark = useStore((s) => s.settings.theme) === 'dark'
+  const uiTheme = useStore((s) => s.settings.uiTheme)
   const { convert } = useFx(holdings.map((h) => h.currency), currency)
 
   // Current portfolio snapshot (value + gain) in the primary currency.
@@ -201,6 +202,7 @@ export default function MonthDetailModal({ open, onClose, year, month }) {
       currency,
       accent,
       dark,
+      uiTheme,
       labels: {
         income: strings.balance.income,
         expense: strings.balance.expense,

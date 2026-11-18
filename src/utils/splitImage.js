@@ -3,6 +3,7 @@
 // theme-aware background (accent + light/dark), floating rounded card.
 import { formatMoney } from './money'
 import { ACCENTS, DEFAULT_ACCENT } from '../constants/accents'
+import { shareTheme, ensureShareFont } from './shareTheme'
 
 function hexToRgb(hex) {
   const h = hex.replace('#', '')
@@ -29,13 +30,19 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath()
 }
 
-const FONT = '-apple-system, system-ui, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif'
-
 // opts: { title, total, subtotal, charges:[{label,amount}], rows:[{name,color,initial,amount}],
-//         currency, accent, dark, labels:{ total, perPerson, footer } }
+//         currency, accent, dark, uiTheme, labels:{ total, perPerson, footer } }
 export async function buildSplitImage(opts) {
-  const { title, total, subtotal, charges = [], rows = [], currency, accent, dark, labels } = opts
+  const { title, total, subtotal, charges = [], rows = [], currency, accent, dark, uiTheme = 'default', labels } = opts
   const accentHex = (ACCENTS.find((a) => a.id === accent) || ACCENTS.find((a) => a.id === DEFAULT_ACCENT)).swatch
+
+  // UI-theme palette + font (default = legacy look; pixel = cream/plum + Silkscreen).
+  const pal = shareTheme(uiTheme, dark)
+  await ensureShareFont(pal)
+  const FONT = pal.font
+  const { ink, muted, cardBg } = pal
+  const chargeBg = pal.panelBg
+  const rr = (r) => (pal.pixel ? 0 : r)
 
   const W = 1080
   const H = 1920
@@ -44,14 +51,25 @@ export async function buildSplitImage(opts) {
   canvas.height = H
   const ctx = canvas.getContext('2d')
 
-  const ink = dark ? '#f1f5f9' : '#0f172a'
-  const muted = dark ? '#94a3b8' : '#64748b'
-  const cardBg = dark ? '#161a23' : '#ffffff'
-  const chargeBg = dark ? 'rgba(255,255,255,0.05)' : '#f6f7fb'
+  // Largest font size <= base that fits maxW (Pixel theme only — Silkscreen is
+  // wide, so long amounts shrink to stay inside the card). Identity for others.
+  const fitPx = (text, maxW, weight, base) => {
+    if (!pal.pixel) return base
+    let px = base
+    ctx.font = `${weight} ${px}px ${FONT}`
+    while (px > 22 && ctx.measureText(text).width > maxW) {
+      px -= 2
+      ctx.font = `${weight} ${px}px ${FONT}`
+    }
+    return px
+  }
 
-  // Background
+  // Background (accent gradient for default, theme paper for pixel)
   const bg = ctx.createLinearGradient(0, 0, 0, H)
-  if (dark) {
+  if (pal.pixel) {
+    bg.addColorStop(0, pal.bg0)
+    bg.addColorStop(1, pal.bg1)
+  } else if (dark) {
     bg.addColorStop(0, mix(accentHex, '#000000', 0.45))
     bg.addColorStop(1, '#06070c')
   } else {
@@ -98,7 +116,7 @@ export async function buildSplitImage(opts) {
       ctx.font = `600 26px ${FONT}`
       ctx.fillText(labels.total, left, y + 26)
       ctx.fillStyle = accentHex
-      ctx.font = `800 86px ${FONT}`
+      ctx.font = `800 ${fitPx(formatMoney(total, currency), innerW, 800, 86)}px ${FONT}`
       ctx.fillText(formatMoney(total, currency), left, y + 110)
     }
     y += 150
@@ -109,7 +127,7 @@ export async function buildSplitImage(opts) {
       const blockH = 28 + lineH * (charges.length + 1) + 20
       if (d) {
         ctx.fillStyle = chargeBg
-        roundRect(ctx, left, y, innerW, blockH, 20)
+        roundRect(ctx, left, y, innerW, blockH, rr(20))
         ctx.fill()
         let ly = y + 44
         const row = (label, amount, strong) => {
@@ -159,10 +177,10 @@ export async function buildSplitImage(opts) {
         // amount
         ctx.textAlign = 'right'
         ctx.fillStyle = ink
-        ctx.font = `800 36px ${FONT}`
+        ctx.font = `800 ${fitPx(formatMoney(r.amount, currency), innerW * 0.45, 800, 36)}px ${FONT}`
         ctx.fillText(formatMoney(r.amount, currency), left + innerW, y + 40)
-        // divider
-        ctx.strokeStyle = dark ? 'rgba(255,255,255,0.07)' : '#eef1f5'
+        // divider (keep the original default-theme color exactly; pixel overrides)
+        ctx.strokeStyle = pal.pixel ? pal.divider : (dark ? 'rgba(255,255,255,0.07)' : '#eef1f5')
         ctx.lineWidth = 2
         ctx.beginPath()
         ctx.moveTo(left, y + rowH - 10)
@@ -190,12 +208,25 @@ export async function buildSplitImage(opts) {
   const cardY = Math.max(M, Math.round((H - cardH) / 2))
 
   ctx.save()
-  ctx.shadowColor = 'rgba(0,0,0,0.25)'
-  ctx.shadowBlur = 40
-  ctx.shadowOffsetY = 16
-  ctx.fillStyle = cardBg
-  roundRect(ctx, M, cardY, cardW, cardH, 48)
-  ctx.fill()
+  if (pal.pixel) {
+    ctx.fillStyle = pal.border
+    roundRect(ctx, M + 12, cardY + 12, cardW, cardH, 0) // hard shadow block
+    ctx.fill()
+    ctx.fillStyle = cardBg
+    roundRect(ctx, M, cardY, cardW, cardH, 0)
+    ctx.fill()
+    ctx.lineWidth = 6
+    ctx.strokeStyle = pal.border
+    roundRect(ctx, M, cardY, cardW, cardH, 0)
+    ctx.stroke()
+  } else {
+    ctx.shadowColor = 'rgba(0,0,0,0.25)'
+    ctx.shadowBlur = 40
+    ctx.shadowOffsetY = 16
+    ctx.fillStyle = cardBg
+    roundRect(ctx, M, cardY, cardW, cardH, 48)
+    ctx.fill()
+  }
   ctx.restore()
 
   render(cardY + PAD, true)

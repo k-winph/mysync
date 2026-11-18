@@ -63,6 +63,7 @@ export default function SplitBill() {
   const primary = useStore((s) => s.settings.primaryCurrency)
   const accent = useStore((s) => s.settings.accent)
   const dark = useStore((s) => s.settings.theme) === 'dark'
+  const uiTheme = useStore((s) => s.settings.uiTheme)
   const confirm = useConfirm()
   const toast = useToast()
 
@@ -156,6 +157,7 @@ export default function SplitBill() {
       currency: primary,
       accent,
       dark,
+      uiTheme,
       labels: {
         total: strings.split.total,
         subtotal: strings.split.subtotal,
