@@ -223,10 +223,11 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
             />
           </div>
 
-          {/* Category grid */}
+          {/* Category — horizontal scroll row (pinned first, via `options`);
+             shows ~4 at a time and scrolls to the rest, like the tag row. */}
           <div>
             <label className="mb-1 block text-sm font-medium">{strings.tx.category}</label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="no-scrollbar flex items-stretch gap-2 overflow-x-auto py-1">
               {options.map((c) => {
                 const active = c.id === categoryId
                 return (
@@ -234,7 +235,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
                     key={c.id}
                     type="button"
                     onClick={() => setCategoryId(c.id)}
-                    className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-[11px]
+                    className={`flex w-20 shrink-0 flex-col items-center gap-1 rounded-xl border p-2 text-[11px]
                       transition ${
                         active
                           ? 'border-brand-500 bg-brand-50 dark:bg-brand-600/20'
@@ -247,7 +248,7 @@ export default function TransactionForm({ initial, onSubmit, onCancel }) {
                     >
                       <CategoryIcon name={c.icon} size={16} />
                     </span>
-                    <span className="truncate w-full text-center">{c.name}</span>
+                    <span className="w-full truncate text-center">{c.name}</span>
                   </button>
                 )
               })}
